@@ -3,6 +3,7 @@ package org.example;
 import java.util.*;
 import java.io.File;
 import java.util.Date;
+import java.io.FileWriter;
 import java.util.List;
 import java.io.IOException;
 import java.io.InputStream;
@@ -182,18 +183,51 @@ class Hotel {
         }
     }
 
-    public String logState() {
+    public String logStated() {
+        List<Map<String, Object>> roomsState = new ArrayList<>();
+        // Formatter for the date output.
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+        for (Room room : rooms) {
+            Map<String, Object> roomMap = new LinkedHashMap<>();
+            roomMap.put("room_id", room.getRoomId());
+            roomMap.put("capacity", room.getCapacity());
+
+            // Gather bookings for this room.
+            List<Map<String, Object>> roomBookings = new ArrayList<>();
+            for (Booking booking : bookings) {
+                if (booking.getRoomId() == room.getRoomId()) {
+                    Map<String, Object> bookingMap = new LinkedHashMap<>();
+                    bookingMap.put("id", booking.getBookingId());
+
+                    // Add customer details for this booking.
+                    Customer customer = findCustomerById(booking.getCustomerId());
+                    if (customer != null) {
+                        Map<String, Object> customerMap = new LinkedHashMap<>();
+                        customerMap.put("ssn", customer.getSsn());
+                        customerMap.put("name", customer.getName());
+                        customerMap.put("phone", customer.getPhone());
+                        customerMap.put("age", customer.getAge());
+                        bookingMap.put("customer", customerMap);
+                    } else {
+                        bookingMap.put("customer", null);
+                    }
+                    bookingMap.put("check_in", sdf.format(booking.getCheckIn()));
+                    bookingMap.put("check_out", sdf.format(booking.getCheckOut()));
+
+                    roomBookings.add(bookingMap);
+                }
+            }
+            roomMap.put("bookings", roomBookings);
+            roomsState.add(roomMap);
+        }
+
         try {
             ObjectMapper objectMapper = new ObjectMapper();
-            String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
-            return "0";
-
-            //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-
+            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(roomsState);
         } catch (IOException e) {
             e.printStackTrace();
-            return "{}"; // Return empty JSON if an error occurs
+            return "{}";
         }
     }
 }
@@ -210,7 +244,6 @@ public class Main {
                 throw new RuntimeException("File not found: data.json");
             }
 
-            // Parse JSON
             ObjectMapper objectMapper = new ObjectMapper();
             Hotel hotel = objectMapper.readValue(inputStream, Hotel.class);
 
@@ -226,6 +259,13 @@ public class Main {
             }
 
             //state.json
+            String stateJson = hotel.logStated();
+            File stateFile = new File("state.json");
+            try (FileWriter writer = new FileWriter(stateFile)) {
+                writer.write(stateJson);
+            }
+            System.out.println("Hotel state written to state.json");
+
 
 
         } catch (Exception e) {
