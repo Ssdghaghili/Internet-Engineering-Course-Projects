@@ -72,7 +72,9 @@ class HotelTest {
     @Test
     void testStayDurationCalculation() throws ParseException {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        Booking booking = new Booking(1, 1, 101, sdf.parse("2025-02-14 14:00:00"), sdf.parse("2025-02-16 15:00:00"));
-        assertEquals(3, booking.getStayDurationInDays(), "Stay duration should be 3 days");
+        hotel.addBooking(new Booking(1, 1, 101, sdf.parse("2025-02-14 14:00:00"), sdf.parse("2025-02-16 15:00:00")));
+        //Booking booking = new Booking(1, 1, 101, sdf.parse("2025-02-14 14:00:00"), sdf.parse("2025-02-16 15:00:00"));
+        assertEquals(3, hotel.getBookings().get(0).getStayDurationInDays(), "Stay duration should be 3 days");
+        //assertEquals(3, booking.getStayDurationInDays(), "Stay duration should be 3 days");
     }
 }

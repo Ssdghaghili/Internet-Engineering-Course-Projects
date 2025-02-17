@@ -48,11 +48,12 @@ class Room {
         this.roomCapacity = roomCapacity;
     }
 
-    public int getId() { return roomId; }
+    public int getRoomId() { return roomId; }
     public int getCapacity() { return roomCapacity; }
 }
 
 class Booking {
+    @JsonProperty("id")
     private int id;
     @JsonProperty("customer_id")
     private int customerId;
@@ -75,7 +76,7 @@ class Booking {
         this.check_out = check_out;
     }
 
-    public int getId() { return id; }
+    public int getBookingId() { return id; }
     public int getCustomerId() { return customerId; }
     public int getRoomId() { return roomId; }
     public Date getCheckIn() { return check_in; }
@@ -105,7 +106,7 @@ class Hotel {
 
     private Room findRoomById(int id) {
         return rooms.stream()
-                .filter(room -> room.getId() == id)
+                .filter(room -> room.getRoomId() == id)
                 .findFirst()
                 .orElse(null);
     }
@@ -119,17 +120,17 @@ class Hotel {
     }
 
     public boolean addRoom(Room room) {
-        boolean exists = rooms.stream().anyMatch(r -> r.getId() == room.getId());
+        boolean exists = rooms.stream().anyMatch(r -> r.getRoomId() == room.getRoomId());
         if (exists) {
-            throw new IllegalArgumentException("Room with ID " + room.getId() + " already exists.");
+            throw new IllegalArgumentException("Room with ID " + room.getRoomId() + " already exists.");
         }
         return rooms.add(room);
     }
 
     public boolean addBooking(Booking booking) {
-        boolean exists = bookings.stream().anyMatch(b -> b.getId() == booking.getId());
+        boolean exists = bookings.stream().anyMatch(b -> b.getBookingId() == booking.getBookingId());
         if (exists) {
-            throw new IllegalArgumentException("Booking with ID " + booking.getId() + " already exists.");
+            throw new IllegalArgumentException("Booking with ID " + booking.getBookingId() + " already exists.");
         }
         return bookings.add(booking);
     }
@@ -169,14 +170,14 @@ class Hotel {
         }
 
         for (Room room : rooms) {
-            if (!roomIds.add(room.getId())) {
-                throw new IllegalArgumentException("Duplicate Room ID found: " + room.getId());
+            if (!roomIds.add(room.getRoomId())) {
+                throw new IllegalArgumentException("Duplicate Room ID found: " + room.getRoomId());
             }
         }
 
         for (Booking booking : bookings) {
-            if (!bookingIds.add(booking.getId())) {
-                throw new IllegalArgumentException("Duplicate Booking ID found: " + booking.getId());
+            if (!bookingIds.add(booking.getBookingId())) {
+                throw new IllegalArgumentException("Duplicate Booking ID found: " + booking.getBookingId());
             }
         }
     }
@@ -221,7 +222,7 @@ public class Main {
             List<Room> rooms = hotel.getRooms(minCapacity);
             System.out.println("Number of rooms with min capacity " +minCapacity + ": " + rooms.size());
             for (Room room : rooms) {
-                System.out.println("Room Number(Id): " + room.getId());
+                System.out.println("Room Number(Id): " + room.getRoomId());
             }
 
             //state.json
