@@ -1,18 +1,20 @@
 package org.example;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.core.type.TypeReference;
-import java.io.InputStream;
-import java.util.List;
 import java.util.*;
 import java.io.File;
+import java.util.Date;
+import java.util.List;
 import java.io.IOException;
+import java.io.InputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.stream.Collectors;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-
+//--------------------------------------------------------------------------------------------
 
 class Customer {
     private int ssn;
@@ -63,6 +65,9 @@ class Booking {
 
     public Booking() {}
     public Booking(int id, int customerId, int roomId, Date check_in, Date check_out) {
+        if (check_out.before(check_in)) {
+            throw new IllegalArgumentException("Check-out date cannot be before check-in date");
+        }
         this.id = id;
         this.customerId = customerId;
         this.roomId = roomId;
@@ -76,8 +81,9 @@ class Booking {
     public Date getCheckIn() { return check_in; }
     public Date getCheckOut() { return check_out; }
 
-    public long getStayDurationInDays() {
-        return (check_out.getTime() - check_in.getTime()) / (1000 * 60 * 60 * 24);
+    public int getStayDurationInDays() {
+       double exactTime = (double) (check_out.getTime() - check_in.getTime()) / (1000 * 60 * 60 * 24);
+       return (int) Math.ceil(exactTime);
     }
 }
 
@@ -89,19 +95,6 @@ class Hotel {
     public List<Customer> getCustomers() { return customers; }
     public List<Room> getRooms() { return rooms; }
     public List<Booking> getBookings() { return bookings; }
-
-    public List<Room> getRooms(int minCapacity) {
-        return rooms.stream()
-                .filter(room -> room.getCapacity() >= minCapacity)
-                .toList();
-    }
-
-    public String getOldestCustomerName() {
-        return customers.stream()
-                .max(Comparator.comparingInt(Customer::getAge))
-                .map(Customer::getName)
-                .orElse("No customers available");
-    }
 
     private Customer findCustomerById(int id) {
         return customers.stream()
@@ -117,6 +110,19 @@ class Hotel {
                 .orElse(null);
     }
 
+    public List<Room> getRooms(int minCapacity) {
+        return rooms.stream()
+                .filter(room -> room.getCapacity() >= minCapacity)
+                .toList();
+    }
+
+    public String getOldestCustomerName() {
+        return customers.stream()
+                .max(Comparator.comparingInt(Customer::getAge))
+                .map(Customer::getName)
+                .orElse("No customers available");
+    }
+
     public List<String> getCustomerPhonesByRoomNumber(int roomNumber) {
         return bookings.stream()
                 .filter(booking -> booking.getRoomId() == roomNumber)
@@ -126,13 +132,29 @@ class Hotel {
                 })
                 .toList();
     }
+
+    public String logState() {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+
+            // Save JSON to file
+            File file = new File("state.json");
+            objectMapper.writeValue(file, this);
+
+            return jsonString;
+        } catch (IOException e) {
+            e.printStackTrace();
+            return "{}"; // Return empty JSON if an error occurs
+        }
+    }
 }
 
 // Example Usage
 public class Main {
     public static void main(String[] args) {
         try {
-            int minCapacity = 3;
+            int minCapacity = 2;
             // Load JSON file from resources
             InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("data.json");
 
@@ -144,16 +166,20 @@ public class Main {
             ObjectMapper objectMapper = new ObjectMapper();
             Hotel hotel = objectMapper.readValue(inputStream, Hotel.class);
 
-            // Example Outputs
+            // Outputs
             System.out.println("Oldest Customer: " + hotel.getOldestCustomerName());
-            //System.out.println("Rooms with min capacity 3: " + hotel.getRooms(3).size());
+
             List<Room> rooms = hotel.getRooms(minCapacity);
             System.out.println("Number of rooms with min capacity " +minCapacity + ": " + rooms.size());
-
             for (Room room : rooms) {
                 System.out.println("Room Number(Id): " + room.getId());
             }
+
             System.out.println("Customer phones for room 102: " + hotel.getCustomerPhonesByRoomNumber(102));
+
+            //state.json
+            String jsonOutput = hotel.logState();
+            System.out.println("Hotel state saved to state.json.");
 
         } catch (Exception e) {
             e.printStackTrace();
