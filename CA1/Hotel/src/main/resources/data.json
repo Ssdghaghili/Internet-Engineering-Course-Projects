@@ -1,0 +1,59 @@
+{
+    "customers": [
+      {
+        "ssn": 1,
+        "name": "Alice",
+        "phone": "123456789",
+        "age": 30
+      },
+      {
+        "ssn": 2,
+        "name": "Bob",
+        "phone": "987654321",
+        "age": 45
+      },
+      {
+        "ssn": 3,
+        "name": "Charlie",
+        "phone": "555666777",
+        "age": 25
+      }
+    ],
+    "rooms": [
+      {
+        "id": 101,
+        "capacity": 2
+      },
+      {
+        "id": 102,
+        "capacity": 4
+      },
+      {
+        "id": 103,
+        "capacity": 1
+      }
+    ],
+    "bookings": [
+      {
+        "id": 1,
+        "customer_id": 1,
+        "room_id": 101,
+        "check_in": "2025-02-14 14:00:00",
+        "check_out": "2025-02-16 12:00:00"
+      },
+      {
+        "id": 2,
+        "customer_id": 2,
+        "room_id": 102,
+        "check_in": "2025-02-15 15:00:00",
+        "check_out": "2025-02-18 11:00:00"
+      },
+      {
+        "id": 3,
+        "customer_id": 3,
+        "room_id": 101,
+        "check_in": "2025-02-17 16:00:00",
+        "check_out": "2025-02-20 10:00:00"
+      }
+    ]
+  }
