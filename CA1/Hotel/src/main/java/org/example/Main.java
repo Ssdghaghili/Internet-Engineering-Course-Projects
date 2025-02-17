@@ -110,6 +110,30 @@ class Hotel {
                 .orElse(null);
     }
 
+    public boolean addCustomer(Customer customer) {
+        boolean exists = customers.stream().anyMatch(c -> c.getSsn() == customer.getSsn());
+        if (exists) {
+            throw new IllegalArgumentException("Customer with SSN " + customer.getSsn() + " already exists.");
+        }
+        return customers.add(customer);
+    }
+
+    public boolean addRoom(Room room) {
+        boolean exists = rooms.stream().anyMatch(r -> r.getId() == room.getId());
+        if (exists) {
+            throw new IllegalArgumentException("Room with ID " + room.getId() + " already exists.");
+        }
+        return rooms.add(room);
+    }
+
+    public boolean addBooking(Booking booking) {
+        boolean exists = bookings.stream().anyMatch(b -> b.getId() == booking.getId());
+        if (exists) {
+            throw new IllegalArgumentException("Booking with ID " + booking.getId() + " already exists.");
+        }
+        return bookings.add(booking);
+    }
+
     public List<Room> getRooms(int minCapacity) {
         return rooms.stream()
                 .filter(room -> room.getCapacity() >= minCapacity)
@@ -133,16 +157,39 @@ class Hotel {
                 .toList();
     }
 
+    public void validateData() {
+        Set<Integer> customerSSNs = new HashSet<>();
+        Set<Integer> roomIds = new HashSet<>();
+        Set<Integer> bookingIds = new HashSet<>();
+
+        for (Customer customer : customers) {
+            if (!customerSSNs.add(customer.getSsn())) {
+                throw new IllegalArgumentException("Duplicate SSN found: " + customer.getSsn());
+            }
+        }
+
+        for (Room room : rooms) {
+            if (!roomIds.add(room.getId())) {
+                throw new IllegalArgumentException("Duplicate Room ID found: " + room.getId());
+            }
+        }
+
+        for (Booking booking : bookings) {
+            if (!bookingIds.add(booking.getId())) {
+                throw new IllegalArgumentException("Duplicate Booking ID found: " + booking.getId());
+            }
+        }
+    }
+
     public String logState() {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             String jsonString = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(this);
+            return "0";
 
-            // Save JSON to file
-            File file = new File("state.json");
-            objectMapper.writeValue(file, this);
+            //%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-            return jsonString;
+
         } catch (IOException e) {
             e.printStackTrace();
             return "{}"; // Return empty JSON if an error occurs
@@ -166,20 +213,19 @@ public class Main {
             ObjectMapper objectMapper = new ObjectMapper();
             Hotel hotel = objectMapper.readValue(inputStream, Hotel.class);
 
+            hotel.validateData(); // check for duplicates in Json file
+
             // Outputs
             System.out.println("Oldest Customer: " + hotel.getOldestCustomerName());
-
+            System.out.println("Customer phones for room 102: " + hotel.getCustomerPhonesByRoomNumber(102));
             List<Room> rooms = hotel.getRooms(minCapacity);
             System.out.println("Number of rooms with min capacity " +minCapacity + ": " + rooms.size());
             for (Room room : rooms) {
                 System.out.println("Room Number(Id): " + room.getId());
             }
 
-            System.out.println("Customer phones for room 102: " + hotel.getCustomerPhonesByRoomNumber(102));
-
             //state.json
-            String jsonOutput = hotel.logState();
-            System.out.println("Hotel state saved to state.json.");
+
 
         } catch (Exception e) {
             e.printStackTrace();
