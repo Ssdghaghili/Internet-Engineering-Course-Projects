@@ -3,8 +3,8 @@ package org.example;
 import java.util.*;
 import java.io.File;
 import java.util.Date;
-import java.io.FileWriter;
 import java.util.List;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.ParseException;
@@ -232,12 +232,11 @@ class Hotel {
     }
 }
 
-// Example Usage
 public class Main {
     public static void main(String[] args) {
         try {
             int minCapacity = 2;
-            // Load JSON file from resources
+            // Load Json file
             InputStream inputStream = Main.class.getClassLoader().getResourceAsStream("data.json");
 
             if (inputStream == null) {
@@ -265,8 +264,6 @@ public class Main {
                 writer.write(stateJson);
             }
             System.out.println("Hotel state written to state.json");
-
-
 
         } catch (Exception e) {
             e.printStackTrace();
