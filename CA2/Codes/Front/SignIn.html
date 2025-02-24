@@ -4,6 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="style-css/style.css" />
     <link
       rel="stylesheet"
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
@@ -13,5 +14,70 @@
     />
     <title>SignIn</title>
   </head>
-  <body></body>
+  <body class="bg-light">
+    <div class="container-fluid">
+      <div class="row d-flex vh-100 align-items-center justify-content-center">
+        <div
+          class="col-sm-12 col-md-10 col-lg-8 col-xl-6 p-4 d-flex justify-content-center rounded-4 bg-white"
+        >
+          <div class="row justify-content-center">
+            <div class="col-12 text-center">
+              <h4>Sign in</h4>
+            </div>
+            <div class="col-12 text-center">
+              <p class="font-small color-dark-gray">MioBook</p>
+            </div>
+
+            <div class="col-sm-8 align-items-center">
+              <div class="form-floating mb-3">
+                <input
+                  type="Username"
+                  class="form-control"
+                  id="floatingInput"
+                  placeholder="name@example.com"
+                />
+                <label for="floatingInput">Username</label>
+              </div>
+            </div>
+
+            <div class="col-sm-8 align-items-center">
+              <div class="form-floating mb-3">
+                <input
+                  type="password"
+                  class="form-control"
+                  id="floatingPassword"
+                  placeholder="Password"
+                />
+                <label for="floatingInput">Password</label>
+              </div>
+            </div>
+
+            <div class="col-10 col-sm-8 align-items-center mb-1">
+              <div class="d-grid gap-2 col-12 mx-auto">
+                <button class="btn btn-sign" type="button">Sign in</button>
+              </div>
+            </div>
+
+            <div class="col-sm-6 justify-content-center mb-1 d-flex font-small">
+              <p class="me-1 color-dark-gray">Not a member yet?</p>
+              <a
+                href="#"
+                class="text-decoration-none font-size9 fw-bold coler-green"
+                >Sign Up</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>
+  
+  <footer
+    class="text-center bg-dark-green d-flex align-items-center justify-content-center py-1"
+  >
+    <p class="color-gray m-0" style="font-size: 0.9rem">
+      Copyright © 2025 -
+      <a href="#" class="text-decoration-none color-beige">MioBook</a>
+    </p>
+  </footer>
 </html>
