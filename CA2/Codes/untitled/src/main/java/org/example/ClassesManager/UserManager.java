@@ -4,6 +4,8 @@ import org.example.model.User;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class UserManager {
     private List<User> users = new ArrayList<>();
@@ -23,7 +25,35 @@ public class UserManager {
         if (validateUsername(newUser.getUsername()) && validateEmail(newUser.getEmail()) && validateRole(newUser.getRole()) &&
                 validatePassword(newUser.getPassword())) {
             users.add(newUser);
-//            System.out.println("User added successfully.");
+            //System.out.println("User added successfully.");
+        }
+    }
+
+    public String addCredit(String jsonInput) {
+        try {
+            ObjectMapper objectMapper = new ObjectMapper();
+            JsonNode jsonNode = objectMapper.readTree(jsonInput);
+
+            String username = jsonNode.get("username").asText();
+            int credit = jsonNode.get("credit").asInt();
+
+            User user = findUserByUsername(username);
+
+            if (user == null) {
+                return "{\"success\": false, \"message\": \"User not found!\"}";
+            }
+            if (user.getRole() != User.Role.customer) {
+                return "{\"success\": false, \"message\": \"Only customers can add credit!\"}";
+            }
+            if (credit < 100) {
+                return "{\"success\": false, \"message\": \"Minimum deposit amount is 100 cents (1 dollar).\"}";
+            }
+
+            user.setBalance(user.getBalance() + credit);
+            return "{\"success\": true, \"message\": \"Credit added successfully.\"}";
+
+        } catch (Exception e) {
+            return "{\"success\": false, \"message\": \"" + e.getMessage() + "\"}";
         }
     }
 
@@ -66,4 +96,14 @@ public class UserManager {
         }
         else { return true; }
     }
+
+    public User findUserByUsername(String username) {
+        for (User user : users) {
+            if (user.getUsername().equalsIgnoreCase(username)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
 }
