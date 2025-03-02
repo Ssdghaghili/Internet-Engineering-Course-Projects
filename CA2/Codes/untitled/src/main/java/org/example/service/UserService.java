@@ -1,11 +1,19 @@
 package org.example.service;
 
+import org.example.model.Book;
+import org.example.model.PurchaseReceipt;
 import org.example.model.User;
 import java.util.ArrayList;
 import java.util.List;
 
 public class UserService {
-    private List<User> users = new ArrayList<>();
+    private List<User> users;
+    private BookService bookService;
+
+    public UserService(BookService bookService) {
+        users = new ArrayList<>();
+        this.bookService = bookService;
+    }
 
     public void addUser(User newUser) {
 
@@ -27,6 +35,44 @@ public class UserService {
         users.add(newUser);
     }
 
+    public void addCart(String username, String bookTitle) {
+        Book book = bookService.findBookByTitle(bookTitle);
+
+        if (book == null)
+            throw new IllegalArgumentException("Book doesn't exist");
+
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User doesn't exist");
+
+        if (user.getRole() == User.Role.admin)
+            throw new IllegalArgumentException("admins cannot add to cart.");
+
+        if (user.getCart().size() >= 10)
+            throw new IllegalArgumentException("Cart cannot have more than 10 items.");
+
+        user.addCart(book);
+    }
+
+    public void removeCart(String username, String bookTitle) {
+        Book book = bookService.findBookByTitle(bookTitle);
+
+        if (book == null)
+            throw new IllegalArgumentException("Book doesn't exist");
+
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User doesn't exist");
+
+        if (user.getRole() == User.Role.admin)
+            throw new IllegalArgumentException("Admins cannot remove from cart.");
+
+        if (!user.removeBookFromCart(book))
+            throw new IllegalArgumentException("Book is not in the user's cart.");
+    }
+
     public void addCredit(String username, int credit) {
         User user = findUserByUsername(username);
 
@@ -42,13 +88,64 @@ public class UserService {
         user.setBalance(user.getBalance() + credit);
     }
 
+    public PurchaseReceipt purchaseCart(String username) {
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User not found.");
+
+        if (user.getRole() != User.Role.customer)
+            throw new IllegalArgumentException("Only customers can purchase cart.");
+
+        if (user.getCart().isEmpty())
+            throw new IllegalArgumentException("Cart cannot be empty.");
+
+        if (!user.hasEnoughCreditForCart())
+            throw new IllegalArgumentException("User has not enough credit.");
+
+        return user.purchaseCart();
+    }
+
+    public void borrowBook(String username, String bookTitle, int days) {
+        Book book = bookService.findBookByTitle(bookTitle);
+
+        if (book == null)
+            throw new IllegalArgumentException("Book doesn't exist");
+
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User doesn't exist");
+
+        if (user.getRole() == User.Role.admin)
+            throw new IllegalArgumentException("admins cannot add to cart.");
+
+        if (user.getCart().size() >= 10)
+            throw new IllegalArgumentException("Cart cannot have more than 10 items.");
+
+        if (days < 1 || days > 9)
+            throw new IllegalArgumentException("Borrow days should be between 1 and 9.");
+
+        user.borrowBook(book, days);
+    }
+
     public User findUserByUsername(String username) {
         for (User user : users) {
-            if (user.getUsername().equalsIgnoreCase(username)) {
+            if (user.getUsername().equals(username)) {
                 return user;
             }
         }
         return null;
+    }
+
+    public void validateAdmin(String username) {
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User not found.");;
+
+        if (user.getRole() != User.Role.admin)
+            throw new IllegalArgumentException("User is not an admin.");
     }
 
     public boolean usernameExists(String username) {

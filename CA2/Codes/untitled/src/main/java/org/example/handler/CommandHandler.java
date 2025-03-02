@@ -2,23 +2,30 @@ package org.example.handler;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.example.model.Author;
-import org.example.model.User;
+import org.example.model.*;
 import org.example.response.Response;
 import org.example.service.AuthorService;
+import org.example.service.BookService;
+import org.example.service.ReviewService;
 import org.example.service.UserService;
 
 public class CommandHandler {
     private AuthorService authorService;
+    private BookService bookService;
     private UserService userService;
+    private ReviewService reviewService;
     private ObjectMapper objectMapper;
 
     public CommandHandler() {
-        userService = new UserService();
-        authorService = new AuthorService(userService);
+        authorService = new AuthorService();
+        bookService = new BookService(authorService);
+        userService = new UserService(bookService);
+        reviewService = new ReviewService(userService, bookService);
         objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }
 
     public Response handleCommand(String commandInput) {
@@ -34,23 +41,32 @@ public class CommandHandler {
                 return handleAddUser(inputJson);
             case "add_author":
                 return handleAddAuthor(inputJson);
+            case "add_book":
+                return handleAddBook(inputJson);
+            case "add_cart":
+                return handleAddCart(inputJson);
+            case "remove_cart":
+                return handleRemoveCart(inputJson);
             case "add_credit":
                 return handleAddCredit(inputJson);
+            case "purchase_cart":
+                return handlePurchaseCart(inputJson);
+            case "borrow_book":
+                return handleBorrowBook(inputJson);
+            case "add_review":
+                return handleAddReview(inputJson);
             default:
                 return Response.failure("Command is invalid.");
         }
     }
 
     public static Response createFailureResponse(Exception e) {
-        String message;
 
         if (e instanceof JsonProcessingException) {
-            message = "JSON format is invalid.";
-        } else {
-            message = e.getMessage();
+            return new Response(false, "JSON format is invalid.", e.getMessage());
         }
 
-        return Response.failure(message);
+        return Response.failure(e.getMessage());
     }
 
     public Response handleAddUser(String jsonInput) {
@@ -66,7 +82,9 @@ public class CommandHandler {
 
     public Response handleAddAuthor(String jsonInput) {
         try {
+            String username = objectMapper.readTree(jsonInput).get("username").asText();
             Author newAuthor = objectMapper.readValue(jsonInput, Author.class);
+            userService.validateAdmin(username);
             authorService.addAuthor(newAuthor);
             return new Response(true, "Author added successfully.");
         }
@@ -75,15 +93,97 @@ public class CommandHandler {
         }
     }
 
-    public Response handleAddCredit(String jsonInput) {
+    public Response handleAddBook(String jsonInput) {
         try {
             String username = objectMapper.readTree(jsonInput).get("username").asText();
-            int credit = objectMapper.readTree(jsonInput).get("credit").asInt();
-            userService.addCredit(username, credit);
-            return new Response(true, "Author added successfully.");
+            Book newBook = objectMapper.readValue(jsonInput, Book.class);
+            userService.validateAdmin(username);
+            bookService.addBook(newBook);
+            return new Response(true, "Book added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return Response.failure(e.getMessage());
         }
     }
+
+    private Response handleAddCart(String jsonInput) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonInput);
+            String username = jsonNode.get("username").asText();
+            String bookTitle = jsonNode.get("title").asText();
+            userService.addCart(username, bookTitle);
+            return new Response(true, "Added book to cart.");
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    private Response handleRemoveCart(String jsonInput) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonInput);
+            String username = jsonNode.get("username").asText();
+            String bookTitle = jsonNode.get("title").asText();
+            userService.removeCart(username, bookTitle);
+            return new Response(true, "Removed book from cart.");
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleAddCredit(String jsonInput) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonInput);
+            String username = jsonNode.get("username").asText();
+            int credit = jsonNode.get("credit").asInt();
+            userService.addCredit(username, credit);
+            return new Response(true, "Credit added successfully.");
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handlePurchaseCart(String jsonInput) {
+        try {
+            String username = objectMapper.readTree(jsonInput).get("username").asText();
+            PurchaseReceipt purchaseReceipt = userService.purchaseCart(username);
+            return new Response(true, "Purchase completed successfully.", purchaseReceipt);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleBorrowBook(String jsonInput) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonInput);
+            String username = jsonNode.get("username").asText();
+            String bookTitle = jsonNode.get("title").asText();
+            int days = jsonNode.get("days").asInt();
+            userService.borrowBook(username, bookTitle, days);
+            return new Response(true, "Added borrowed book to cart.");
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleAddReview(String jsonInput) {
+        try {
+            JsonNode jsonNode = objectMapper.readTree(jsonInput);
+            String username = jsonNode.get("username").asText();
+            String bookTitle = jsonNode.get("title").asText();
+            int rate = jsonNode.get("rate").asInt();;
+            String comment = jsonNode.get("comment").asText();
+            reviewService.addReview(username, bookTitle, rate, comment);
+            return new Response(true, "Review added successfully.");
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+                return Response.failure(e.getMessage());
+        }
+    }
+
+
 }

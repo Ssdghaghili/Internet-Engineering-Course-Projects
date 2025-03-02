@@ -1,7 +1,11 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
+import java.util.ArrayList;
 import java.util.List;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Book {
     private String title;
     private String author;
@@ -11,6 +15,11 @@ public class Book {
     private String synopsis;
     private String content;
     private List<String> genres;
+    private List<Review> reviews;
+
+    public Book() {
+        this.reviews = new ArrayList<>();
+    }
 
     public Book(String title, String author, String publisher, int year, int price, String synopsis, String content, List<String> genres) {
         this.title = title;
@@ -21,9 +30,28 @@ public class Book {
         this.synopsis = synopsis;
         this.content = content;
         this.genres = genres;
+        this.reviews = new ArrayList<>();
     }
 
-    public int getPrice() {
-        return price;
+    public void addReview(Review newReview) {
+        for (Review r : reviews) {
+            if (r.getUser().equals(newReview.getUser())) {
+                reviews.remove(r);
+                break;
+            }
+        }
+        reviews.add(newReview);
     }
+
+    public String getTitle() { return title; }
+    public String getAuthor() { return author; }
+    public String getPublisher() { return publisher; }
+    public int getYear() { return year; }
+    public int getPrice() { return price; }
+    public String getSynopsis() { return synopsis; }
+    public String getContent() { return content; }
+    public List<String> getGenres() {
+        return genres;
+    }
+    public List<Review> getReviews() { return reviews; }
 }

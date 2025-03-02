@@ -1,7 +1,7 @@
 package org.example.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -14,7 +14,6 @@ public class User {
 
     private Role role;
     private String username;
-    @JsonProperty("password")
     private String password;
     private String email;
     private Address address;
@@ -46,13 +45,42 @@ public class User {
     public Address getAddress() { return address;}
     public int getBalance() { return balance; }
     public List<CartItem> getCart() { return cart; }
-    public List<PurchaseRecord> getPurchaseHistory() {return purchaseHistory;}
+    public List<PurchaseRecord> getPurchaseHistory() { return purchaseHistory; }
 
     public void setBalance(int balance) {
-        if (balance < 0) {
-            throw new IllegalArgumentException("Balance cannot be negative.");
-        }
         this.balance = balance;
+    }
+
+    public void addCart(Book book) {
+        this.cart.add(new CartItem(book, false, 0));
+    }
+
+    public void borrowBook(Book book, int days) {
+        this.cart.add(new CartItem(book, true, days));
+    }
+
+    public boolean removeBookFromCart(Book book) {
+        return cart.removeIf(c -> c.getBook().equals(book));
+    }
+
+    public PurchaseReceipt purchaseCart() {
+        PurchaseReceipt purchaseReceipt = new PurchaseReceipt(this.cart.size(), calculateCartCost(), LocalDateTime.now());
+        purchaseHistory.add(new PurchaseRecord(LocalDateTime.now(), this.cart, calculateCartCost()));
+        this.balance -= calculateCartCost();
+        this.cart = new ArrayList<>();
+        return purchaseReceipt;
+    }
+
+    public int calculateCartCost() {
+        int totalCost = 0;
+        for (CartItem cartItem : this.cart) {
+            totalCost += cartItem.getFinalPrice();
+        }
+        return totalCost;
+    }
+
+    public boolean hasEnoughCreditForCart() {
+        return this.balance >= calculateCartCost();
     }
 
 }

@@ -7,36 +7,31 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AuthorService {
-    private List<Author> authors = new ArrayList<>();
-    private UserService userService;
+    private List<Author> authors;
 
-    public AuthorService(UserService userService) {
-        this.userService = userService;
+    public AuthorService() {
+        authors = new ArrayList<>();
     }
 
     public void addAuthor(Author newAuthor) {
-        for (Author author : authors) {
-            if (author.getName().equalsIgnoreCase(newAuthor.getName())) {
-                throw new IllegalArgumentException("Author already exists!");
-            }
-        }
-        if (ServiceUtils.validateUsername(newAuthor.getName()) && validateAdder(newAuthor.getAdderUserName())) {
-            authors.add(newAuthor);
-        }
+
+        if (authorNameExists(newAuthor.getName()))
+            throw new IllegalArgumentException("Author already exists.");
+
+        authors.add(newAuthor);
     }
 
-    private boolean validateAdder(String username) {
-        User user = userService.findUserByUsername(username);
-        System.out.println(user);
+    public Author findAuthorByName(String name) {
+        for (Author author : authors) {
+            if (author.getName().equals(name)) {
+                return author;
+            }
+        }
+        return null;
+    }
 
-        if (user == null) {
-            throw new IllegalArgumentException("User not found!");
-        }
-        if (user.getRole() == User.Role.admin) {
-            return true;
-        } else {
-            throw new IllegalArgumentException("Only Admin can add authors!");
-        }
+    public boolean authorNameExists(String name) {
+        return authors.stream().anyMatch(a -> a.getName().equals(name));
     }
 
     public List<Author> getAuthors() {

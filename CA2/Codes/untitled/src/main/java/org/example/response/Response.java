@@ -4,14 +4,19 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
 public class Response {
+    private static final ObjectMapper objectMapper = new ObjectMapper();
+    static {
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
+    }
 
     private boolean success;
-
     private String message;
-
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private Object data;
 
@@ -41,10 +46,9 @@ public class Response {
 
     public String toJson() {
         try {
-            ObjectMapper objectMapper = new ObjectMapper();
             return objectMapper.writeValueAsString(this);
         } catch (JsonProcessingException e) {
-            return "{\n  \"success\": false,\n  \"message\": \"Serializing response failed.\"\n}";
+            return "{\n  \"success\": false,\n  \"message\": \"Serializing response failed.\"\n  \"data\": " + e.getMessage() + ",\n}";
         }
     }
 }
