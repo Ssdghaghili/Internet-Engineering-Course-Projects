@@ -12,4 +12,9 @@ public class CartItem {
         this.borrowDays = borrowDays;
         this.finalPrice = isBorrowed ? ((borrowDays * book.getPrice()) / 10) : book.getPrice();
     }
+
+    public Book getBook() { return book; }
+    public boolean isBorrowed() { return isBorrowed; }
+    public int getBorrowDays() { return borrowDays; }
+    public int getFinalPrice() { return finalPrice; }
 }
