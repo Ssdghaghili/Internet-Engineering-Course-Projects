@@ -3,8 +3,8 @@ package org.example.service;
 import org.example.model.Book;
 import org.example.model.PurchaseReceipt;
 import org.example.model.User;
-import java.util.ArrayList;
-import java.util.List;
+
+import java.util.*;
 
 public class UserService {
     private List<User> users;
@@ -127,6 +127,25 @@ public class UserService {
             throw new IllegalArgumentException("Borrow days should be between 1 and 9.");
 
         user.borrowBook(book, days);
+    }
+
+    public Map<String, Object> showUserDetails(String username) {
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User not found.");
+
+        Map<String, Object> userDetails = new LinkedHashMap<>();
+        userDetails.put("username", user.getUsername());
+        userDetails.put("role", user.getRole());
+        userDetails.put("email", user.getEmail());
+        userDetails.put("address", user.getAddress());
+
+        if (user.getRole() != User.Role.admin) {
+            userDetails.put("balance", user.getBalance());
+        }
+
+        return userDetails;
     }
 
     public User findUserByUsername(String username) {

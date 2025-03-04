@@ -50,8 +50,6 @@ public class Book {
     public int getPrice() { return price; }
     public String getSynopsis() { return synopsis; }
     public String getContent() { return content; }
-    public List<String> getGenres() {
-        return genres;
-    }
+    public List<String> getGenres() {return genres;}
     public List<Review> getReviews() { return reviews; }
 }

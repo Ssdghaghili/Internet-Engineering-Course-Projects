@@ -21,7 +21,7 @@ public class User {
     private List<CartItem> cart;
     private List<PurchaseRecord> purchaseHistory;
 
-    public User() {                         //Default constructor
+    public User() {
         this.cart = new ArrayList<>();
         this.purchaseHistory = new ArrayList<>();
         this.balance = 0;

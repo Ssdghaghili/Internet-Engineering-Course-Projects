@@ -12,6 +12,8 @@ import org.example.service.BookService;
 import org.example.service.ReviewService;
 import org.example.service.UserService;
 
+import java.util.Map;
+
 public class CommandHandler {
     private AuthorService authorService;
     private BookService bookService;
@@ -55,6 +57,10 @@ public class CommandHandler {
                 return handleBorrowBook(inputJson);
             case "add_review":
                 return handleAddReview(inputJson);
+            case "show_user_details":
+                return handelShowUserDetails(inputJson);
+            case "show_author_details":
+                return handelShowAuthorDetails(inputJson);
             default:
                 return Response.failure("Command is invalid.");
         }
@@ -182,6 +188,28 @@ public class CommandHandler {
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
                 return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handelShowUserDetails(String jsonInput) {
+        try{
+            String username = objectMapper.readTree(jsonInput).get("username").asText();
+            Map<String, Object> userDetails = userService.showUserDetails(username);
+            return new Response(true, "User details retrieved successfully.", userDetails);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handelShowAuthorDetails(String jsonInput) {
+        try {
+            String authorName = objectMapper.readTree(jsonInput).get("username").asText();
+            Author author = authorService.showAuthorDetails(authorName);
+            return new Response(true, "Author details retrieved successfully.", author);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
         }
     }
 

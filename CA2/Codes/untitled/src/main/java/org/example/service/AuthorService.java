@@ -21,6 +21,15 @@ public class AuthorService {
         authors.add(newAuthor);
     }
 
+    public Author showAuthorDetails(String name) {
+        Author author = findAuthorByName(name);
+
+        if (author == null)
+            throw new IllegalArgumentException("Author not found.");
+
+        return author;
+    }
+
     public Author findAuthorByName(String name) {
         for (Author author : authors) {
             if (author.getName().equals(name)) {
