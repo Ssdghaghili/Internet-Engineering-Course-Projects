@@ -136,6 +136,7 @@ public class UserService {
             throw new IllegalArgumentException("User not found.");
 
         Map<String, Object> userDetails = new LinkedHashMap<>();
+
         userDetails.put("username", user.getUsername());
         userDetails.put("role", user.getRole());
         userDetails.put("email", user.getEmail());
@@ -146,6 +147,41 @@ public class UserService {
         }
 
         return userDetails;
+    }
+
+    public Map<String, Object> showCart(String username) {
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User not found.");
+
+        if (user.getRole() == User.Role.admin)
+            throw new IllegalArgumentException("Admins cannot have a cart.");
+
+        Map<String, Object> userCart = new LinkedHashMap<>();
+
+        userCart.put("username", user.getUsername());
+        userCart.put("totalCost", user.calculateCartCost());
+
+        List<Map<String, Object>> cart = new ArrayList<>();
+
+        for (int i = 0; i < user.getCart().size(); i++) {
+            Map<String, Object> cartItem = new LinkedHashMap<>();
+            cartItem.put("title", user.getCart().get(i).getBook().getTitle());
+            cartItem.put("author", user.getCart().get(i).getBook().getAuthor());
+            cartItem.put("publisher", user.getCart().get(i).getBook().getPublisher());
+            cartItem.put("genre", user.getCart().get(i).getBook().getGenres());
+            cartItem.put("year", user.getCart().get(i).getBook().getYear());
+            cartItem.put("price", user.getCart().get(i).getBook().getPrice());
+            cartItem.put("isBorrowed", user.getCart().get(i).isBorrowed());
+            cartItem.put("finalPrice", user.getCart().get(i).getFinalPrice());
+            cartItem.put("borrowDays", user.getCart().get(i).getBorrowDays());
+            cart.add(cartItem);
+        }
+
+        userCart.put("items", cart);
+
+        return userCart;
     }
 
     public User findUserByUsername(String username) {

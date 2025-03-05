@@ -61,6 +61,14 @@ public class CommandHandler {
                 return handelShowUserDetails(inputJson);
             case "show_author_details":
                 return handelShowAuthorDetails(inputJson);
+            case "show_book_details":
+                return handleShowBookDetails(inputJson);
+            case "show_book_content":
+                return handleShowBookContent(inputJson);
+            case "show_book_reviews":
+                return handelShowBookReviews(inputJson);
+            case "show_cart":
+                return handelShowCart(inputJson);
             default:
                 return Response.failure("Command is invalid.");
         }
@@ -207,6 +215,51 @@ public class CommandHandler {
             String authorName = objectMapper.readTree(jsonInput).get("username").asText();
             Author author = authorService.showAuthorDetails(authorName);
             return new Response(true, "Author details retrieved successfully.", author);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleShowBookDetails(String jsonInput) {
+        try {
+            String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
+            Map<String, Object> bookDetails = bookService.showBookDetails(bookTitle);
+            return new Response(true, "Book details retrieved successfully.", bookDetails);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleShowBookContent(String jsonInput) {
+        try {
+            String username = objectMapper.readTree(jsonInput).get("username").asText();
+            String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
+            Map<String, Object> bookContent = bookService.showBookContent(username,bookTitle);
+            return new Response(true, "Book content retrieved successfully.", bookContent);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handelShowBookReviews(String jsonInput) {
+        try {
+            String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
+            Map<String, Object> bookReviews = bookService.showBookReviews(bookTitle);
+            return new Response(true, "Book reviews retrieved successfully.", bookReviews);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handelShowCart(String jsonInput) {
+        try {
+            String username = objectMapper.readTree(jsonInput).get("username").asText();
+            Map<String, Object> cart = userService.showCart(username);
+            return new Response(true, "Buy cart retrieved successfully.", cart);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return Response.failure(e.getMessage());

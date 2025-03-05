@@ -43,6 +43,17 @@ public class Book {
         reviews.add(newReview);
     }
 
+    public double getAverageRate() {
+        if (reviews.isEmpty())
+            return 0;
+
+        double sum = 0;
+        for (Review r : reviews) {
+            sum += r.getRate();
+        }
+        return sum / reviews.size();
+    }
+
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
     public String getPublisher() { return publisher; }

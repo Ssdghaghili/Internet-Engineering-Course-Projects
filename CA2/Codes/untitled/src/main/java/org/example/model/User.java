@@ -79,6 +79,10 @@ public class User {
         return totalCost;
     }
 
+    public boolean hasBookInCart(Book book) {
+        return this.cart.stream().anyMatch(c -> c.getBook().equals(book));
+    }
+
     public boolean hasEnoughCreditForCart() {
         return this.balance >= calculateCartCost();
     }
