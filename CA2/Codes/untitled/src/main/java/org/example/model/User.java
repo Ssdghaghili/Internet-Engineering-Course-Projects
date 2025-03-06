@@ -93,7 +93,7 @@ public class User {
                 .anyMatch(cartItem -> cartItem.getBook().equals(book) && !cartItem.isBorrowed());
 
         if (hasNonBorrowed)
-            return true; // If any non-borrowed book is found, return false immediately
+            return true;
 
         return this.purchaseHistory.stream()
                 .flatMap(purchase -> purchase.getItems().stream())

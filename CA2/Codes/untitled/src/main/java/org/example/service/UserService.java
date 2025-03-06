@@ -53,6 +53,12 @@ public class UserService {
         if (user.getCart().size() >= 10)
             throw new IllegalArgumentException("Cart cannot have more than 10 items.");
 
+        if (user.hasBookInCart(book))
+            throw new IllegalArgumentException("Book is already in the cart.");
+
+        if (user.hasBookInPurchaseHistory(book) && user.hasBorrowBookValid(book))
+            throw new IllegalArgumentException("Book is already purchased.");
+
         user.addCart(book);
     }
 
@@ -123,6 +129,15 @@ public class UserService {
 
         if (user.getCart().size() >= 10)
             throw new IllegalArgumentException("Cart cannot have more than 10 items.");
+
+        if (user.hasBookInCart(book))
+            throw new IllegalArgumentException("Book is already in the cart.");
+
+        if (user.hasBookInCart(book))
+            throw new IllegalArgumentException("Book is already in the cart.");
+
+        if (user.hasBookInPurchaseHistory(book) && user.hasBorrowBookValid(book))
+            throw new IllegalArgumentException("Book is already purchased.");
 
         if (days < 1 || days > 9)
             throw new IllegalArgumentException("Borrow days should be between 1 and 9.");
