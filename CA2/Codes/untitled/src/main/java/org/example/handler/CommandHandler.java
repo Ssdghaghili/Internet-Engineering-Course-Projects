@@ -73,6 +73,14 @@ public class CommandHandler {
                 return handleShowPurchaseHistory(inputJson);
             case "show_purchase_books":
                 return handleShowPurchaseBooks(inputJson);
+            case "search_books_by_title":
+                return handleSearchBooksByTitle(inputJson);
+            case "search_books_by_author":
+                return handleSearchBooksByAuthor(inputJson);
+            case "search_books_by_genre":
+                return handleSearchBooksByGenre(inputJson);
+            case "search_books_by_year":
+                return handleSearchBooksByYear(inputJson);
             default:
                 return Response.failure("Command is invalid.");
         }
@@ -286,6 +294,51 @@ public class CommandHandler {
             String username = objectMapper.readTree(jsonInput).get("username").asText();
             Map<String, Object> purchaseBooks = userService.showPurchaseBooks(username);
             return new Response(true, "Purchase books retrieved successfully.", purchaseBooks);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleSearchBooksByTitle (String jsonInput) {
+        try {
+            String title = objectMapper.readTree(jsonInput).get("title").asText();
+            Map<String, Object> searchResults = bookService.searchBooksByTitle(title);
+            return new Response(true, "Books containing " + "'" + title + "'" + " in their title:", searchResults);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleSearchBooksByAuthor(String jsonInput) {
+        try {
+            String author = objectMapper.readTree(jsonInput).get("name").asText();
+            Map<String, Object> searchResults = bookService.searchBooksByAuthor(author);
+            return new Response(true, "Books by " + "'" + author + "'" + ":", searchResults);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleSearchBooksByGenre(String jsonInput) {
+        try {
+            String genre = objectMapper.readTree(jsonInput).get("genre").asText();
+            Map<String, Object> searchResults = bookService.searchBooksByGenre(genre);
+            return new Response(true, "Book in the " + "'" + genre + "'" + " genre:", searchResults);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleSearchBooksByYear(String jsonInput) {
+        try {
+            int start = objectMapper.readTree(jsonInput).get("from").asInt();
+            int end = objectMapper.readTree(jsonInput).get("to").asInt();
+            Map<String, Object> searchResults = bookService.searchBooksByYear(start, end);
+            return new Response(true, "Books published from " + start + " to " + end + ":", searchResults);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return Response.failure(e.getMessage());

@@ -95,6 +95,142 @@ public class BookService {
         return bookReviews;
     }
 
+    public Map<String, Object> searchBooksByTitle(String title) {
+        List<Book> foundBooks = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getTitle().contains(title)) {
+                foundBooks.add(book);
+            }
+        }
+
+        if (foundBooks.isEmpty())
+            throw new IllegalArgumentException("No books found.");
+
+        Map<String, Object> searchResults = new LinkedHashMap<>();
+        searchResults.put("search", title);
+        List<Map<String, Object>> books = new ArrayList<>();
+
+        for (Book book : foundBooks) {
+            Map<String, Object> bookDetails = new LinkedHashMap<>();
+
+            bookDetails.put("title", book.getTitle());
+            bookDetails.put("author", book.getAuthor());
+            bookDetails.put("publisher", book.getPublisher());
+            bookDetails.put("genres", book.getGenres());
+            bookDetails.put("year", book.getYear());
+            bookDetails.put("price", book.getPrice());
+            bookDetails.put("synopsis", book.getSynopsis());
+            books.add(bookDetails);
+        }
+
+        searchResults.put("books", books);
+
+        return searchResults;
+    }
+
+    public Map<String, Object> searchBooksByAuthor(String author) {
+        List<Book> foundBooks = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getAuthor().contains(author)) {
+                foundBooks.add(book);
+            }
+        }
+
+        if (foundBooks.isEmpty())
+            throw new IllegalArgumentException("No books found.");
+
+        Map<String, Object> searchResults = new LinkedHashMap<>();
+        searchResults.put("search", author);
+
+        List<Map<String, Object>> books = new ArrayList<>();
+
+        for (Book book : foundBooks) {
+            Map<String, Object> bookDetails = new LinkedHashMap<>();
+
+            bookDetails.put("title", book.getTitle());
+            bookDetails.put("author", book.getAuthor());
+            bookDetails.put("publisher", book.getPublisher());
+            bookDetails.put("genres", book.getGenres());
+            bookDetails.put("year", book.getYear());
+            bookDetails.put("price", book.getPrice());
+            bookDetails.put("synopsis", book.getSynopsis());
+            books.add(bookDetails);
+        }
+
+        searchResults.put("books", books);
+
+        return searchResults;
+    }
+
+    public Map<String, Object> searchBooksByGenre(String genre) {
+        List<Book> foundBooks = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getGenres().contains(genre)) {
+                foundBooks.add(book);
+            }
+        }
+
+        if (foundBooks.isEmpty())
+            throw new IllegalArgumentException("No books found.");
+
+        Map<String, Object> searchResults = new LinkedHashMap<>();
+        searchResults.put("search", genre);
+
+        List<Map<String, Object>> books = new ArrayList<>();
+
+        for (Book book : foundBooks) {
+            Map<String, Object> bookDetails = new LinkedHashMap<>();
+
+            bookDetails.put("title", book.getTitle());
+            bookDetails.put("author", book.getAuthor());
+            bookDetails.put("publisher", book.getPublisher());
+            bookDetails.put("genres", book.getGenres());
+            bookDetails.put("year", book.getYear());
+            bookDetails.put("price", book.getPrice());
+            bookDetails.put("synopsis", book.getSynopsis());
+            books.add(bookDetails);
+        }
+
+        searchResults.put("books", books);
+
+        return searchResults;
+
+    }
+
+    public Map<String, Object> searchBooksByYear(int start, int end){
+        List<Book> foundBooks = new ArrayList<>();
+        for (Book book : books) {
+            if (book.getYear() >= start && book.getYear() <= end) {
+                foundBooks.add(book);
+            }
+        }
+
+        if (foundBooks.isEmpty())
+            throw new IllegalArgumentException("No books found.");
+
+        Map<String, Object> searchResults = new LinkedHashMap<>();
+        searchResults.put("search", start + "-" + end);
+
+        List<Map<String, Object>> books = new ArrayList<>();
+
+        for (Book book : foundBooks) {
+            Map<String, Object> bookDetails = new LinkedHashMap<>();
+
+            bookDetails.put("title", book.getTitle());
+            bookDetails.put("author", book.getAuthor());
+            bookDetails.put("publisher", book.getPublisher());
+            bookDetails.put("genres", book.getGenres());
+            bookDetails.put("year", book.getYear());
+            bookDetails.put("price", book.getPrice());
+            bookDetails.put("synopsis", book.getSynopsis());
+            books.add(bookDetails);
+        }
+
+        searchResults.put("books", books);
+
+        return searchResults;
+    }
+
     public Book findBookByTitle(String title) {
         for (Book book : books) {
             if (book.getTitle().equals(title)) {
