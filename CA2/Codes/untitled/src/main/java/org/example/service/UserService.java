@@ -42,10 +42,6 @@ public class UserService {
         if (book == null)
             throw new IllegalArgumentException("Book doesn't exist");
 
-//        if (purchaseCart().)
-//            throw new IllegalArgumentException("Book is borrowed.");
-
-
         User user = findUserByUsername(username);
 
         if (user == null)
@@ -152,6 +148,29 @@ public class UserService {
         }
 
         return userDetails;
+    }
+
+    public Map<String, Object> showBookContent(String username, String title) {
+        User user = findUserByUsername(username);
+        Book book = bookService.findBookByTitle(title);
+        if (user == null)
+            throw new IllegalArgumentException("User not found.");
+
+        if (book == null)
+            throw new IllegalArgumentException("Book not found.");
+
+        if (!user.hasBookInPurchaseHistory(book))
+            throw new IllegalArgumentException("The book is not in your possession.");
+
+        if (!user.hasBorrowBookValid(book))
+            throw new IllegalArgumentException("The book is not in your possession.");
+
+        Map<String, Object> bookContent = new LinkedHashMap<>();
+
+        bookContent.put("title", book.getTitle());
+        bookContent.put("content", book.getContent());
+
+        return bookContent;
     }
 
     public Map<String, Object> showCart(String username) {

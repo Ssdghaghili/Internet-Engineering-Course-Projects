@@ -53,23 +53,6 @@ public class BookService {
         return bookDetails;
     }
 
-    public Map<String, Object> showBookContent(String username, String bookTitle){
-        Book book = findBookByTitle(bookTitle);
-        if (book == null)
-            throw new IllegalArgumentException("Book not found.");
-
-//        User user = userService.findUserByUsername(username);
-//        if (!user.hasBookInCart(book))   //book is not in user's possession
-//            throw new IllegalArgumentException("The book is not in your possession.");
-
-        Map<String, Object> bookContent = new LinkedHashMap<>();
-
-        bookContent.put("title", book.getTitle());
-        bookContent.put("content", book.getContent());
-
-        return bookContent;
-    }
-
     public  Map<String, Object> showBookReviews(String title) {
         Book book = findBookByTitle(title);
 

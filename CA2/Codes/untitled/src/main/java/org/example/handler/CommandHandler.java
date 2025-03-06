@@ -248,7 +248,7 @@ public class CommandHandler {
         try {
             String username = objectMapper.readTree(jsonInput).get("username").asText();
             String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
-            Map<String, Object> bookContent = bookService.showBookContent(username,bookTitle);
+            Map<String, Object> bookContent = userService.showBookContent(username,bookTitle);
             return new Response(true, "Book content retrieved successfully.", bookContent);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {

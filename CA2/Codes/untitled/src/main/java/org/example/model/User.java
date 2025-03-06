@@ -83,6 +83,24 @@ public class User {
         return this.cart.stream().anyMatch(c -> c.getBook().equals(book));
     }
 
+    public boolean hasBookInPurchaseHistory(Book book) {
+        return this.purchaseHistory.stream().anyMatch(p -> p.getItems().stream().anyMatch(c -> c.getBook().equals(book)));
+    }
+
+    public boolean hasBorrowBookValid(Book book) {
+        boolean hasNonBorrowed = this.purchaseHistory.stream()
+                .flatMap(purchase -> purchase.getItems().stream())
+                .anyMatch(cartItem -> cartItem.getBook().equals(book) && !cartItem.isBorrowed());
+
+        if (hasNonBorrowed)
+            return true; // If any non-borrowed book is found, return false immediately
+
+        return this.purchaseHistory.stream()
+                .flatMap(purchase -> purchase.getItems().stream())
+                .filter(cartItem -> cartItem.getBook().equals(book))
+                .anyMatch(cartItem -> cartItem.isBorrowed() && cartItem.getBorrowDays() > 0);
+    }
+
     public boolean hasEnoughCreditForCart() {
         return this.balance >= calculateCartCost();
     }
