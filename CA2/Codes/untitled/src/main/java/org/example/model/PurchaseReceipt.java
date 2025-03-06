@@ -18,15 +18,9 @@ public class PurchaseReceipt {
         this.date = date;
     }
 
-    public int getBookCount() {
-        return bookCount;
-    }
+    public int getBookCount() {return bookCount;}
 
-    public double getTotalCost() {
-        return totalCost;
-    }
+    public double getTotalCost() {return totalCost;}
 
-    public LocalDateTime getDate() {
-        return date;
-    }
+    public LocalDateTime getDate() {return date;}
 }

@@ -69,6 +69,8 @@ public class CommandHandler {
                 return handelShowBookReviews(inputJson);
             case "show_cart":
                 return handelShowCart(inputJson);
+            case "show_purchase_history":
+                return handleShowPurchaseHistory(inputJson);
             default:
                 return Response.failure("Command is invalid.");
         }
@@ -266,5 +268,15 @@ public class CommandHandler {
         }
     }
 
+    public Response handleShowPurchaseHistory(String jsonInput) {
+        try {
+            String username = objectMapper.readTree(jsonInput).get("username").asText();
+            Map<String, Object> purchaseHistory = userService.showPurchaseHistory(username);
+            return new Response(true, "Purchase history retrieved successfully.", purchaseHistory);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
 
 }

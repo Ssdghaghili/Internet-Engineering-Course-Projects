@@ -4,6 +4,7 @@ import org.example.model.Book;
 import org.example.model.PurchaseReceipt;
 import org.example.model.User;
 
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class UserService {
@@ -170,7 +171,7 @@ public class UserService {
             cartItem.put("title", user.getCart().get(i).getBook().getTitle());
             cartItem.put("author", user.getCart().get(i).getBook().getAuthor());
             cartItem.put("publisher", user.getCart().get(i).getBook().getPublisher());
-            cartItem.put("genre", user.getCart().get(i).getBook().getGenres());
+            cartItem.put("genres", user.getCart().get(i).getBook().getGenres());
             cartItem.put("year", user.getCart().get(i).getBook().getYear());
             cartItem.put("price", user.getCart().get(i).getBook().getPrice());
             cartItem.put("isBorrowed", user.getCart().get(i).isBorrowed());
@@ -182,6 +183,53 @@ public class UserService {
         userCart.put("items", cart);
 
         return userCart;
+    }
+
+    public Map<String, Object> showPurchaseHistory(String username) {
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User not found.");
+
+        if (user.getRole() == User.Role.admin)
+            throw new IllegalArgumentException("Admins cannot have a purchase history.");
+
+        Map<String, Object> purchaseHistory = new LinkedHashMap<>();
+        purchaseHistory.put("username", user.getUsername());
+
+        List<Map<String, Object>> records = new ArrayList<>();
+
+        for (int i = 0; i < user.getPurchaseHistory().size(); i++) {
+            Map<String, Object> record = new LinkedHashMap<>();
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+            record.put("purchaseDate", user.getPurchaseHistory().get(i).getPurchaseDate().format(formatter));
+//            record.put("purchaseDate", user.getPurchaseHistory().get(i).getPurchaseDate());
+
+            List<Map<String, Object>> itemsList = new ArrayList<>();
+
+            for (int j = 0; j < user.getPurchaseHistory().get(i).getItems().size(); j++) {
+                Map<String, Object> items = new LinkedHashMap<>();
+                items.put("title", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getTitle());
+                items.put("author", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getAuthor());
+                items.put("publisher", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPublisher());
+                items.put("genres", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getGenres());
+                items.put("year", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getYear());
+                items.put("isBorrowed", user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed());
+                items.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
+                items.put("price", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPrice());
+                items.put("finalPrice", user.getPurchaseHistory().get(i).getItems().get(j).getFinalPrice());
+                itemsList.add(items);
+            }
+
+            record.put("items", itemsList);
+            record.put("totalCost", user.getPurchaseHistory().get(i).getTotalCost());
+            records.add(record);
+        }
+
+        purchaseHistory.put("purchaseHistory", records);
+
+        return purchaseHistory;
     }
 
     public User findUserByUsername(String username) {
