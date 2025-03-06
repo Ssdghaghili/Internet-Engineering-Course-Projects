@@ -176,7 +176,8 @@ public class UserService {
             cartItem.put("price", user.getCart().get(i).getBook().getPrice());
             cartItem.put("isBorrowed", user.getCart().get(i).isBorrowed());
             cartItem.put("finalPrice", user.getCart().get(i).getFinalPrice());
-            cartItem.put("borrowDays", user.getCart().get(i).getBorrowDays());
+            if (user.getCart().get(i).isBorrowed())
+                cartItem.put("borrowDays", user.getCart().get(i).getBorrowDays());
             cart.add(cartItem);
         }
 
@@ -204,7 +205,6 @@ public class UserService {
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
             record.put("purchaseDate", user.getPurchaseHistory().get(i).getPurchaseDate().format(formatter));
-//            record.put("purchaseDate", user.getPurchaseHistory().get(i).getPurchaseDate());
 
             List<Map<String, Object>> itemsList = new ArrayList<>();
 
@@ -216,7 +216,8 @@ public class UserService {
                 items.put("genres", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getGenres());
                 items.put("year", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getYear());
                 items.put("isBorrowed", user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed());
-                items.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
+                if (user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed())
+                    items.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
                 items.put("price", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPrice());
                 items.put("finalPrice", user.getPurchaseHistory().get(i).getItems().get(j).getFinalPrice());
                 itemsList.add(items);
@@ -230,6 +231,48 @@ public class UserService {
         purchaseHistory.put("purchaseHistory", records);
 
         return purchaseHistory;
+    }
+
+    public Map<String, Object> showPurchaseBooks(String username) {
+        User user = findUserByUsername(username);
+
+        if (user == null)
+            throw new IllegalArgumentException("User not found.");
+
+        if (user.getRole() == User.Role.admin)
+            throw new IllegalArgumentException("Admins cannot have a purchase history.");
+
+        Map<String, Object> purchaseBooks = new LinkedHashMap<>();
+        purchaseBooks.put("username", user.getUsername());
+
+        List<Map<String, Object>> books = new ArrayList<>();
+
+        for (int i = 0; i < user.getPurchaseHistory().size(); i++) {
+            for (int j = 0; j < user.getPurchaseHistory().get(i).getItems().size(); j++) {
+                Map<String, Object> book = new LinkedHashMap<>();
+                if (!user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed() ||
+                        user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays() > 0) {
+
+                    book.put("title", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getTitle());
+                    book.put("author", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getAuthor());
+                    book.put("publisher", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPublisher());
+                    book.put("genres", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getGenres());
+                    book.put("year", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getYear());
+                    book.put("price", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPrice());
+                    book.put("isBorrowed", user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed());
+                    if (user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed())
+                        book.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
+                    book.put("finalPrice", user.getPurchaseHistory().get(i).getItems().get(j).getFinalPrice());
+
+                    books.add(book);
+
+                }
+            }
+        }
+
+        purchaseBooks.put("books", books);
+
+        return purchaseBooks;
     }
 
     public User findUserByUsername(String username) {

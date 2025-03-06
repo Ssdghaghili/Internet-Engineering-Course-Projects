@@ -71,6 +71,8 @@ public class CommandHandler {
                 return handelShowCart(inputJson);
             case "show_purchase_history":
                 return handleShowPurchaseHistory(inputJson);
+            case "show_purchase_books":
+                return handleShowPurchaseBooks(inputJson);
             default:
                 return Response.failure("Command is invalid.");
         }
@@ -273,6 +275,17 @@ public class CommandHandler {
             String username = objectMapper.readTree(jsonInput).get("username").asText();
             Map<String, Object> purchaseHistory = userService.showPurchaseHistory(username);
             return new Response(true, "Purchase history retrieved successfully.", purchaseHistory);
+        }
+        catch (IllegalArgumentException | JsonProcessingException e) {
+            return Response.failure(e.getMessage());
+        }
+    }
+
+    public Response handleShowPurchaseBooks(String jsonInput) {
+        try {
+            String username = objectMapper.readTree(jsonInput).get("username").asText();
+            Map<String, Object> purchaseBooks = userService.showPurchaseBooks(username);
+            return new Response(true, "Purchase books retrieved successfully.", purchaseBooks);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return Response.failure(e.getMessage());
