@@ -326,7 +326,7 @@ public class CommandHandler {
         try {
             String genre = objectMapper.readTree(jsonInput).get("genre").asText();
             Map<String, Object> searchResults = bookService.searchBooksByGenre(genre);
-            return new Response(true, "Book in the " + "'" + genre + "'" + " genre:", searchResults);
+            return new Response(true, "Books in the " + "'" + genre + "'" + " genre:", searchResults);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return Response.failure(e.getMessage());

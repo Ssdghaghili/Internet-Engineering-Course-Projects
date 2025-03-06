@@ -42,6 +42,10 @@ public class UserService {
         if (book == null)
             throw new IllegalArgumentException("Book doesn't exist");
 
+//        if (purchaseCart().)
+//            throw new IllegalArgumentException("Book is borrowed.");
+
+
         User user = findUserByUsername(username);
 
         if (user == null)
