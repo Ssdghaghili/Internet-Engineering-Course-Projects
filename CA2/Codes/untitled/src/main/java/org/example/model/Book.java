@@ -1,11 +1,14 @@
 package org.example.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.example.model.serializer.BookSerializer;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize(using = BookSerializer.class)
 public class Book {
     private String title;
     private String author;

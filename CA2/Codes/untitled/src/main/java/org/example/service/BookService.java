@@ -33,24 +33,13 @@ public class BookService {
         books.add(book);
     }
 
-    public Map<String, Object> showBookDetails(String title) {
+    public Book showBookDetails(String title) {
         Book book = findBookByTitle(title);
 
         if (book == null)
             throw new IllegalArgumentException("Book not found.");
 
-        Map<String, Object> bookDetails = new LinkedHashMap<>();
-
-        bookDetails.put("title", book.getTitle());
-        bookDetails.put("author", book.getAuthor());
-        bookDetails.put("publisher", book.getPublisher());
-        bookDetails.put("genres", book.getGenres());
-        bookDetails.put("year", book.getYear());
-        bookDetails.put("price", book.getPrice());
-        bookDetails.put("synopsis", book.getSynopsis());
-        bookDetails.put("averageRating", book.getAverageRate());
-
-        return bookDetails;
+        return book;
     }
 
     public  Map<String, Object> showBookReviews(String title) {
@@ -62,17 +51,7 @@ public class BookService {
         Map<String, Object> bookReviews = new LinkedHashMap<>();
 
         bookReviews.put("title", book.getTitle());
-
-        List<Map<String, Object>> reviews = new ArrayList<>();
-        for (int i = 0; i < book.getReviews().size(); i++) {
-            Map<String, Object> review = new LinkedHashMap<>();
-            review.put("username", book.getReviews().get(i).getUser().getUsername());
-            review.put("rate", book.getReviews().get(i).getRate());
-            review.put("comment", book.getReviews().get(i).getComment());
-            reviews.add(review);
-        }
-
-        bookReviews.put("reviews", reviews);
+        bookReviews.put("reviews", book.getReviews());
         bookReviews.put("averageRating", book.getAverageRate());
 
         return bookReviews;
@@ -90,23 +69,9 @@ public class BookService {
             throw new IllegalArgumentException("No books found.");
 
         Map<String, Object> searchResults = new LinkedHashMap<>();
+
         searchResults.put("search", title);
-        List<Map<String, Object>> books = new ArrayList<>();
-
-        for (Book book : foundBooks) {
-            Map<String, Object> bookDetails = new LinkedHashMap<>();
-
-            bookDetails.put("title", book.getTitle());
-            bookDetails.put("author", book.getAuthor());
-            bookDetails.put("publisher", book.getPublisher());
-            bookDetails.put("genres", book.getGenres());
-            bookDetails.put("year", book.getYear());
-            bookDetails.put("price", book.getPrice());
-            bookDetails.put("synopsis", book.getSynopsis());
-            books.add(bookDetails);
-        }
-
-        searchResults.put("books", books);
+        searchResults.put("books", foundBooks);
 
         return searchResults;
     }
@@ -123,24 +88,9 @@ public class BookService {
             throw new IllegalArgumentException("No books found.");
 
         Map<String, Object> searchResults = new LinkedHashMap<>();
+
         searchResults.put("search", author);
-
-        List<Map<String, Object>> books = new ArrayList<>();
-
-        for (Book book : foundBooks) {
-            Map<String, Object> bookDetails = new LinkedHashMap<>();
-
-            bookDetails.put("title", book.getTitle());
-            bookDetails.put("author", book.getAuthor());
-            bookDetails.put("publisher", book.getPublisher());
-            bookDetails.put("genres", book.getGenres());
-            bookDetails.put("year", book.getYear());
-            bookDetails.put("price", book.getPrice());
-            bookDetails.put("synopsis", book.getSynopsis());
-            books.add(bookDetails);
-        }
-
-        searchResults.put("books", books);
+        searchResults.put("books", foundBooks);
 
         return searchResults;
     }
@@ -157,27 +107,11 @@ public class BookService {
             throw new IllegalArgumentException("No books found.");
 
         Map<String, Object> searchResults = new LinkedHashMap<>();
+
         searchResults.put("search", genre);
-
-        List<Map<String, Object>> books = new ArrayList<>();
-
-        for (Book book : foundBooks) {
-            Map<String, Object> bookDetails = new LinkedHashMap<>();
-
-            bookDetails.put("title", book.getTitle());
-            bookDetails.put("author", book.getAuthor());
-            bookDetails.put("publisher", book.getPublisher());
-            bookDetails.put("genres", book.getGenres());
-            bookDetails.put("year", book.getYear());
-            bookDetails.put("price", book.getPrice());
-            bookDetails.put("synopsis", book.getSynopsis());
-            books.add(bookDetails);
-        }
-
-        searchResults.put("books", books);
+        searchResults.put("books", foundBooks);
 
         return searchResults;
-
     }
 
     public Map<String, Object> searchBooksByYear(int start, int end){
@@ -192,24 +126,9 @@ public class BookService {
             throw new IllegalArgumentException("No books found.");
 
         Map<String, Object> searchResults = new LinkedHashMap<>();
+
         searchResults.put("search", start + "-" + end);
-
-        List<Map<String, Object>> books = new ArrayList<>();
-
-        for (Book book : foundBooks) {
-            Map<String, Object> bookDetails = new LinkedHashMap<>();
-
-            bookDetails.put("title", book.getTitle());
-            bookDetails.put("author", book.getAuthor());
-            bookDetails.put("publisher", book.getPublisher());
-            bookDetails.put("genres", book.getGenres());
-            bookDetails.put("year", book.getYear());
-            bookDetails.put("price", book.getPrice());
-            bookDetails.put("synopsis", book.getSynopsis());
-            books.add(bookDetails);
-        }
-
-        searchResults.put("books", books);
+        searchResults.put("books", foundBooks);
 
         return searchResults;
     }

@@ -17,8 +17,7 @@ public class Author {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private Date died;
 
-    public Author() {               //Default constructor
-    }
+    public Author() {}
 
     public Author(String name, String penName, String nationality, Date born, Date died) {
         this.name = name;

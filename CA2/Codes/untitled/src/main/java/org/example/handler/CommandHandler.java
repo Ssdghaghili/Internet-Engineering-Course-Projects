@@ -71,8 +71,8 @@ public class CommandHandler {
                 return handelShowCart(inputJson);
             case "show_purchase_history":
                 return handleShowPurchaseHistory(inputJson);
-            case "show_purchase_books":
-                return handleShowPurchaseBooks(inputJson);
+            case "show_purchased_books":
+                return handleShowPurchasedBooks(inputJson);
             case "search_books_by_title":
                 return handleSearchBooksByTitle(inputJson);
             case "search_books_by_author":
@@ -214,8 +214,8 @@ public class CommandHandler {
     public Response handelShowUserDetails(String jsonInput) {
         try{
             String username = objectMapper.readTree(jsonInput).get("username").asText();
-            Map<String, Object> userDetails = userService.showUserDetails(username);
-            return new Response(true, "User details retrieved successfully.", userDetails);
+            User user = userService.showUserDetails(username);
+            return new Response(true, "User details retrieved successfully.", user);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return createFailureResponse(e);
@@ -224,7 +224,7 @@ public class CommandHandler {
 
     public Response handelShowAuthorDetails(String jsonInput) {
         try {
-            String authorName = objectMapper.readTree(jsonInput).get("username").asText();
+            String authorName = objectMapper.readTree(jsonInput).get("name").asText();
             Author author = authorService.showAuthorDetails(authorName);
             return new Response(true, "Author details retrieved successfully.", author);
         }
@@ -236,8 +236,8 @@ public class CommandHandler {
     public Response handleShowBookDetails(String jsonInput) {
         try {
             String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
-            Map<String, Object> bookDetails = bookService.showBookDetails(bookTitle);
-            return new Response(true, "Book details retrieved successfully.", bookDetails);
+            Book book = bookService.showBookDetails(bookTitle);
+            return new Response(true, "Book details retrieved successfully.", book);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return createFailureResponse(e);
@@ -289,7 +289,7 @@ public class CommandHandler {
         }
     }
 
-    public Response handleShowPurchaseBooks(String jsonInput) {
+    public Response handleShowPurchasedBooks(String jsonInput) {
         try {
             String username = objectMapper.readTree(jsonInput).get("username").asText();
             Map<String, Object> purchaseBooks = userService.showPurchaseBooks(username);

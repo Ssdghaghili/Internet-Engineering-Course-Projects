@@ -145,24 +145,13 @@ public class UserService {
         user.borrowBook(book, days);
     }
 
-    public Map<String, Object> showUserDetails(String username) {
+    public User showUserDetails(String username) {
         User user = findUserByUsername(username);
 
         if (user == null)
             throw new IllegalArgumentException("User not found.");
 
-        Map<String, Object> userDetails = new LinkedHashMap<>();
-
-        userDetails.put("username", user.getUsername());
-        userDetails.put("role", user.getRole());
-        userDetails.put("email", user.getEmail());
-        userDetails.put("address", user.getAddress());
-
-        if (user.getRole() != User.Role.admin) {
-            userDetails.put("balance", user.getBalance());
-        }
-
-        return userDetails;
+        return user;
     }
 
     public Map<String, Object> showBookContent(String username, String title) {
@@ -198,25 +187,7 @@ public class UserService {
 
         userCart.put("username", user.getUsername());
         userCart.put("totalCost", user.calculateCartCost());
-
-        List<Map<String, Object>> cart = new ArrayList<>();
-
-        for (int i = 0; i < user.getCart().size(); i++) {
-            Map<String, Object> cartItem = new LinkedHashMap<>();
-            cartItem.put("title", user.getCart().get(i).getBook().getTitle());
-            cartItem.put("author", user.getCart().get(i).getBook().getAuthor());
-            cartItem.put("publisher", user.getCart().get(i).getBook().getPublisher());
-            cartItem.put("genres", user.getCart().get(i).getBook().getGenres());
-            cartItem.put("year", user.getCart().get(i).getBook().getYear());
-            cartItem.put("price", user.getCart().get(i).getBook().getPrice());
-            cartItem.put("isBorrowed", user.getCart().get(i).isBorrowed());
-            cartItem.put("finalPrice", user.getCart().get(i).getFinalPrice());
-            if (user.getCart().get(i).isBorrowed())
-                cartItem.put("borrowDays", user.getCart().get(i).getBorrowDays());
-            cart.add(cartItem);
-        }
-
-        userCart.put("items", cart);
+        userCart.put("items", user.getCart());
 
         return userCart;
     }
@@ -232,38 +203,7 @@ public class UserService {
 
         Map<String, Object> purchaseHistory = new LinkedHashMap<>();
         purchaseHistory.put("username", user.getUsername());
-
-        List<Map<String, Object>> records = new ArrayList<>();
-
-        for (int i = 0; i < user.getPurchaseHistory().size(); i++) {
-            Map<String, Object> record = new LinkedHashMap<>();
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            record.put("purchaseDate", user.getPurchaseHistory().get(i).getPurchaseDate().format(formatter));
-
-            List<Map<String, Object>> itemsList = new ArrayList<>();
-
-            for (int j = 0; j < user.getPurchaseHistory().get(i).getItems().size(); j++) {
-                Map<String, Object> items = new LinkedHashMap<>();
-                items.put("title", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getTitle());
-                items.put("author", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getAuthor());
-                items.put("publisher", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPublisher());
-                items.put("genres", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getGenres());
-                items.put("year", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getYear());
-                items.put("isBorrowed", user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed());
-                if (user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed())
-                    items.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
-                items.put("price", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPrice());
-                items.put("finalPrice", user.getPurchaseHistory().get(i).getItems().get(j).getFinalPrice());
-                itemsList.add(items);
-            }
-
-            record.put("items", itemsList);
-            record.put("totalCost", user.getPurchaseHistory().get(i).getTotalCost());
-            records.add(record);
-        }
-
-        purchaseHistory.put("purchaseHistory", records);
+        purchaseHistory.put("purchaseHistory", user.getPurchaseHistory());
 
         return purchaseHistory;
     }
@@ -278,34 +218,9 @@ public class UserService {
             throw new IllegalArgumentException("Admins cannot have a purchase history.");
 
         Map<String, Object> purchaseBooks = new LinkedHashMap<>();
+
         purchaseBooks.put("username", user.getUsername());
-
-        List<Map<String, Object>> books = new ArrayList<>();
-
-        for (int i = 0; i < user.getPurchaseHistory().size(); i++) {
-            for (int j = 0; j < user.getPurchaseHistory().get(i).getItems().size(); j++) {
-                Map<String, Object> book = new LinkedHashMap<>();
-
-                if (user.isBookPurchased(user.getPurchaseHistory().get(i).getItems().get(j).getBook())){
-
-                    book.put("title", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getTitle());
-                    book.put("author", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getAuthor());
-                    book.put("publisher", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPublisher());
-                    book.put("genres", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getGenres());
-                    book.put("year", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getYear());
-                    book.put("price", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPrice());
-                    book.put("isBorrowed", user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed());
-                    if (user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed())
-                        book.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
-                    book.put("finalPrice", user.getPurchaseHistory().get(i).getItems().get(j).getFinalPrice());
-
-                    books.add(book);
-
-                }
-            }
-        }
-
-        purchaseBooks.put("books", books);
+        purchaseBooks.put("books", user.getPurchasedBooks());
 
         return purchaseBooks;
     }

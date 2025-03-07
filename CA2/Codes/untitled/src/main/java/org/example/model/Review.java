@@ -1,10 +1,13 @@
 package org.example.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.example.model.serializer.ReviewSerializer;
 
 import java.time.LocalDateTime;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@JsonSerialize(using = ReviewSerializer.class)
 public class Review {
     private User user;
     private int rate;
