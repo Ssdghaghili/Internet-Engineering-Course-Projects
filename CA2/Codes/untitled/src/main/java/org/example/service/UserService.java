@@ -285,8 +285,8 @@ public class UserService {
         for (int i = 0; i < user.getPurchaseHistory().size(); i++) {
             for (int j = 0; j < user.getPurchaseHistory().get(i).getItems().size(); j++) {
                 Map<String, Object> book = new LinkedHashMap<>();
-                if (!user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed() ||
-                        user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays() > 0) {
+
+                if (user.isBookPurchased(user.getPurchaseHistory().get(i).getItems().get(j).getBook())){
 
                     book.put("title", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getTitle());
                     book.put("author", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getAuthor());
