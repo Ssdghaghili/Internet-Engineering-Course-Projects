@@ -27,7 +27,8 @@ public class CommandHandler {
         userService = new UserService(bookService);
         reviewService = new ReviewService(userService, bookService);
         objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES);
+        objectMapper.enable(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES);
     }
 
     public Response handleCommand(String commandInput) {
