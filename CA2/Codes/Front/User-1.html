@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="Style-css/style.css" />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.2.0/css/all.min.css"
+      integrity="sha512-xh6O/CkQoPOWDdYTDqeRdPCVd1SpvCA9XXcUnZS2FmJNp1coAFzvtCN9BmamE+4aHK8yyUHUSCcJHgXloTyT2A=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <title>User-1</title>
+</head>
+
+<body>
+    <nav class="navbar bg-white border-bottom p-0">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+          <a class="navbar-brand ps-4 m-0" href="#">
+            <img
+              src="Images/logo.png"
+              alt="MioBook Logo"
+              width="98"
+              height="36"
+            />
+          </a>
+  
+          <div class="search-box">
+            <div class="dropdown">
+              <button
+                class="dropdown-toggle"
+                type="button"
+                id="searchDropdown"
+                data-bs-toggle="dropdown"
+                aria-expanded="false">
+                Author
+              </button>
+              <ul class="dropdown-menu" aria-labelledby="searchDropdown">
+                <li>
+                  <a class="dropdown-item color-dark-gray" href="#">Name</a>
+                </li>
+                <li>
+                  <a class="dropdown-item color-dark-gray" href="#">Author</a>
+                </li>
+                <li>
+                  <a class="dropdown-item color-dark-gray" href="#">Genre</a>
+                </li>
+              </ul>
+            </div>
+  
+            <div class="divider"></div>
+            <input type="text" placeholder="Search"/>
+          </div>
+  
+          <a
+            href="#"
+            class="btn btn-buy-now me-4 p-0 text-center align-content-center fw-medium"
+            >Buy now</a>
+        </div>
+    </nav>
+
+    <main class="container-fluid background pb-5">
+      <div class="container">
+        <div class="row justify-content-center rounded-3 pt-5">
+          <div class="col-7 bg-white p-4 rounded-3">
+            <div class="row mb-2">
+              <h3 class="fw-bold">$1,000</h4>
+            </div>
+
+            <div class="row">
+              <div class="input-group">
+                  <input type="number" class="form-control border rounded-3 me-4 ps-4 p-2" placeholder="$Amount">
+                  <button class="btn-form rounded-3 p-2 ps-3 pe-3">Add more credit</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-1"></div>
+
+          <div class="col-4 bg-white p-4 rounded-3">
+            <div class="row">
+              <div class="d-flex align-items-center mb-2">
+                <img src="Images/user-icon.png" alt="User Icon" class="Icon">
+                <span class="ms-2">UserName</span>
+              </div>
+            </div>
+            <div class="row">
+              <div class="d-flex align-items-center mb-2">
+                <img src="Images/email-icon.png" alt="Email Icon" class="Icon">
+                <span class="ms-2">email.sample@gmail.com</span>
+              </div>
+            </div>
+            <div class="row">
+              <div>
+                <button class="btn-form rounded-3 p-0 ps-4 pe-4 text-dark">logout</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container bg-white pb-3 rounded-3">
+        <div class="col mt-5">
+          <div class="row p-4">
+            <div class="d-flex align-items-center">
+              <img src="Images/cart-icon.png" alt="Cart Icon" class="Icon me-3">
+              <h3 class="fw-bold">Cart</h3>
+            </div>
+          </div>
+
+          <div class="row ps-4 pe-4">
+            <table class="table align-middle">
+              <thead class="table-secondary table-light table-head">
+                  <tr>
+                      <th class="table-head-word fw-normal">Image</th>
+                      <th class="table-head-word fw-normal">Name</th>
+                      <th class="table-head-word fw-normal">Author</th>
+                      <th class="table-head-word fw-normal">Price</th>
+                      <th class="table-head-word fw-normal">Amount</th>
+                  </tr>
+              </thead>
+              <tbody>
+                <tr>
+                    <td><img src="Images/book-image.jpeg" alt="Book Image" class="book-image"></td>
+                    <td>Book Title</td>
+                    <td>John Doe</td>
+                    <td>$20.00</td>
+                    <td class="d-flex align-items-center">
+                      <div class="row">
+                        <button class="col minus-btn btn-sm bg-light">−</button>
+                        <input type="col number" class="form-control text-center" value="1" style="width: 40px;" min="1">
+                        <button class="col plus-btn btn-sm bg-dark-green">+</button>
+                      </div>
+                    </td>
+                </tr>
+                <tr>
+                  <td><img src="Images/book-image.jpeg" alt="Book Image" class="book-image"></td>
+                  <td>Book Title</td>
+                  <td>John Doe</td>
+                  <td>$20.00</td>
+                  <td class="d-flex align-items-center">
+                    <div class="row">
+                      <button class="col minus-btn btn-sm bg-light">−</button>
+                      <input type="col number" class="form-control text-center" value="1" style="width: 40px;" min="1">
+                      <button class="col plus-btn btn-sm bg-dark-green">+</button>
+                    </div>
+                  </td>
+              </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="row align-items-center justify-content-center">
+          <div class="d-grid col-3 mx-auto">
+            <button class="btn btn-sign" type="button">Purchase</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="container bg-white pb-3 bg-white">
+        <div class="col mt-5">
+          <div class="row p-4 rounded-3">
+            <div class="d-flex align-items-center">
+              <img src="Images/history-icon.png" alt="History Icon" class="Icon me-3">
+              <h3 class="fw-bold">History</h3>
+            </div>
+          </div>
+
+          <div class="row bg-white ps-4 pe-4">
+            <table class="table align-middle">
+              <thead class="table-secondary table-light table-head">
+                <tr>
+                    <th class="table-head-word fw-normal">Image</th>
+                    <th class="table-head-word fw-normal">Name</th>
+                    <th class="table-head-word fw-normal">Author</th>
+                    <th class="table-head-word fw-normal">Price</th>
+                    <th class="table-head-word fw-normal">Quantity</th>
+                </tr>
+              </thead>
+              <tbody>
+                  <tr>
+                      <td><img src="Images/book-image.jpeg" alt="Book Image" class="book-image"></td>
+                      <td>Book Title</td>
+                      <td>$20.00</td>
+                      <td>John Doe</td>
+                      <td>1</td>
+                  </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <footer class="bg-dark-green d-flex align-items-center justify-content-center py-1">
+        <p class="color-gray m-0" style="font-size: 0.9rem">
+            Copyright © 2025 -
+            <a href="#" class="text-decoration-none color-beige">MioBook</a>
+        </p>
+    </footer>
+    <script src="js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

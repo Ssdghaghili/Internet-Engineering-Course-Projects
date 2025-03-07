@@ -46,6 +46,9 @@ footer {
     width: 100%;
 }
 
+.background {
+    background-color:#f7f9fb;
+}
 
 .btn {
     display: block;
@@ -60,11 +63,48 @@ footer {
     transition: background-color 0.3s ease;
 }
 
+.minus-btn {
+    display: block;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #000000;
+    font-family: poppins, sans-serif;
+    margin: 1rem 0;
+}
+
+.plus-btn {
+    display: block;
+    border-radius: 5px;
+    outline: none;
+    border: none;
+    font-size: 1.2rem;
+    color: #fff;
+    font-family: poppins, sans-serif;
+    margin: 1rem 0;
+}
+
+.btn-form {
+    outline: none;
+    border: none;
+    font-size: 1.1rem;
+    color: #d9d9d9;
+    font-family: poppins, sans-serif;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    background-color: #f2f2f2;
+}
+
+.btn-form:hover {
+    background-color: #16423c;
+    color: #fff !important;
+}
+
 .btn-sign{
     display: block;
     width: 100%;
     height: 40px;
-    background-color: #d9d9d9;
     background-color: #d9d9d9;
 }
 
@@ -266,11 +306,6 @@ footer {
     border-bottom: 1px solid #8553125c;
 }
 
-.card-light-word{
-    font-size: 0.8rem;
-    color: #666;
-}
-
 .card-book-price{
     font-weight: bold;
     font-size: 1.4rem;
@@ -353,3 +388,21 @@ footer {
     border-color: #16423c;
     box-shadow: 0 0 5px #16423c;
   }
+
+  .Icon {
+    width: 24px; 
+    height: auto;
+  }
+
+.table-head {
+    border-color: #ffffff !important;
+}
+
+.table-head-word {
+    color: #666 !important;
+}
+
+.book-image {
+    width: 40px; 
+    height: auto;
+}
