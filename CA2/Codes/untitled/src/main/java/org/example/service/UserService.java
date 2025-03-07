@@ -56,7 +56,7 @@ public class UserService {
         if (user.hasBookInCart(book))
             throw new IllegalArgumentException("Book is already in the cart.");
 
-        if (user.hasBookInPurchaseHistory(book) && user.hasBorrowBookValid(book))
+        if (user.isBookPurchased(book))
             throw new IllegalArgumentException("Book is already purchased.");
 
         user.addCart(book);
@@ -136,7 +136,7 @@ public class UserService {
         if (user.hasBookInCart(book))
             throw new IllegalArgumentException("Book is already in the cart.");
 
-        if (user.hasBookInPurchaseHistory(book) && user.hasBorrowBookValid(book))
+        if (user.isBookPurchased(book))
             throw new IllegalArgumentException("Book is already purchased.");
 
         if (days < 1 || days > 9)
@@ -174,10 +174,7 @@ public class UserService {
         if (book == null)
             throw new IllegalArgumentException("Book not found.");
 
-        if (!user.hasBookInPurchaseHistory(book))
-            throw new IllegalArgumentException("The book is not in your possession.");
-
-        if (!user.hasBorrowBookValid(book))
+        if (!user.isBookPurchased(book))
             throw new IllegalArgumentException("The book is not in your possession.");
 
         Map<String, Object> bookContent = new LinkedHashMap<>();

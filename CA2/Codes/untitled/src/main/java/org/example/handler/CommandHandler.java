@@ -115,7 +115,7 @@ public class CommandHandler {
             return new Response(true, "Author added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -128,7 +128,7 @@ public class CommandHandler {
             return new Response(true, "Book added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -141,7 +141,7 @@ public class CommandHandler {
             return new Response(true, "Added book to cart.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -154,7 +154,7 @@ public class CommandHandler {
             return new Response(true, "Removed book from cart.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -167,7 +167,7 @@ public class CommandHandler {
             return new Response(true, "Credit added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -178,7 +178,7 @@ public class CommandHandler {
             return new Response(true, "Purchase completed successfully.", purchaseReceipt);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -192,7 +192,7 @@ public class CommandHandler {
             return new Response(true, "Added borrowed book to cart.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -207,7 +207,7 @@ public class CommandHandler {
             return new Response(true, "Review added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-                return Response.failure(e.getMessage());
+                return createFailureResponse(e);
         }
     }
 
@@ -218,7 +218,7 @@ public class CommandHandler {
             return new Response(true, "User details retrieved successfully.", userDetails);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -229,7 +229,7 @@ public class CommandHandler {
             return new Response(true, "Author details retrieved successfully.", author);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -240,7 +240,7 @@ public class CommandHandler {
             return new Response(true, "Book details retrieved successfully.", bookDetails);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -252,7 +252,7 @@ public class CommandHandler {
             return new Response(true, "Book content retrieved successfully.", bookContent);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -263,7 +263,7 @@ public class CommandHandler {
             return new Response(true, "Book reviews retrieved successfully.", bookReviews);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -274,7 +274,7 @@ public class CommandHandler {
             return new Response(true, "Buy cart retrieved successfully.", cart);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -285,7 +285,7 @@ public class CommandHandler {
             return new Response(true, "Purchase history retrieved successfully.", purchaseHistory);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -296,7 +296,7 @@ public class CommandHandler {
             return new Response(true, "Purchase books retrieved successfully.", purchaseBooks);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -307,7 +307,7 @@ public class CommandHandler {
             return new Response(true, "Books containing " + "'" + title + "'" + " in their title:", searchResults);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -318,7 +318,7 @@ public class CommandHandler {
             return new Response(true, "Books by " + "'" + author + "'" + ":", searchResults);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -329,7 +329,7 @@ public class CommandHandler {
             return new Response(true, "Books in the " + "'" + genre + "'" + " genre:", searchResults);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 
@@ -341,7 +341,7 @@ public class CommandHandler {
             return new Response(true, "Books published from " + start + " to " + end + ":", searchResults);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
-            return Response.failure(e.getMessage());
+            return createFailureResponse(e);
         }
     }
 

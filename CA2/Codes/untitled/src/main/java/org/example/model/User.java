@@ -83,22 +83,31 @@ public class User {
         return this.cart.stream().anyMatch(c -> c.getBook().equals(book));
     }
 
-    public boolean hasBookInPurchaseHistory(Book book) {
-        return this.purchaseHistory.stream().anyMatch(p -> p.getItems().stream().anyMatch(c -> c.getBook().equals(book)));
+    public boolean isBookPurchased(Book book) {
+        for (PurchaseRecord r : purchaseHistory) {
+            for (CartItem c : r.getItems()) {
+                if (c.getBook().equals(book)) {
+                    if (!c.isBorrowed())
+                        return true;
+                    else if (r.getPurchaseDate().plusDays(c.getBorrowDays()).isAfter(LocalDateTime.now()))
+                        return true;
+                }
+            }
+        }
+        return false;
     }
 
-    public boolean hasBorrowBookValid(Book book) {
-        boolean hasNonBorrowed = this.purchaseHistory.stream()
-                .flatMap(purchase -> purchase.getItems().stream())
-                .anyMatch(cartItem -> cartItem.getBook().equals(book) && !cartItem.isBorrowed());
-
-        if (hasNonBorrowed)
-            return true;
-
-        return this.purchaseHistory.stream()
-                .flatMap(purchase -> purchase.getItems().stream())
-                .filter(cartItem -> cartItem.getBook().equals(book))
-                .anyMatch(cartItem -> cartItem.isBorrowed() && cartItem.getBorrowDays() > 0);
+    public List<CartItem> getPurchasedBooks() {
+        List<CartItem> purchasedBooks = new ArrayList<>();
+        for (PurchaseRecord r : purchaseHistory) {
+            for (CartItem c : r.getItems()) {
+                if (!c.isBorrowed())
+                    purchasedBooks.add(c);
+                else if (r.getPurchaseDate().plusDays(c.getBorrowDays()).isAfter(LocalDateTime.now()))
+                    purchasedBooks.add(c);
+            }
+        }
+        return purchasedBooks;
     }
 
     public boolean hasEnoughCreditForCart() {
