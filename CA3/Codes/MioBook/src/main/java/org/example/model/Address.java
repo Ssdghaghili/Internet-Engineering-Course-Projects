@@ -1,0 +1,16 @@
+package org.example.model;
+
+public class Address {
+    private String country;
+    private String city;
+
+    public Address(String country, String city) {
+        this.country = country;
+        this.city = city;
+    }
+
+    public Address() {} //Default constructor
+
+    public String getCountry() { return country; }
+    public String getCity() { return city; }
+}
