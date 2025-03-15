@@ -12,6 +12,8 @@ import org.example.service.BookService;
 import org.example.service.ReviewService;
 import org.example.service.UserService;
 
+import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.Map;
 
 public class CommandHandler {
@@ -21,13 +23,13 @@ public class CommandHandler {
     private ReviewService reviewService;
     private ObjectMapper objectMapper;
 
-    public CommandHandler() {
-        authorService = new AuthorService();
-        bookService = new BookService(authorService);
-        userService = new UserService(bookService);
-        reviewService = new ReviewService(userService, bookService);
-        objectMapper = new ObjectMapper();
-        objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
+    public CommandHandler(AuthorService authorService, BookService bookService, UserService userService, ReviewService reviewService) {
+        this.authorService = authorService;
+        this.bookService = bookService;
+        this.userService = userService;
+        this.reviewService = reviewService;
+        this.objectMapper = new ObjectMapper();
+        this.objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }
 
     public Response handleCommand(String commandInput) {
@@ -81,6 +83,8 @@ public class CommandHandler {
                 return handleSearchBooksByGenre(inputJson);
             case "search_books_by_year":
                 return handleSearchBooksByYear(inputJson);
+            case "search_books":
+                return handleSearchBooks(inputJson);
             default:
                 return Response.failure("Command is invalid.");
         }
@@ -195,6 +199,7 @@ public class CommandHandler {
             return createFailureResponse(e);
         }
     }
+
     public Response handleAddReview(String jsonInput) {
         try {
             JsonNode jsonNode = objectMapper.readTree(jsonInput);
@@ -202,7 +207,7 @@ public class CommandHandler {
             String bookTitle = jsonNode.get("title").asText();
             int rate = jsonNode.get("rate").asInt();;
             String comment = jsonNode.get("comment").asText();
-            reviewService.addReview(username, bookTitle, rate, comment);
+            reviewService.addReview(username, bookTitle, rate, comment, LocalDateTime.now(), false);
             return new Response(true, "Review added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
@@ -255,13 +260,17 @@ public class CommandHandler {
         }
     }
 
-    public Response handelShowBookReviews(String jsonInput) {
+    public Response handelShowBookReviews(String query) {
         try {
-            String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
-            Map<String, Object> bookReviews = bookService.showBookReviews(bookTitle);
+            Map<String, String> queryParams = parseQueryParams(query);
+            String bookTitle = queryParams.get("title");
+
+            if (bookTitle == null || bookTitle.isEmpty())
+                throw new IllegalArgumentException("Book title is required.");
+
+            Map<String, Object> bookReviews = bookService.showBookReviews(bookTitle, queryParams);
             return new Response(true, "Book reviews retrieved successfully.", bookReviews);
-        }
-        catch (IllegalArgumentException | JsonProcessingException e) {
+        } catch (IllegalArgumentException e) {
             return createFailureResponse(e);
         }
     }
@@ -342,6 +351,31 @@ public class CommandHandler {
         catch (IllegalArgumentException | JsonProcessingException e) {
             return createFailureResponse(e);
         }
+    }
+
+    public Response handleSearchBooks(String query) {
+        try {
+            Map<String, String> queryParams = parseQueryParams(query);
+            Map<String, Object> searchResults = bookService.searchBooks(queryParams);
+            return new Response(true, "Search results:", searchResults);
+        }
+        catch (IllegalArgumentException e) {
+            return createFailureResponse(e);
+        }
+    }
+
+    private Map<String, String> parseQueryParams(String query) {
+        Map<String, String> queryParams = new HashMap<>();
+        if (query == null || query.trim().isEmpty()) return queryParams;
+
+        String[] pairs = query.split("&");
+        for (String pair : pairs) {
+            String[] keyValue = pair.split("=", 2);
+            if (keyValue.length == 2) {
+                queryParams.put(keyValue[0], keyValue[1]);
+            }
+        }
+        return queryParams;
     }
 
 }

@@ -63,6 +63,10 @@ public class Book {
         return sum / reviews.size();
     }
 
+    public int getReviewsCount() {
+        return reviews.size();
+    }
+
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
     public String getPublisher() { return publisher; }

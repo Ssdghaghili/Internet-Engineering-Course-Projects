@@ -15,7 +15,7 @@ public class ReviewService {
         this.bookService = bookService;
     }
 
-    public void addReview(String username, String bookTitle, int rate, String comment) {
+    public void addReview(String username, String bookTitle, int rate, String comment, LocalDateTime dateTime, boolean isInitializing) {
         User user = userService.findUserByUsername(username);
 
         if (user == null)
@@ -32,13 +32,13 @@ public class ReviewService {
         if (rate < 1 || rate > 5)
             throw new IllegalArgumentException("Rate should be between 1 and 5.");
 
-        if (!user.isBookPurchased(book))
+        if (!isInitializing && !user.isBookPurchased(book))
             throw new IllegalArgumentException("Only customers who have purchased the book can add reviews.");
 
         if (hasUserReviewedBook(book, user))
             book.removeReview(user);
 
-        Review newReview = new Review(user, rate, comment, LocalDateTime.now());
+        Review newReview = new Review(user, rate, comment, dateTime);
         book.addReview(newReview);
     }
 
