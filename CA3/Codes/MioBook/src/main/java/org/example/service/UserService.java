@@ -337,6 +337,16 @@ public class UserService {
         return users.stream().anyMatch(u -> u.getEmail().equals(email));
     }
 
+    public User authenticateUser(String username, String password) {
+
+        for (User user : users) {
+            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
+                return user;
+            }
+        }
+        return null;
+    }
+
     public List<User> getUsers() {
         return users;
     }
