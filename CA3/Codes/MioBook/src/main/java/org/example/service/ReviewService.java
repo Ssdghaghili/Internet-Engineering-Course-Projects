@@ -7,19 +7,19 @@ import org.example.model.User;
 import java.time.LocalDateTime;
 
 public class ReviewService {
-    private UserService userService;
     private BookService bookService;
+    private UserSession  userSession;
 
-    public ReviewService(UserService userService, BookService bookService) {
-        this.userService = userService;
+    public ReviewService(BookService bookService, UserSession  userSession) {
         this.bookService = bookService;
+        this.userSession = userSession;
     }
 
-    public void addReview(String username, String bookTitle, int rate, String comment, LocalDateTime dateTime, boolean isInitializing) {
-        User user = userService.findUserByUsername(username);
+    public void addReview(String bookTitle, int rate, String comment, LocalDateTime dateTime) {
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() != User.Role.customer)
             throw new IllegalArgumentException("Only customers can add reviews.");
@@ -32,8 +32,31 @@ public class ReviewService {
         if (rate < 1 || rate > 5)
             throw new IllegalArgumentException("Rate should be between 1 and 5.");
 
-        if (!isInitializing && !user.isBookPurchased(book))
+        if (!user.isBookPurchased(book))
             throw new IllegalArgumentException("Only customers who have purchased the book can add reviews.");
+
+        if (hasUserReviewedBook(book, user))
+            book.removeReview(user);
+
+        Review newReview = new Review(user, rate, comment, dateTime);
+        book.addReview(newReview);
+    }
+
+    public void loadReview(User user, String bookTitle, int rate, String comment, LocalDateTime dateTime) {
+
+        if (user == null)
+            throw new IllegalArgumentException("User does not exist.");
+
+        if (user.getRole() != User.Role.customer)
+            throw new IllegalArgumentException("Only customers can add reviews.");
+
+        Book book = bookService.findBookByTitle(bookTitle);
+
+        if (book == null)
+            throw new IllegalArgumentException("Book doesn't exist");
+
+        if (rate < 1 || rate > 5)
+            throw new IllegalArgumentException("Rate should be between 1 and 5.");
 
         if (hasUserReviewedBook(book, user))
             book.removeReview(user);

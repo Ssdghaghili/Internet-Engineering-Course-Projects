@@ -2,22 +2,29 @@ package org.example.service;
 
 import org.example.model.User;
 
+import java.util.ArrayList;
+
 public class UserSession {
-    private static User loggedInUser = null;
+    private User currentUser;
 
-    public static void login(User user) {
-        loggedInUser = user;
+    public UserSession() {
+        currentUser = null;
     }
 
-    public static void logout() {
-        loggedInUser = null;
+    public void login(User user) {
+        this.currentUser = user;
     }
 
-    public static User getLoggedInUser() {
-        return loggedInUser;
+    public void logout() {
+        this.currentUser = null;
     }
 
-    public static boolean isLoggedIn() {
-        return loggedInUser != null;
+    public User getCurrentUser() {
+        return currentUser;
+    }
+
+    public boolean isLoggedIn() {
+        return currentUser != null;
     }
 }
+

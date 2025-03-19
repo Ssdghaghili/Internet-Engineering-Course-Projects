@@ -1,10 +1,14 @@
 package org.example.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.example.model.serializer.UserSerializer;
+
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 
+@JsonSerialize(using = UserSerializer.class)
 public class User {
 
     public enum Role {
@@ -46,6 +50,10 @@ public class User {
     public int getBalance() { return balance; }
     public List<CartItem> getCart() { return cart; }
     public List<PurchaseRecord> getPurchaseHistory() { return purchaseHistory; }
+
+    public boolean checkPassword(String password) {
+        return this.password.equals(password);
+    }
 
     public void setBalance(int balance) {
         this.balance = balance;

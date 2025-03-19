@@ -1,5 +1,9 @@
 package org.example.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.example.model.serializer.CartItemSerializer;
+
+@JsonSerialize(using = CartItemSerializer.class)
 public class CartItem {
     private Book book;
     private boolean isBorrowed;

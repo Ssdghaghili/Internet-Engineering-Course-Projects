@@ -8,6 +8,7 @@ import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Author {
+    private String username;
     private String name;
     private String penName;
     private String nationality;

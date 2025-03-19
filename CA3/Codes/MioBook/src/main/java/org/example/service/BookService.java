@@ -33,24 +33,13 @@ public class BookService {
         books.add(book);
     }
 
-    public Map<String, Object> showBookDetails(String title) {
+    public Book showBookDetails(String title) {
         Book book = findBookByTitle(title);
 
         if (book == null)
             throw new IllegalArgumentException("Book not found.");
 
-        Map<String, Object> bookDetails = new LinkedHashMap<>();
-
-        bookDetails.put("title", book.getTitle());
-        bookDetails.put("author", book.getAuthor());
-        bookDetails.put("publisher", book.getPublisher());
-        bookDetails.put("genres", book.getGenres());
-        bookDetails.put("year", book.getYear());
-        bookDetails.put("price", book.getPrice());
-        bookDetails.put("synopsis", book.getSynopsis());
-        bookDetails.put("averageRating", book.getAverageRate());
-
-        return bookDetails;
+        return book;
     }
 
     public  Map<String, Object> showBookReviews(String title, Map<String, String> queryParams) {

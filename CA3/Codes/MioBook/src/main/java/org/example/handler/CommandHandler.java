@@ -14,17 +14,22 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class CommandHandler {
+    private UserSession userSession;
     private AuthorService authorService;
     private BookService bookService;
     private UserService userService;
     private ReviewService reviewService;
+    private AuthService authService;
     private ObjectMapper objectMapper;
 
-    public CommandHandler(AuthorService authorService, BookService bookService, UserService userService, ReviewService reviewService) {
+    public CommandHandler(UserSession userSession, AuthorService authorService, BookService bookService,
+                          UserService userService, ReviewService reviewService, AuthService authService) {
+        this.userSession = userSession;
         this.authorService = authorService;
         this.bookService = bookService;
         this.userService = userService;
         this.reviewService = reviewService;
+        this.authService = authService;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.configure(DeserializationFeature.FAIL_ON_NULL_FOR_PRIMITIVES, false);
     }
@@ -70,8 +75,8 @@ public class CommandHandler {
                 return handelShowCart();
             case "show_purchase_history":
                 return handleShowPurchaseHistory();
-            case "show_purchase_books":
-                return handleShowPurchaseBooks();
+            case "show_purchased_books":
+                return handleShowPurchasedBooks();
             case "search_books_by_title":
                 return handleSearchBooksByTitle(inputJson);
             case "search_books_by_author":
@@ -113,12 +118,8 @@ public class CommandHandler {
 
     public Response handleAddAuthor(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to add authors.");
-
-            User user = UserSession.getLoggedInUser();
+            authService.validateAdmin();
             Author newAuthor = objectMapper.readValue(jsonInput, Author.class);
-            userService.validateAdmin(user.getUsername());
             authorService.addAuthor(newAuthor);
             return new Response(true, "Author added successfully.");
         }
@@ -131,35 +132,26 @@ public class CommandHandler {
         try {
             String username = objectMapper.readTree(jsonInput).get("username").asText();
             String password = objectMapper.readTree(jsonInput).get("password").asText();
-
-            User user = userService.authenticateUser(username, password);
-
-            if (user == null)
-                return new Response(false, "Invalid username or password.");
-
-            UserSession.login(user);
+            authService.login(username, password);
             return new Response(true, "User logged in successfully.");
-        } catch (JsonProcessingException e) {
+        } catch (IllegalArgumentException | JsonProcessingException e) {
             return createFailureResponse(e);
         }
     }
 
     public Response handleLogout() {
-        if (!UserSession.isLoggedIn())
-            return new Response(false, "No user is logged in.");
-
-        UserSession.logout();
-        return new Response(true, "User logged out successfully.");
+        try {
+            authService.logout();
+            return new Response(true, "User logged out successfully.");
+        } catch (IllegalArgumentException e) {
+            return createFailureResponse(e);
+        }
     }
 
     public Response handleAddBook(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to add books.");
-
-            User user = UserSession.getLoggedInUser();
             Book newBook = objectMapper.readValue(jsonInput, Book.class);
-            userService.validateAdmin(user.getUsername());
+            authService.validateAdmin();
             bookService.addBook(newBook);
             return new Response(true, "Book added successfully.");
         }
@@ -170,13 +162,9 @@ public class CommandHandler {
 
     private Response handleAddCart(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to add items to cart.");
-
-            User user = UserSession.getLoggedInUser();
             JsonNode jsonNode = objectMapper.readTree(jsonInput);
             String bookTitle = jsonNode.get("title").asText();
-            userService.addCart(user.getUsername(), bookTitle);
+            userService.addCart(bookTitle);
             return new Response(true, "Added book to cart.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
@@ -186,13 +174,9 @@ public class CommandHandler {
 
     private Response handleRemoveCart(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to remove items from cart.");
-
-            User user = UserSession.getLoggedInUser();
             JsonNode jsonNode = objectMapper.readTree(jsonInput);
             String bookTitle = jsonNode.get("title").asText();
-            userService.removeCart(user.getUsername(), bookTitle);
+            userService.removeCart(bookTitle);
             return new Response(true, "Removed book from cart.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
@@ -202,13 +186,9 @@ public class CommandHandler {
 
     public Response handleAddCredit(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to add credit.");
-
-            User user = UserSession.getLoggedInUser();
             JsonNode jsonNode = objectMapper.readTree(jsonInput);
             int credit = jsonNode.get("credit").asInt();
-            userService.addCredit(user.getUsername(), credit);
+            userService.addCredit(credit);
             return new Response(true, "Credit added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
@@ -218,11 +198,7 @@ public class CommandHandler {
 
     public Response handlePurchaseCart() {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to purchase items.");
-
-            User user = UserSession.getLoggedInUser();
-            PurchaseReceipt purchaseReceipt = userService.purchaseCart(user.getUsername());
+            PurchaseReceipt purchaseReceipt = userService.purchaseCart();
             return new Response(true, "Purchase completed successfully.", purchaseReceipt);
         }
         catch (IllegalArgumentException e) {
@@ -232,14 +208,10 @@ public class CommandHandler {
 
     public Response handleBorrowBook(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to borrow books.");
-
-            User user = UserSession.getLoggedInUser();
             JsonNode jsonNode = objectMapper.readTree(jsonInput);
             String bookTitle = jsonNode.get("title").asText();
             int days = jsonNode.get("days").asInt();
-            userService.borrowBook(user.getUsername(), bookTitle, days);
+            userService.borrowBook(bookTitle, days);
             return new Response(true, "Added borrowed book to cart.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
@@ -249,15 +221,11 @@ public class CommandHandler {
 
     public Response handleAddReview(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to add reviews.");
-
-            User user = UserSession.getLoggedInUser();
             JsonNode jsonNode = objectMapper.readTree(jsonInput);
             String bookTitle = jsonNode.get("title").asText();
             int rate = jsonNode.get("rate").asInt();;
             String comment = jsonNode.get("comment").asText();
-            reviewService.addReview(user.getUsername(), bookTitle, rate, comment, LocalDateTime.now(), false);
+            reviewService.addReview(bookTitle, rate, comment, LocalDateTime.now());
             return new Response(true, "Review added successfully.");
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
@@ -267,12 +235,8 @@ public class CommandHandler {
 
     public Response handelShowUserDetails() {
         try{
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to view user details.");
-
-            User user = UserSession.getLoggedInUser();
-            Map<String, Object> userDetails = userService.showUserDetails(user.getUsername());
-            return new Response(true, "User details retrieved successfully.", userDetails);
+            User user = userService.showUserDetails();
+            return new Response(true, "User details retrieved successfully.", user);
         }
         catch (IllegalArgumentException e) {
             return createFailureResponse(e);
@@ -293,8 +257,8 @@ public class CommandHandler {
     public Response handleShowBookDetails(String jsonInput) {
         try {
             String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
-            Map<String, Object> bookDetails = bookService.showBookDetails(bookTitle);
-            return new Response(true, "Book details retrieved successfully.", bookDetails);
+            Book book = bookService.showBookDetails(bookTitle);
+            return new Response(true, "Book details retrieved successfully.", book);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
             return createFailureResponse(e);
@@ -303,12 +267,8 @@ public class CommandHandler {
 
     public Response handleShowBookContent(String jsonInput) {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to view book content.");
-
-            User user = UserSession.getLoggedInUser();
             String bookTitle = objectMapper.readTree(jsonInput).get("title").asText();
-            Map<String, Object> bookContent = userService.showBookContent(user.getUsername(),bookTitle);
+            Map<String, Object> bookContent = userService.showBookContent(bookTitle);
             return new Response(true, "Book content retrieved successfully.", bookContent);
         }
         catch (IllegalArgumentException | JsonProcessingException e) {
@@ -333,11 +293,7 @@ public class CommandHandler {
 
     public Response handelShowCart() {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to view cart.");
-
-            User user = UserSession.getLoggedInUser();
-            Map<String, Object> cart = userService.showCart(user.getUsername());
+            Map<String, Object> cart = userService.showCart();
             return new Response(true, "Buy cart retrieved successfully.", cart);
         }
         catch (IllegalArgumentException e) {
@@ -347,11 +303,7 @@ public class CommandHandler {
 
     public Response handleShowPurchaseHistory() {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to view purchase history.");
-
-            User user = UserSession.getLoggedInUser();
-            Map<String, Object> purchaseHistory = userService.showPurchaseHistory(user.getUsername());
+            Map<String, Object> purchaseHistory = userService.showPurchaseHistory();
             return new Response(true, "Purchase history retrieved successfully.", purchaseHistory);
         }
         catch (IllegalArgumentException e) {
@@ -359,13 +311,9 @@ public class CommandHandler {
         }
     }
 
-    public Response handleShowPurchaseBooks() {
+    public Response handleShowPurchasedBooks() {
         try {
-            if (!UserSession.isLoggedIn())
-                return new Response(false, "You must be logged in to view purchase books.");
-
-            User user = UserSession.getLoggedInUser();
-            Map<String, Object> purchaseBooks = userService.showPurchaseBooks(user.getUsername());
+            Map<String, Object> purchaseBooks = userService.showPurchasedBooks();
             return new Response(true, "Purchase books retrieved successfully.", purchaseBooks);
         }
         catch (IllegalArgumentException e) {

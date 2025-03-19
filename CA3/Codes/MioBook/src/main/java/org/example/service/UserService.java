@@ -10,10 +10,12 @@ import java.util.*;
 public class UserService {
     private List<User> users;
     private BookService bookService;
+    private UserSession userSession;
 
-    public UserService(BookService bookService) {
-        users = new ArrayList<>();
+    public UserService(BookService bookService, UserSession userSession) {
+        this.users = new ArrayList<>();
         this.bookService = bookService;
+        this.userSession = userSession;
     }
 
     public void addUser(User newUser) {
@@ -36,16 +38,16 @@ public class UserService {
         users.add(newUser);
     }
 
-    public void addCart(String username, String bookTitle) {
+    public void addCart(String bookTitle) {
         Book book = bookService.findBookByTitle(bookTitle);
 
         if (book == null)
             throw new IllegalArgumentException("Book doesn't exist");
 
-        User user = findUserByUsername(username);
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User doesn't exist");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() == User.Role.admin)
             throw new IllegalArgumentException("admins cannot add to cart.");
@@ -62,16 +64,16 @@ public class UserService {
         user.addCart(book);
     }
 
-    public void removeCart(String username, String bookTitle) {
+    public void removeCart(String bookTitle) {
         Book book = bookService.findBookByTitle(bookTitle);
 
         if (book == null)
             throw new IllegalArgumentException("Book doesn't exist");
 
-        User user = findUserByUsername(username);
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User doesn't exist");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() == User.Role.admin)
             throw new IllegalArgumentException("Admins cannot remove from cart.");
@@ -80,11 +82,11 @@ public class UserService {
             throw new IllegalArgumentException("Book is not in the user's cart.");
     }
 
-    public void addCredit(String username, int credit) {
-        User user = findUserByUsername(username);
+    public void addCredit(int credit) {
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("User is not logged in..");
 
         if (user.getRole() != User.Role.customer)
             throw new IllegalArgumentException("Only customers can add credit.");
@@ -95,11 +97,11 @@ public class UserService {
         user.setBalance(user.getBalance() + credit);
     }
 
-    public PurchaseReceipt purchaseCart(String username) {
-        User user = findUserByUsername(username);
+    public PurchaseReceipt purchaseCart() {
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() != User.Role.customer)
             throw new IllegalArgumentException("Only customers can purchase cart.");
@@ -113,16 +115,16 @@ public class UserService {
         return user.purchaseCart();
     }
 
-    public void borrowBook(String username, String bookTitle, int days) {
+    public void borrowBook(String bookTitle, int days) {
         Book book = bookService.findBookByTitle(bookTitle);
 
         if (book == null)
-            throw new IllegalArgumentException("Book doesn't exist");
+            throw new IllegalArgumentException("Book doesn't exist.");
 
-        User user = findUserByUsername(username);
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User doesn't exist");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() == User.Role.admin)
             throw new IllegalArgumentException("admins cannot add to cart.");
@@ -145,34 +147,26 @@ public class UserService {
         user.borrowBook(book, days);
     }
 
-    public Map<String, Object> showUserDetails(String username) {
-        User user = findUserByUsername(username);
+    public User showUserDetails() {
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("User is not logged in.");
 
-        Map<String, Object> userDetails = new LinkedHashMap<>();
-
-        userDetails.put("username", user.getUsername());
-        userDetails.put("role", user.getRole());
-        userDetails.put("email", user.getEmail());
-        userDetails.put("address", user.getAddress());
-
-        if (user.getRole() != User.Role.admin) {
-            userDetails.put("balance", user.getBalance());
-        }
-
-        return userDetails;
+        return user;
     }
 
-    public Map<String, Object> showBookContent(String username, String title) {
-        User user = findUserByUsername(username);
+
+    public Map<String, Object> showBookContent(String title) {
         Book book = bookService.findBookByTitle(title);
-        if (user == null)
-            throw new IllegalArgumentException("User not found.");
 
         if (book == null)
             throw new IllegalArgumentException("Book not found.");
+
+        User user = userSession.getCurrentUser();
+
+        if (user == null)
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (!user.isBookPurchased(book))
             throw new IllegalArgumentException("The book is not in your possession.");
@@ -185,11 +179,11 @@ public class UserService {
         return bookContent;
     }
 
-    public Map<String, Object> showCart(String username) {
-        User user = findUserByUsername(username);
+    public Map<String, Object> showCart() {
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() == User.Role.admin)
             throw new IllegalArgumentException("Admins cannot have a cart.");
@@ -198,116 +192,42 @@ public class UserService {
 
         userCart.put("username", user.getUsername());
         userCart.put("totalCost", user.calculateCartCost());
-
-        List<Map<String, Object>> cart = new ArrayList<>();
-
-        for (int i = 0; i < user.getCart().size(); i++) {
-            Map<String, Object> cartItem = new LinkedHashMap<>();
-            cartItem.put("title", user.getCart().get(i).getBook().getTitle());
-            cartItem.put("author", user.getCart().get(i).getBook().getAuthor());
-            cartItem.put("publisher", user.getCart().get(i).getBook().getPublisher());
-            cartItem.put("genres", user.getCart().get(i).getBook().getGenres());
-            cartItem.put("year", user.getCart().get(i).getBook().getYear());
-            cartItem.put("price", user.getCart().get(i).getBook().getPrice());
-            cartItem.put("isBorrowed", user.getCart().get(i).isBorrowed());
-            cartItem.put("finalPrice", user.getCart().get(i).getFinalPrice());
-            if (user.getCart().get(i).isBorrowed())
-                cartItem.put("borrowDays", user.getCart().get(i).getBorrowDays());
-            cart.add(cartItem);
-        }
-
-        userCart.put("items", cart);
+        userCart.put("items", user.getCart());
 
         return userCart;
     }
 
-    public Map<String, Object> showPurchaseHistory(String username) {
-        User user = findUserByUsername(username);
+    public Map<String, Object> showPurchaseHistory() {
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() == User.Role.admin)
             throw new IllegalArgumentException("Admins cannot have a purchase history.");
 
         Map<String, Object> purchaseHistory = new LinkedHashMap<>();
         purchaseHistory.put("username", user.getUsername());
-
-        List<Map<String, Object>> records = new ArrayList<>();
-
-        for (int i = 0; i < user.getPurchaseHistory().size(); i++) {
-            Map<String, Object> record = new LinkedHashMap<>();
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-            record.put("purchaseDate", user.getPurchaseHistory().get(i).getPurchaseDate().format(formatter));
-
-            List<Map<String, Object>> itemsList = new ArrayList<>();
-
-            for (int j = 0; j < user.getPurchaseHistory().get(i).getItems().size(); j++) {
-                Map<String, Object> items = new LinkedHashMap<>();
-                items.put("title", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getTitle());
-                items.put("author", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getAuthor());
-                items.put("publisher", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPublisher());
-                items.put("genres", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getGenres());
-                items.put("year", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getYear());
-                items.put("isBorrowed", user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed());
-                if (user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed())
-                    items.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
-                items.put("price", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPrice());
-                items.put("finalPrice", user.getPurchaseHistory().get(i).getItems().get(j).getFinalPrice());
-                itemsList.add(items);
-            }
-
-            record.put("items", itemsList);
-            record.put("totalCost", user.getPurchaseHistory().get(i).getTotalCost());
-            records.add(record);
-        }
-
-        purchaseHistory.put("purchaseHistory", records);
+        purchaseHistory.put("purchaseHistory", user.getPurchaseHistory());
 
         return purchaseHistory;
     }
 
-    public Map<String, Object> showPurchaseBooks(String username) {
-        User user = findUserByUsername(username);
+    public Map<String, Object> showPurchasedBooks() {
+        User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User not found.");
+            throw new IllegalArgumentException("User is not logged in.");
 
         if (user.getRole() == User.Role.admin)
-            throw new IllegalArgumentException("Admins cannot have a purchase history.");
+            throw new IllegalArgumentException("Admins cannot have purchased books.");
 
-        Map<String, Object> purchaseBooks = new LinkedHashMap<>();
-        purchaseBooks.put("username", user.getUsername());
+        Map<String, Object> purchasedBooks = new LinkedHashMap<>();
 
-        List<Map<String, Object>> books = new ArrayList<>();
+        purchasedBooks.put("username", user.getUsername());
+        purchasedBooks.put("books", user.getPurchasedBooks());
 
-        for (int i = 0; i < user.getPurchaseHistory().size(); i++) {
-            for (int j = 0; j < user.getPurchaseHistory().get(i).getItems().size(); j++) {
-                Map<String, Object> book = new LinkedHashMap<>();
-
-                if (user.isBookPurchased(user.getPurchaseHistory().get(i).getItems().get(j).getBook())){
-
-                    book.put("title", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getTitle());
-                    book.put("author", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getAuthor());
-                    book.put("publisher", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPublisher());
-                    book.put("genres", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getGenres());
-                    book.put("year", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getYear());
-                    book.put("price", user.getPurchaseHistory().get(i).getItems().get(j).getBook().getPrice());
-                    book.put("isBorrowed", user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed());
-                    if (user.getPurchaseHistory().get(i).getItems().get(j).isBorrowed())
-                        book.put("borrowDays", user.getPurchaseHistory().get(i).getItems().get(j).getBorrowDays());
-                    book.put("finalPrice", user.getPurchaseHistory().get(i).getItems().get(j).getFinalPrice());
-
-                    books.add(book);
-
-                }
-            }
-        }
-
-        purchaseBooks.put("books", books);
-
-        return purchaseBooks;
+        return purchasedBooks;
     }
 
     public User findUserByUsername(String username) {
@@ -319,32 +239,12 @@ public class UserService {
         return null;
     }
 
-    public void validateAdmin(String username) {
-        User user = findUserByUsername(username);
-
-        if (user == null)
-            throw new IllegalArgumentException("User not found.");;
-
-        if (user.getRole() != User.Role.admin)
-            throw new IllegalArgumentException("User is not an admin.");
-    }
-
     public boolean usernameExists(String username) {
         return users.stream().anyMatch(u -> u.getUsername().equals(username));
     }
 
     public boolean emailExists(String email) {
         return users.stream().anyMatch(u -> u.getEmail().equals(email));
-    }
-
-    public User authenticateUser(String username, String password) {
-
-        for (User user : users) {
-            if (user.getUsername().equals(username) && user.getPassword().equals(password)) {
-                return user;
-            }
-        }
-        return null;
     }
 
     public List<User> getUsers() {

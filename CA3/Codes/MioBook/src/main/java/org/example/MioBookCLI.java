@@ -2,26 +2,25 @@ package org.example;
 
 import org.example.handler.CommandHandler;
 import org.example.model.DataInitializer;
-import org.example.service.AuthorService;
-import org.example.service.BookService;
-import org.example.service.ReviewService;
-import org.example.service.UserService;
+import org.example.service.*;
 
 import java.util.Scanner;
 
-public class Main {
+public class MioBookCLI {
     public static void main(String[] args) {
-
+        UserSession userSession = new UserSession();
         AuthorService authorService = new AuthorService();
         BookService bookService = new BookService(authorService);
-        UserService userService = new UserService(bookService);
-        ReviewService reviewService = new ReviewService(userService, bookService);
+        UserService userService = new UserService(bookService, userSession);
+        ReviewService reviewService = new ReviewService(bookService, userSession);
+        AuthService authService = new AuthService(userService, userSession);
 
         DataInitializer dataInitializer = new DataInitializer(userService, authorService, bookService, reviewService);
         dataInitializer.initializeData();
 
+        CommandHandler commandHandler = new CommandHandler(userSession, authorService, bookService,
+                userService, reviewService, authService);
 
-        CommandHandler commandHandler = new CommandHandler(authorService, bookService, userService, reviewService);
         Scanner scanner = new Scanner(System.in);
 
         while (true) {

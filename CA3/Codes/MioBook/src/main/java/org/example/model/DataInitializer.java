@@ -88,7 +88,8 @@ public class DataInitializer {
                     String dateString = (String) review.get("date");
                     LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
 
-                    reviewService.addReview(username, bookTitle, rate, comment, dateTime, true);
+                    User user =userService.findUserByUsername(username);
+                    reviewService.loadReview(user, bookTitle, rate, comment, dateTime);
 
                     //System.out.println("Added review for book: " + bookTitle + " by user: " + username);
                 } catch (IllegalArgumentException e) {
