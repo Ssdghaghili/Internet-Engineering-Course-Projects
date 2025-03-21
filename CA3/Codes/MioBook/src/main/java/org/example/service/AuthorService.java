@@ -1,37 +1,38 @@
 package org.example.service;
 
+import org.example.database.Database;
+import org.example.exception.*;
 import org.example.model.Author;
-import org.example.model.User;
 
-import java.util.ArrayList;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.List;
 
+@Service
 public class AuthorService {
-    private List<Author> authors;
+    @Autowired
+    private Database db;
 
-    public AuthorService() {
-        authors = new ArrayList<>();
-    }
-
-    public void addAuthor(Author newAuthor) {
+    public void addAuthor(Author newAuthor) throws DuplicateEntityException {
 
         if (authorNameExists(newAuthor.getName()))
-            throw new IllegalArgumentException("Author already exists.");
+            throw new DuplicateEntityException("Author already exists");
 
-        authors.add(newAuthor);
+        db.authors.add(newAuthor);
     }
 
-    public Author showAuthorDetails(String name) {
+    public Author showAuthorDetails(String name) throws NotFoundException {
         Author author = findAuthorByName(name);
 
         if (author == null)
-            throw new IllegalArgumentException("Author not found.");
+            throw new NotFoundException("Author not found.");
 
         return author;
     }
 
     public Author findAuthorByName(String name) {
-        for (Author author : authors) {
+        for (Author author : db.authors) {
             if (author.getName().equals(name)) {
                 return author;
             }
@@ -40,10 +41,6 @@ public class AuthorService {
     }
 
     public boolean authorNameExists(String name) {
-        return authors.stream().anyMatch(a -> a.getName().equals(name));
-    }
-
-    public List<Author> getAuthors() {
-        return authors;
+        return db.authors.stream().anyMatch(a -> a.getName().equals(name));
     }
 }

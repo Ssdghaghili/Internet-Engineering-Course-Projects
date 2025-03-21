@@ -1,9 +1,11 @@
-package org.example.model;
+package org.example.database;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.example.service.*;
 
+import org.example.model.*;
+
+import javax.xml.crypto.Data;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -17,18 +19,11 @@ public class DataInitializer {
 
     private static final String BASE_URL = "http://194.60.230.196:8000/";
 
-    private final UserService userService;
-    private final AuthorService authorService;
-    private final BookService bookService;
-    private final ReviewService reviewService;
-
+    private Database db;
     private final ObjectMapper objectMapper;
 
-    public DataInitializer(UserService userService, AuthorService authorService, BookService bookService, ReviewService reviewService) {
-        this.userService = userService;
-        this.authorService = authorService;
-        this.bookService = bookService;
-        this.reviewService = reviewService;
+    public DataInitializer(Database db) {
+        this.db = db;
         this.objectMapper = new ObjectMapper();
     }
 
@@ -43,8 +38,7 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Users");
             List<User> users = objectMapper.readValue(json, new TypeReference<List<User>>() {});
-            users.forEach(userService::addUser);
-            //System.out.println("Loaded " + users.size() + " users.");
+            db.users.addAll(users);
         } catch (Exception e) {
             System.out.println("Failed to fetch users: " + e.getMessage());
         }
@@ -54,8 +48,7 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Authors");
             List<Author> authors = objectMapper.readValue(json, new TypeReference<List<Author>>() {});
-            authors.forEach(authorService::addAuthor);
-            //System.out.println("Loaded " + authors.size() + " authors.");
+            db.authors.addAll(authors);
         } catch (Exception e) {
             System.out.println("Failed to fetch authors: " + e.getMessage());
         }
@@ -65,8 +58,7 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Books");
             List<Book> books = objectMapper.readValue(json, new TypeReference<List<Book>>() {});
-            books.forEach(bookService::addBook);
-            //System.out.println("Loaded " + books.size() + " books.");
+            db.books.addAll(books);
         } catch (Exception e) {
             System.out.println("Failed to fetch books: " + e.getMessage());
         }
@@ -80,21 +72,17 @@ public class DataInitializer {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
             for (Map<String, Object> review : reviews) {
-                try {
-                    String username = (String) review.get("username");
-                    String bookTitle = (String) review.get("title");
-                    int rate = (int) review.get("rate");
-                    String comment = (String) review.get("comment");
-                    String dateString = (String) review.get("date");
-                    LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+                String username = (String) review.get("username");
+                String bookTitle = (String) review.get("title");
+                int rate = (int) review.get("rate");
+                String comment = (String) review.get("comment");
+                String dateString = (String) review.get("date");
+                LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
 
-                    User user =userService.findUserByUsername(username);
-                    reviewService.loadReview(user, bookTitle, rate, comment, dateTime);
-
-                    //System.out.println("Added review for book: " + bookTitle + " by user: " + username);
-                } catch (IllegalArgumentException e) {
-                    System.out.println("Failed to add review: " + e.getMessage());
-                }
+                User user = findUserByUsername(db.users, username);
+                Book book = findBookByTitle(db.books, bookTitle);
+                Review newReview = new Review(user, rate, comment, dateTime);
+                book.addReview(newReview);
             }
         } catch (Exception e) {
             System.out.println("Failed to fetch reviews: " + e.getMessage());
@@ -124,5 +112,21 @@ public class DataInitializer {
         in.close();
         connection.disconnect();
         return content.toString();
+    }
+
+    User findUserByUsername(List<User> users, String username) {
+        for (User user : users) {
+            if (user.getUsername().equals(username))
+                return user;
+        }
+        return null;
+    }
+
+    Book findBookByTitle(List<Book> books, String title) {
+        for (Book book : books) {
+            if (book.getTitle().equals(title))
+                return book;
+        }
+        return null;
     }
 }

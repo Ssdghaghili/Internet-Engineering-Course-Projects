@@ -1,54 +1,36 @@
 package org.example.response;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
+import org.springframework.http.HttpStatus;
+
+import java.time.LocalDateTime;
 
 @JsonAutoDetect(fieldVisibility = JsonAutoDetect.Visibility.ANY)
-public class Response {
-    private static final ObjectMapper objectMapper = new ObjectMapper();
-    static {
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.disable(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS);
-    }
-
+public class Response<T> {
     private boolean success;
+    private HttpStatus status;
     private String message;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    private Object data;
+    private T data;
+    private LocalDateTime timestamp;
 
-    public Response(boolean success, String message, Object data) {
+    public Response(boolean success, HttpStatus status, String message, T data, LocalDateTime timestamp) {
         this.success = success;
+        this.status = status;
         this.message = message;
         this.data = data;
+        this.timestamp = timestamp;
     }
 
-    public Response(boolean success, String message) {
-        this.success = success;
-        this.message = message;
-        this.data = null;
+    public static <T> Response<T> ok(String message, T data) {
+        return new Response<T>(true, HttpStatus.OK, message, data, LocalDateTime.now());
     }
 
-    public static Response success(String message) {
-        return new Response(true, message);
+    public static <T> Response<T> ok(String message) {
+        return new Response<T>(true, HttpStatus.OK, message, null, LocalDateTime.now());
     }
 
-    public static Response failure(String message) {
-        return new Response(false, message);
-    }
-
-    public boolean isSuccess() { return success; }
-    public String getMessage() { return message; }
-    public Object getData() { return data; }
-
-    public String toJson() {
-        try {
-            return objectMapper.writeValueAsString(this);
-        } catch (JsonProcessingException e) {
-            return "{\n  \"success\": false,\n  \"message\": \"Serializing response failed.\"\n  \"data\": " + e.getMessage() + ",\n}";
-        }
+    public static <T> Response<T> failure(HttpStatus status, String message) {
+        return new Response<T>(false, status, message, null, LocalDateTime.now());
     }
 }

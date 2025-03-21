@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.example.model.serializer.UserSerializer;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.ArrayList;
 

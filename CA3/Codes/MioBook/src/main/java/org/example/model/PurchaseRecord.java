@@ -25,7 +25,5 @@ public class PurchaseRecord {
         return items;
     }
 
-    public int getTotalCost() {
-        return totalCost;
-    }
+    public int getTotalCost() { return totalCost; }
 }

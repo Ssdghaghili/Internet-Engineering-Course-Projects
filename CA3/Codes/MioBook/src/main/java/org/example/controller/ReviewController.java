@@ -1,0 +1,31 @@
+package org.example.controller;
+
+import org.example.exception.BadRequestException;
+import org.example.exception.ForbiddenException;
+import org.example.exception.NotFoundException;
+import org.example.exception.UnauthorizedException;
+import org.example.request.AddReviewRequest;
+import org.example.response.Response;
+import org.example.service.ReviewService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.time.LocalDateTime;
+
+@RestController
+@RequestMapping("/review")
+public class ReviewController {
+    @Autowired
+    private ReviewService reviewService;
+
+    @PostMapping("/add")
+    public Response<Object> addReview(@RequestBody AddReviewRequest addReviewRequest)
+            throws ForbiddenException, UnauthorizedException, NotFoundException, BadRequestException {
+        reviewService.addReview(addReviewRequest.getTitle(), addReviewRequest.getRate(),
+                addReviewRequest.getComment(), LocalDateTime.now());
+        return Response.ok("Review added successfully");
+    }
+}

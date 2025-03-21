@@ -1,237 +1,178 @@
 package org.example.service;
 
-import org.example.model.Book;
-import org.example.model.PurchaseReceipt;
-import org.example.model.User;
+import org.example.database.Database;
+import org.example.exception.*;
+import org.example.model.*;
 
-import java.time.format.DateTimeFormatter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
 import java.util.*;
 
+@Service
 public class UserService {
-    private List<User> users;
+    @Autowired
+    private Database db;
+    @Autowired
     private BookService bookService;
+    @Autowired
     private UserSession userSession;
 
-    public UserService(BookService bookService, UserSession userSession) {
-        this.users = new ArrayList<>();
-        this.bookService = bookService;
-        this.userSession = userSession;
-    }
-
-    public void addUser(User newUser) {
-
-        if (!ServiceUtils.validateUsername(newUser.getUsername()))
-            throw new IllegalArgumentException("Username is invalid.");
-
-        if (!ServiceUtils.validateEmail(newUser.getEmail()))
-            throw new IllegalArgumentException("Email is invalid.");
-
-        if (!ServiceUtils.validatePassword(newUser.getPassword()))
-            throw new IllegalArgumentException("Password is invalid.");
-
-        if (usernameExists(newUser.getUsername()))
-            throw new IllegalArgumentException("Username already exists.");
-
-        if (emailExists(newUser.getEmail()))
-            throw new IllegalArgumentException("Email already exists.");
-
-        users.add(newUser);
-    }
-
-    public void addCart(String bookTitle) {
+    public void addCart(String bookTitle)
+            throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
         Book book = bookService.findBookByTitle(bookTitle);
 
         if (book == null)
-            throw new IllegalArgumentException("Book doesn't exist");
+            throw new NotFoundException("Book not found");
 
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() == User.Role.admin)
-            throw new IllegalArgumentException("admins cannot add to cart.");
+            throw new ForbiddenException("Admins cannot add to cart");
 
         if (user.getCart().size() >= 10)
-            throw new IllegalArgumentException("Cart cannot have more than 10 items.");
+            throw new BadRequestException("Cart cannot have more than 10 items");
 
         if (user.hasBookInCart(book))
-            throw new IllegalArgumentException("Book is already in the cart.");
+            throw new BadRequestException("Book is already in the cart");
 
         if (user.isBookPurchased(book))
-            throw new IllegalArgumentException("Book is already purchased.");
+            throw new BadRequestException("Book is already purchased");
 
         user.addCart(book);
     }
 
-    public void removeCart(String bookTitle) {
+    public void removeCart(String bookTitle)
+            throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
         Book book = bookService.findBookByTitle(bookTitle);
 
         if (book == null)
-            throw new IllegalArgumentException("Book doesn't exist");
+            throw new NotFoundException("Book not found");
 
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() == User.Role.admin)
-            throw new IllegalArgumentException("Admins cannot remove from cart.");
+            throw new ForbiddenException("Admins cannot remove from cart");
 
         if (!user.removeBookFromCart(book))
-            throw new IllegalArgumentException("Book is not in the user's cart.");
+            throw new BadRequestException("Book is not in the user's cart");
     }
 
-    public void addCredit(int credit) {
+    public void addCredit(int amount)
+            throws UnauthorizedException, ForbiddenException, BadRequestException {
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in..");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() != User.Role.customer)
-            throw new IllegalArgumentException("Only customers can add credit.");
+            throw new ForbiddenException("Admins cannot add credit");
 
-        if (credit < 100)
-            throw new IllegalArgumentException("Minimum deposit amount is 100 cents (1 dollar).");
+        if (amount < 100)
+            throw new BadRequestException("Minimum deposit amount is 100 cents (1 dollar)");
 
-        user.setBalance(user.getBalance() + credit);
+        user.setBalance(user.getBalance() + amount);
     }
 
-    public PurchaseReceipt purchaseCart() {
+    public PurchaseReceipt purchaseCart()
+            throws UnauthorizedException, ForbiddenException, BadRequestException {
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() != User.Role.customer)
-            throw new IllegalArgumentException("Only customers can purchase cart.");
+            throw new ForbiddenException("Only customers can purchase");
 
         if (user.getCart().isEmpty())
-            throw new IllegalArgumentException("Cart cannot be empty.");
+            throw new BadRequestException("Cart cannot be empty");
 
         if (!user.hasEnoughCreditForCart())
-            throw new IllegalArgumentException("User has not enough credit.");
+            throw new BadRequestException("User has not enough credit");
 
         return user.purchaseCart();
     }
 
-    public void borrowBook(String bookTitle, int days) {
+    public void borrowBook(String bookTitle, int days)
+            throws UnauthorizedException, NotFoundException, ForbiddenException, BadRequestException {
         Book book = bookService.findBookByTitle(bookTitle);
 
         if (book == null)
-            throw new IllegalArgumentException("Book doesn't exist.");
+            throw new NotFoundException("Book not found");
 
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() == User.Role.admin)
-            throw new IllegalArgumentException("admins cannot add to cart.");
+            throw new ForbiddenException("Admins cannot add to cart");
 
         if (user.getCart().size() >= 10)
-            throw new IllegalArgumentException("Cart cannot have more than 10 items.");
+            throw new BadRequestException("Cart cannot have more than 10 items");
 
         if (user.hasBookInCart(book))
-            throw new IllegalArgumentException("Book is already in the cart.");
-
-        if (user.hasBookInCart(book))
-            throw new IllegalArgumentException("Book is already in the cart.");
+            throw new BadRequestException("Book is already in the cart");
 
         if (user.isBookPurchased(book))
-            throw new IllegalArgumentException("Book is already purchased.");
+            throw new BadRequestException("Book is already purchased");
 
         if (days < 1 || days > 9)
-            throw new IllegalArgumentException("Borrow days should be between 1 and 9.");
+            throw new BadRequestException("Borrow days should be between 1 and 9");
 
         user.borrowBook(book, days);
     }
 
-    public User showUserDetails() {
+    public Map<String, Object> showCart()
+            throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
-
-        return user;
-    }
-
-
-    public Map<String, Object> showBookContent(String title) {
-        Book book = bookService.findBookByTitle(title);
-
-        if (book == null)
-            throw new IllegalArgumentException("Book not found.");
-
-        User user = userSession.getCurrentUser();
-
-        if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
-
-        if (!user.isBookPurchased(book))
-            throw new IllegalArgumentException("The book is not in your possession.");
-
-        Map<String, Object> bookContent = new LinkedHashMap<>();
-
-        bookContent.put("title", book.getTitle());
-        bookContent.put("content", book.getContent());
-
-        return bookContent;
-    }
-
-    public Map<String, Object> showCart() {
-        User user = userSession.getCurrentUser();
-
-        if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() == User.Role.admin)
-            throw new IllegalArgumentException("Admins cannot have a cart.");
+            throw new ForbiddenException("Admins cannot have a cart");
 
         Map<String, Object> userCart = new LinkedHashMap<>();
 
-        userCart.put("username", user.getUsername());
         userCart.put("totalCost", user.calculateCartCost());
         userCart.put("items", user.getCart());
 
         return userCart;
     }
 
-    public Map<String, Object> showPurchaseHistory() {
+    public List<PurchaseRecord> showPurchaseHistory() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() == User.Role.admin)
-            throw new IllegalArgumentException("Admins cannot have a purchase history.");
+            throw new ForbiddenException("Admins cannot have a purchase history");
 
-        Map<String, Object> purchaseHistory = new LinkedHashMap<>();
-        purchaseHistory.put("username", user.getUsername());
-        purchaseHistory.put("purchaseHistory", user.getPurchaseHistory());
-
-        return purchaseHistory;
+        return user.getPurchaseHistory();
     }
 
-    public Map<String, Object> showPurchasedBooks() {
+    public List<CartItem> showPurchasedBooks() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new IllegalArgumentException("User is not logged in.");
+            throw new UnauthorizedException("User is not logged in");
 
         if (user.getRole() == User.Role.admin)
-            throw new IllegalArgumentException("Admins cannot have purchased books.");
+            throw new ForbiddenException("Admins cannot have purchased books");
 
-        Map<String, Object> purchasedBooks = new LinkedHashMap<>();
-
-        purchasedBooks.put("username", user.getUsername());
-        purchasedBooks.put("books", user.getPurchasedBooks());
-
-        return purchasedBooks;
+        return user.getPurchasedBooks();
     }
 
     public User findUserByUsername(String username) {
-        for (User user : users) {
+        for (User user : db.users) {
             if (user.getUsername().equals(username)) {
                 return user;
             }
@@ -240,14 +181,14 @@ public class UserService {
     }
 
     public boolean usernameExists(String username) {
-        return users.stream().anyMatch(u -> u.getUsername().equals(username));
+        return db.users.stream().anyMatch(u -> u.getUsername().equals(username));
     }
 
     public boolean emailExists(String email) {
-        return users.stream().anyMatch(u -> u.getEmail().equals(email));
+        return db.users.stream().anyMatch(u -> u.getEmail().equals(email));
     }
 
     public List<User> getUsers() {
-        return users;
+        return db.users;
     }
 }

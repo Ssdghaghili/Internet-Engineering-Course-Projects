@@ -9,7 +9,7 @@ public class Address {
         this.city = city;
     }
 
-    public Address() {} //Default constructor
+    public Address() {}
 
     public String getCountry() { return country; }
     public String getCity() { return city; }
