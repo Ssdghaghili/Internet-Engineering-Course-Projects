@@ -30,7 +30,8 @@ public class Response<T> {
         return new Response<T>(true, HttpStatus.OK, message, null, LocalDateTime.now());
     }
 
-    public static <T> Response<T> failure(HttpStatus status, String message) {
-        return new Response<T>(false, status, message, null, LocalDateTime.now());
+    public static <T> Response<T> failure(HttpStatus status, String message, T data) {
+        return new Response<T>(false, status, message, data, LocalDateTime.now());
     }
+
 }

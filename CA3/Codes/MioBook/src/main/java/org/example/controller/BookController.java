@@ -31,15 +31,15 @@ public class BookController {
         authService.validateAdmin();
         Book newBook = new Book(addBookRequest.getTitle(), addBookRequest.getAuthor(), addBookRequest.getPublisher(),
                 addBookRequest.getYear(), addBookRequest.getPrice(), addBookRequest.getSynopsis(),
-                addBookRequest.getSynopsis(), addBookRequest.getGenres());
+                addBookRequest.getContent(), addBookRequest.getGenres());
         bookService.addBook(newBook);
-        return Response.ok("Author added successfully");
+        return Response.ok("Book added successfully.");
     }
 
     @GetMapping("/{title}")
     public Response<Book> getBookDetails(@PathVariable String title) throws NotFoundException {
         Book book = bookService.showBookDetails(title);
-        return Response.ok("Book details retrieved successfully", book);
+        return Response.ok("Book details retrieved successfully.", book);
     }
 
     @GetMapping("/book/{title}/content")
@@ -56,7 +56,7 @@ public class BookController {
             @RequestParam(required = false, defaultValue = "10") int size
     ) throws NotFoundException, ForbiddenException, UnauthorizedException {
         List<Review> reviews = bookService.getBookReviews(title, page, size);
-        return Response.ok("Book reviews retrieved successfully");
+        return Response.ok("Book reviews retrieved successfully.", reviews);
     }
 
     @GetMapping("/search")

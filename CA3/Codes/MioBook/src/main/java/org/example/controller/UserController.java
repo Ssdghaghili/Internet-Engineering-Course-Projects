@@ -40,7 +40,7 @@ public class UserController {
     public Response<Object> addCredit(@RequestParam int amount)
             throws ForbiddenException, UnauthorizedException, BadRequestException {
         userService.addCredit(amount);
-        return Response.ok("Removed book from cart");
+        return Response.ok("Credit added successfully");
     }
 
     @PostMapping("/purchase")
