@@ -87,7 +87,7 @@
           <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
       
-        <div class="offcanvas-body">
+        <div class="offcanvas-body" style="border: none;">
           <div calss="row">
             <div class="col justify-content-center text-center font-semi-big fw-bold mb-3">
               Filters
@@ -594,9 +594,26 @@
         </div>
       </div>
     </div>
-
-    <script src="js/bootstrap.bundle.min.js"></script>
   </body>
+
+  <script src="js/bootstrap.bundle.min.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+  const filterGroups = document.querySelectorAll(".mb-3"); // Selects filter sections
+
+  filterGroups.forEach(group => {
+    const buttons = group.querySelectorAll(".btn-filter"); // Selects buttons within the section
+
+    buttons.forEach(button => {
+      button.addEventListener("click", function () {
+        buttons.forEach(btn => btn.classList.remove("btn-filter-selected")); // Remove from group only
+        this.classList.add("btn-filter-selected"); // Add to clicked button
+      });
+      });
+    });
+  });
+  </script>
+
   <footer
     class="text-center bg-dark-green d-flex align-items-center justify-content-center py-1 mt-5"
   >

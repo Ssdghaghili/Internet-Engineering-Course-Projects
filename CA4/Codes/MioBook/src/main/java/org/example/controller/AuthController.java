@@ -13,7 +13,7 @@ import org.example.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-@RequestMapping("/auth")
+@RequestMapping("/api")
 @RestController
 public class AuthController {
     @Autowired
@@ -30,7 +30,7 @@ public class AuthController {
             throws UnauthorizedException {
 
         authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        return Response.ok("User logged in successfully");
+        return Response.ok("User logged in successfully", user());
     }
 
     @PostMapping("/signup")

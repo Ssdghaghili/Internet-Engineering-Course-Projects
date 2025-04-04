@@ -51,7 +51,7 @@ public class UserController {
     }
 
     @PostMapping("/borrow")
-    public Response<Object> borrow(@RequestParam String title, int days)
+    public Response<Object> borrow(@RequestParam String title, @RequestParam Integer days)
             throws ForbiddenException, UnauthorizedException, NotFoundException, BadRequestException {
         userService.borrowBook(title, days);
         return Response.ok("Added borrowed book to cart");
