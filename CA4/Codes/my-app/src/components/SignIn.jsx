@@ -41,11 +41,11 @@ const SignIn = () => {
         return;
       }
 
-      console.log("Login successful:", data);
+      // console.log("Login successful:", data);
 
       localStorage.setItem("user", JSON.stringify(data.data.data));
       
-      console.log("User data:", data.data.data);
+      // console.log("User data:", data.data.data);
 
       ToastNotification({ type: "success", message: "Welcome back! 🎉" });
 

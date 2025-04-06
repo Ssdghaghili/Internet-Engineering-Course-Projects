@@ -43,12 +43,14 @@
 }
 
 body {
+  background-color: #f8f9fa !important;
   margin: 0 !important;
   padding: 0 !important;
   font-family: poppins, sans-serif !important;
 }
+
 footer {
-  position:static ;
+  position: relative;
   bottom: 0;
   width: 100%;
 }
@@ -262,7 +264,7 @@ footer {
   font-size: 1.8rem;
 }
 .navbar {
-  position:sticky;
+  position:fixed;
   padding: 0;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   /* height: 30%; */
@@ -580,6 +582,11 @@ footer {
   color: rgb(209, 133, 27);
 }
 
+.star.hoverd {
+  color: rgb(209, 133, 27);
+  cursor: pointer;
+}
+
 .star.selected {
   color: rgb(209, 133, 27);
 }
@@ -589,7 +596,7 @@ footer {
   height: 200px;
   border-radius: 10px;
   border: 0;
-  color: #7e7e7ead;
+  /* color: #7e7e7ead; */
   padding: 10px;
   font-size: 14px;
   resize: none;
@@ -600,8 +607,8 @@ footer {
 }
 
 .btn-submit {
-  background-color: #b5b5b533 !important;
-  color: #8a8a8a7e !important;
+  background-color: #16423c !important;
+  color: #ffffff !important;
   border: none;
   padding: 10px 20px;
   border-radius: 10px;
@@ -609,10 +616,17 @@ footer {
   cursor: pointer;
 }
 .btn-submit:hover  {
-  background-color: #16423c !important;
+  background-color: #23665d !important;
   color: #fff !important;
   transition: background-color 0.3s ease;
 }
+
+.btn-submit:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
 .btn-cancel {
   background-color: #b5b5b533;
   color: #000000;

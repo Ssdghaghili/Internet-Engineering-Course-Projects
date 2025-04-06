@@ -60,9 +60,9 @@ const HomePage = () => {
         <div className="row justify-content-center d-flex">
           <div className="col-11 d-flex justify-content-start">
             <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 mt-3 mb-3 gx-3 gx-md-5 gy-3 justify-content-start d-flex">
-              <BookCard Title="The Shadow Hour" Author="Author 1" Price="30" Rate="2.5" />
-              <BookCard Title="Book 2" Author="Author 2" Price="15" Rate="3"/>
-              <BookCard Title="Book 3" Author="Author 3" Price="20" Rate="3.2"/>
+              <BookCard Title="The Shadow Hour" Author="Author 1" Price="30" Rate="2.5" To="/Book/the shadow hour"/>
+              <BookCard Title="Whispers in the Dark" Author="Author 2" Price="15" Rate="3" To="/Book/Whispers in the Dark"/>
+              <BookCard Title="The Lost Chronicles" Author="Author 3" Price="20" Rate="3.2" To="/Book/The Lost Chronicles"/>
               <BookCard Title="Book 4" Author="Author 4" Price="25" Rate="5"/>
               <BookCard Title="Book 5" Author="Author 5" Price="30" Rate="4.7"/>
             </div>

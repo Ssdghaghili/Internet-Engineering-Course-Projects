@@ -21,9 +21,9 @@ const Comment = (props) => {
           <p className="mb-1 fw-light font-small d-md-block d-none">{props.Comment}</p>
         </div>
 
-        <div className="rating justify-content-end d-grid me-1">
+        <div className="rating justify-content-end d-grid me-1 text-end">
           {<Rating Rate={props.Rate} />}
-          <small className="text-muted d-md-block d-none">{props.Date}</small>
+          <small className="text-muted d-md-block d-none mt-1">{props.Date}</small>
         </div>
           
       </div>

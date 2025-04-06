@@ -22,8 +22,4 @@ const Rating = (props) => {
     return <div>{stars}</div>;
 };
 
-// Rating.propTypes = {
-//     Rate: PropTypes.oneOfType([PropTypes.number, PropTypes.string]).isRequired,
-// };
-
 export default Rating;

@@ -6,6 +6,7 @@ import SignIn from "./components/SignIn";
 import UserProfile from "./components/UserProfile";
 import BuyCart from "./components/BuyCart";
 import PurchaseHistory from "./components/PurchaseHistory";
+import BookPage from "./components/BookPage";
 import { ToastContainer } from "react-toastify";
 
 
@@ -22,6 +23,7 @@ function App() {
         <Route path="/signin" element={<SignIn />} />
         <Route path="/buycart" element={<BuyCart />} />
         <Route path="/purchase-history" element={<PurchaseHistory />} />
+        <Route path="/Book/:bookSlug" element={<BookPage />} />
       </Routes>
     </Router>
   );

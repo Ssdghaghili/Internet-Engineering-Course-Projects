@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.time.LocalDateTime;
 
 @RestController
-@RequestMapping("/review")
+@RequestMapping("api/review")
 public class ReviewController {
     @Autowired
     private ReviewService reviewService;

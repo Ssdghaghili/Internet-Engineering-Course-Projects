@@ -15,6 +15,7 @@ public class ReviewSerializer extends JsonSerializer<Review> {
         jsonGen.writeStringField("username", review.getUser().getUsername());
         jsonGen.writeNumberField("rate", review.getRate());
         jsonGen.writeStringField("comment", review.getComment());
+        jsonGen.writeStringField("date", review.getDateTime().toString());
 
         jsonGen.writeEndObject();
     }
