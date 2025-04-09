@@ -18,7 +18,7 @@ import java.util.Map;
 
 public class DataInitializer {
 
-    private static final String BASE_URL = "http://194.60.230.196:8000/";
+    private static final String BASE_URL = "http://194.60.231.242:8000/";
 
     private Database db;
     private final ObjectMapper objectMapper;
