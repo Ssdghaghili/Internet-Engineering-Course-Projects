@@ -32,7 +32,7 @@ const AddToCartModal = ({
     const daysSelection = root.querySelector(`#${daysSelectionId}`);
 
     if (!borrowCheckbox.checked) {
-      fetch(`http://localhost:8080/api/user/addCart?title=${Title}`, {
+      fetch(`api/user/addCart?title=${Title}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -75,10 +75,10 @@ const AddToCartModal = ({
     
         const dayNumber = parseFloat(selectedDays[0]);
 
-        const x = `http://localhost:8080/api/user/addCart?title=${Title}&days=${dayNumber}`;
+        const x = `api/user/addCart?title=${Title}&days=${dayNumber}`;
         console.log("URL:", x);
         
-        fetch(`http://localhost:8080/api/user/addCart?title=${Title}&days=${dayNumber}`, {
+        fetch(`api/user/addCart?title=${Title}&days=${dayNumber}`, {
             method: "POST",
             headers: {
               "Content-Type": "application/json",

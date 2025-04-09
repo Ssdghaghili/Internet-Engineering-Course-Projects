@@ -40,7 +40,7 @@ const AddReviewModal = ({ Book, Image }) => {
       comment: comment,
     };
 
-    fetch(`http://localhost:8080/api/review/add`, {
+    fetch(`api/review/add`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -22,7 +22,7 @@ const BookPage = () => {
 
   
   useEffect(() => {
-    fetch(`http://localhost:8080/api/books/${bookSlug}`)
+    fetch(`api/books/${bookSlug}`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -40,7 +40,7 @@ const BookPage = () => {
   }, [bookSlug, reviews, book]);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/books/book/${bookSlug}/reviews`)
+    fetch(`api/books/book/${bookSlug}/reviews`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
