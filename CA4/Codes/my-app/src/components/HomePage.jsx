@@ -3,7 +3,6 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./MainCmp/Navbar";
 import Footer from "./MainCmp/Footer";
-import Pagination from "./MainCmp/Pagination"
 import BookCard from "./MainCmp/BookCard";
 import DescriptionText from "./HomePageCmp/DescriptionText";
 import LibraryImage from "./HomePageCmp/LibraryImage";

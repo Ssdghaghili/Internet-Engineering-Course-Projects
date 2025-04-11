@@ -61,52 +61,51 @@ const AddToCartModal = ({
           });
         });
     } else {
-        const selectedDays = Array.from(
-            daysSelection.querySelectorAll(".btn-filter-selected")
-        ).map((button) => button.getAttribute("data-price"));
-    
-        if (selectedDays.length === 0) {
-            ToastNotification({
-            type: "error",
-            message: "Please select the number of days to borrow.",
-            });
-            return;
-        }
-    
-        const dayNumber = parseFloat(selectedDays[0]);
+      const selectedDays = Array.from(
+        daysSelection.querySelectorAll(".btn-filter-selected")
+      ).map((button) => button.getAttribute("data-price"));
 
-        const x = `api/user/addCart?title=${Title}&days=${dayNumber}`;
-        console.log("URL:", x);
-        
-        fetch(`api/user/addCart?title=${Title}&days=${dayNumber}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                ToastNotification({
-                  type: "success",
-                  message: `${Title} added to cart successfully!(browwing for ${dayNumber} days)`,
-                });
-              } else {
-                ToastNotification({
-                  type: "error",
-                  message: data.message || "Failed to add book to cart.",
-                });
-                // console.error("Backend message:", data.message);
-              }
-            })
-            .catch((error) => {
-              console.error("Error adding book to cart:", error);
-              ToastNotification({
-                type: "error",
-                message: "An unexpected error occurred. Please try again later.",
-              });
+      if (selectedDays.length === 0) {
+        ToastNotification({
+          type: "error",
+          message: "Please select the number of days to borrow.",
+        });
+        return;
+      }
+
+      const dayNumber = parseFloat(selectedDays[0]);
+
+      fetch(
+        `api/user/borrow?title=${Title}&days=${dayNumber}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      )
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.success) {
+            ToastNotification({
+              type: "success",
+              message: `${Title} added to cart successfully!(browwing for ${dayNumber} days)`,
             });
-        
+          } else {
+            ToastNotification({
+              type: "error",
+              message: data.message || "Failed to add book to cart.",
+            });
+            // console.error("Backend message:", data.message);
+          }
+        })
+        .catch((error) => {
+          console.error("Error adding book to cart:", error);
+          ToastNotification({
+            type: "error",
+            message: "An unexpected error occurred. Please try again later.",
+          });
+        });
     }
   };
 

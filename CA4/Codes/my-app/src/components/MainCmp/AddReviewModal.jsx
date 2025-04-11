@@ -54,6 +54,8 @@ const AddReviewModal = ({ Book, Image }) => {
             type: "success",
             message: `Review for ${Book.title} added successfully!`,
           });
+          setRating(0);
+          setComment("");
         } else {
           ToastNotification({
             type: "error",
