@@ -19,7 +19,7 @@ const PurchaseHistory = () => {
     const fetchHistory = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/user/purchase-history`
+          `/api/user/purchase-history`
         );
         if (!res.ok) {
           throw new Error("Network response was not ok");

@@ -32,7 +32,7 @@ const AddToCartModal = ({
     const daysSelection = root.querySelector(`#${daysSelectionId}`);
 
     if (!borrowCheckbox.checked) {
-      fetch(`api/user/addCart?title=${Title}`, {
+      fetch(`/api/user/addCart?title=${Title}`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -76,7 +76,7 @@ const AddToCartModal = ({
       const dayNumber = parseFloat(selectedDays[0]);
 
       fetch(
-        `api/user/borrow?title=${Title}&days=${dayNumber}`,
+        `/api/user/borrow?title=${Title}&days=${dayNumber}`,
         {
           method: "POST",
           headers: {

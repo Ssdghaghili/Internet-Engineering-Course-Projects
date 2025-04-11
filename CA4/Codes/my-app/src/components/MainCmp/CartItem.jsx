@@ -3,7 +3,7 @@ import ToastNotification from "./ToastNotification";
 
 const CartItem = ({ Item, Image }) => {
   const handelRemoveButtonClick = () => {
-    fetch(`http://localhost:8080/api/user/removeCart?title=${Item.title}`, {
+    fetch(`/api/user/removeCart?title=${Item.title}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

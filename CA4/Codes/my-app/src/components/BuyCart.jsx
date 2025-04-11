@@ -16,7 +16,7 @@ const BuyCart = () => {
   const [cartItems, setCartItems] = useState(null);
 
   useEffect(() => {
-    fetch(`http://localhost:8080/api/user/cart`)
+    fetch(`/api/user/cart`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -53,7 +53,7 @@ const BuyCart = () => {
   }
 
   const handlePurchase = () => {
-    fetch(`http://localhost:8080/api/user/purchase`, {
+    fetch(`/api/user/purchase`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

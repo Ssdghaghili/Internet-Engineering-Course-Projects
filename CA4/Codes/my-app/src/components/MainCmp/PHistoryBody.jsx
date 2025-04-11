@@ -13,7 +13,7 @@ const PHistoryBody = ({ history, image }) => {
       >
         {history.map((entry, index) => (
           <div className="accordion-item font-semi-small" key={index}>
-            <p className="accordion-header" id={`heading-${index}`}>
+            <div className="accordion-header" id={`heading-${index}`}>
               <div className="bg-gray">
                 <button
                   className="accordion-button collapsed bg-custom-gray"
@@ -28,7 +28,7 @@ const PHistoryBody = ({ history, image }) => {
                   </p>
                 </button>
               </div>
-            </p>
+            </div>
             <div
               id={`collapse-${index}`}
               className="accordion-collapse collapse"

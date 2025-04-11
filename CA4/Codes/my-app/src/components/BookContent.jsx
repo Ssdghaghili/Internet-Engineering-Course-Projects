@@ -17,7 +17,7 @@ const BookContent = () => {
     const fetchBookContent = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/books/book/${bookSlug}/content`
+          `/api/books/book/${bookSlug}/content`
         );
         if (!res.ok) {
           throw new Error("Network response was not ok");

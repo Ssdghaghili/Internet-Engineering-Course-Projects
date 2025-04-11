@@ -30,7 +30,7 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`http://localhost:8080/api/user`);
+        const res = await fetch(`/api/user`);
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -51,7 +51,7 @@ const UserProfile = () => {
     const fetchCart = async () => {
       try {
         const res = await fetch(
-          `http://localhost:8080/api/user/purchased-books`
+          `/api/user/purchased-books`
         );
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -89,7 +89,7 @@ const UserProfile = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("http://localhost:8080/api/logout", {
+      const response = await fetch("/api/logout", {
         method: "POST",
       });
       if (response.ok) {
@@ -112,7 +112,7 @@ const UserProfile = () => {
   const handleAddAmount = async () => {
     try {
       const response = await fetch(
-        `http://localhost:8080/api/user/addCredit?amount=${amount * 100}`,
+        `/api/user/addCredit?amount=${amount * 100}`,
         {
           method: "POST",
         }
