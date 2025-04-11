@@ -7,6 +7,7 @@ import UserProfile from "./components/UserProfile";
 import BuyCart from "./components/BuyCart";
 import PurchaseHistory from "./components/PurchaseHistory";
 import BookPage from "./components/BookPage";
+import SearchResult from "./components/SearchResult"
 import { ToastContainer } from "react-toastify";
 
 
@@ -24,6 +25,7 @@ function App() {
         <Route path="/buycart" element={<BuyCart />} />
         <Route path="/purchase-history" element={<PurchaseHistory />} />
         <Route path="/Book/:bookSlug" element={<BookPage />} />
+        <Route path="/search" element={<SearchResult />} />
       </Routes>
     </Router>
   );

@@ -64,14 +64,13 @@ public class BookController {
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String author,
             @RequestParam(required = false) String genre,
-            @RequestParam(required = false) Integer startYear,
-            @RequestParam(required = false) Integer endYear,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int size,
-            @RequestParam(defaultValue = "averageScore") String sortBy,
+            @RequestParam(required = false) Integer year,
+            @RequestParam(required = false, defaultValue = "1") Integer page,
+            @RequestParam(required = false, defaultValue = "10") Integer size,
+            @RequestParam(defaultValue = "rating") String sortBy,
             @RequestParam(defaultValue = "desc") String order
     ) throws BadRequestException {
-        List<Book> books = bookService.searchBooks(title, author, genre, startYear, endYear, page, size, sortBy, order);
+        List<Book> books = bookService.searchBooks(title, author, genre, year, page, size, sortBy, order);
         return Response.ok("Search results retrieved successfully", books);
     }
 }

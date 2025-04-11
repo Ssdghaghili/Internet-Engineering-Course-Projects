@@ -72,6 +72,11 @@ footer {
   transition: background-color 0.3s ease;
 }
 
+.btn.active  {
+  background-color: #23645a !important;
+  color: #ffffff !important;
+}
+
 .minus-btn {
   display: block;
   border-radius: 5px;
@@ -469,20 +474,19 @@ footer {
   font-weight: lighter !important;
   text-decoration: none !important;
   border-radius: 9px !important;
-  width: 25px !important;
+  width: 30px !important;
 }
 
 .pagination-link.active {
-  background: #e3e0e092 !important;
-  color: #000000 !important;
-  border-color: #16423c !important;
+  background: #16423c !important;
+  color: white !important;
 }
 
 .pagination-link:hover {
-  background: #e3e0e092 !important;
-  color: #16423c !important;
-  border-color: #16423c !important;
-  box-shadow: 0 0 5px #16423c !important;
+  background: #e3e0e092;
+  color: #16423c;
+  border-color: #16423c;
+  box-shadow: 0 0 5px #16423c;
 }
 
 .Icon {

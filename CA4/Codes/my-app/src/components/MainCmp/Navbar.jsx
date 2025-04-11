@@ -89,9 +89,8 @@ const Navbar = () => {
                 className="dropdown-menu show"
                 aria-labelledby="searchDropdown"
               >
-                <SearchDropdown Name={"Name"} />
+                <SearchDropdown Name={"Title"} />
                 <SearchDropdown Name={"Author"} />
-                <SearchDropdown Name={"Genre"} />
               </ul>
             )}
           </div>
