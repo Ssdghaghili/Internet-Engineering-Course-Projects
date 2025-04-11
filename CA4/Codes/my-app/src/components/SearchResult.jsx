@@ -43,7 +43,7 @@ export default function SearchResult() {
     const fetchBooks = async (filters) => {
         try {
             const query = new URLSearchParams(filters).toString();
-            const url = `api/books/search?${query}`;
+            const url = `http://localhost:8080/api/books/search?${query}`;
 
             const response = await fetch(url);
 

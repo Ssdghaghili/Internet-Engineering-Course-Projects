@@ -71,6 +71,7 @@ public class BookService {
         Map<String, Object> bookContent = new LinkedHashMap<>();
 
         bookContent.put("title", book.getTitle());
+        bookContent.put("author",book.getAuthor());
         bookContent.put("content", book.getContent());
 
         return bookContent;

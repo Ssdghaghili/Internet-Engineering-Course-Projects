@@ -7,7 +7,10 @@ import UserProfile from "./components/UserProfile";
 import BuyCart from "./components/BuyCart";
 import PurchaseHistory from "./components/PurchaseHistory";
 import BookPage from "./components/BookPage";
-import SearchResult from "./components/SearchResult"
+import SearchResult from "./components/SearchResult";
+import Error from "./components/Error";
+import ProtectedRoute from "./components/MainCmp/ProtectedRoute";
+import BookContent from "./components/BookContent";
 import { ToastContainer } from "react-toastify";
 
 
@@ -18,14 +21,83 @@ function App() {
     <Router>
       <ToastContainer />
       <Routes>
-        <Route path="/" element={<HomePage />} />
-        <Route path="/user-profile" element={<UserProfile />} />
+        {/* Public Routes */}
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
-        <Route path="/buycart" element={<BuyCart />} />
-        <Route path="/purchase-history" element={<PurchaseHistory />} />
-        <Route path="/Book/:bookSlug" element={<BookPage />} />
-        <Route path="/search" element={<SearchResult />} />
+
+        {/* Protected Routes for Both Admin & Customer */}
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "customer"]}>
+              <HomePage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Book/:bookSlug"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "customer"]}>
+              <BookPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/books/search"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "customer"]}>
+              <SearchResult />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected Routes for Customer only */}
+        <Route
+          path="/user-profile"
+          element={
+            <ProtectedRoute allowedRoles={["customer"]}>
+              <UserProfile />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/buycart"
+          element={
+            <ProtectedRoute allowedRoles={["customer"]}>
+              <BuyCart />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/purchase-history"
+          element={
+            <ProtectedRoute allowedRoles={["customer"]}>
+              <PurchaseHistory />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Book/:bookSlug/content"
+          element={
+            <ProtectedRoute allowedRoles={["customer"]}>
+              <BookContent />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Protected Routes for Admin only */}
+        {/* <Route
+          path="/admin-dashboard"
+          element={
+            <ProtectedRoute allowedRoles={["admin"]}>
+              <AdminDashboard />
+            </ProtectedRoute>
+          }
+        /> */}
+
+        {/* Fallback */}
+        <Route path="/error" element={<Error />} />
+        <Route path="*" element={<Error />} />
       </Routes>
     </Router>
   );

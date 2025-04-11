@@ -26,7 +26,7 @@ const SignUp = () => {
     setShowPassword((prevState) => !prevState);
   };
 
-    const [errors, setErrors] = useState({});
+  const [errors, setErrors] = useState({});
 
   const isFormValid =
     userType !== "" &&
@@ -76,7 +76,7 @@ const SignUp = () => {
       });
 
       const data = await response.json();
-    //   console.log(data);
+      //   console.log(data);
 
       if (!data.success) {
         if (data.message.toLowerCase().includes("username")) {
@@ -216,7 +216,6 @@ const SignUp = () => {
                 <div className="row justify-content-center p-0 m-0">
                   <div className="col-5 col-sm-4 align-items-center me-1">
                     <button
-                      //   className="btn btn-iam d-flex align-items-center justify-content-center p-2 gap-2"
                       className={`btn btn-iam d-flex align-items-center justify-content-center p-2 gap-2 ${
                         userType === "customer" ? "active" : ""
                       }`}
@@ -229,7 +228,6 @@ const SignUp = () => {
 
                   <div className="col-5 col-sm-4 align-items-center me-1">
                     <button
-                      //   className="btn btn-iam d-flex align-items-center justify-content-center p-2 gap-2"
                       className={`btn btn-iam d-flex align-items-center justify-content-center p-2 gap-2 ${
                         userType === "admin" ? "active" : ""
                       }`}
@@ -269,9 +267,8 @@ const SignUp = () => {
             </div>
           </div>
         </div>
-
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 };

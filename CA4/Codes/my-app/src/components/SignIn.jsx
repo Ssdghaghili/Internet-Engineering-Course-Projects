@@ -41,18 +41,12 @@ const SignIn = () => {
         return;
       }
 
-      // console.log("Login successful:", data);
-
       localStorage.setItem("user", JSON.stringify(data.data.data));
-      
-      // console.log("User data:", data.data.data);
 
       ToastNotification({ type: "success", message: "Welcome back! 🎉" });
 
       setErrors({});
       setTimeout(() => navigate("/"), 2000);
-
-      
     } catch (error) {
       console.error("Error:", error.message);
       setErrors({
@@ -112,7 +106,6 @@ const SignIn = () => {
                   </div>
                 </div>
 
-                {/* نمایش ارور بالای دکمه Sign in */}
                 {errors.username && (
                   <div className="col-10 col-sm-8 align-items-center mb-1 mt-2">
                     <div className="text-danger text-center" role="alert">
@@ -147,8 +140,8 @@ const SignIn = () => {
             </div>
           </div>
         </div>
-        <Footer />
       </div>
+      <Footer />
     </>
   );
 };

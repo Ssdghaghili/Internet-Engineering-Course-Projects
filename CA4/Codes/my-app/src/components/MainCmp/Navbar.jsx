@@ -48,16 +48,14 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      const response = await fetch("api/logout", {
+      const response = await fetch("/api/logout", {
         method: "POST",
       });
-
-      console.log("entered handle function");
       if (response.ok) {
         ToastNotification({ type: "success", message: "Logout successful!" });
         localStorage.removeItem("user");
         setUser(null);
-        setTimeout(() => navigate("/SignIn"), 2000);
+        setTimeout(() => navigate("/signin"), 2000);
       } else {
         console.error("Logout failed");
       }

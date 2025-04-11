@@ -40,7 +40,7 @@ const AddReviewModal = ({ Book, Image }) => {
       comment: comment,
     };
 
-    fetch(`api/review/add`, {
+    fetch(`/api/review/add`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,6 +54,8 @@ const AddReviewModal = ({ Book, Image }) => {
             type: "success",
             message: `Review for ${Book.title} added successfully!`,
           });
+          setRating(0);
+          setComment("");
         } else {
           ToastNotification({
             type: "error",
