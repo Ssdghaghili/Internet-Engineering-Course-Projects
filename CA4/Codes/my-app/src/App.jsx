@@ -7,11 +7,11 @@ import UserProfile from "./components/UserProfile";
 import BuyCart from "./components/BuyCart";
 import PurchaseHistory from "./components/PurchaseHistory";
 import BookPage from "./components/BookPage";
+import SearchResult from "./components/SearchResult";
 import Error from "./components/Error";
 import ProtectedRoute from "./components/MainCmp/ProtectedRoute";
 import BookContent from "./components/BookContent";
 import { ToastContainer } from "react-toastify";
-
 
 
 import "./App.css";
@@ -39,6 +39,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "customer"]}>
               <BookPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/books/search"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "customer"]}>
+              <SearchResult />
             </ProtectedRoute>
           }
         />

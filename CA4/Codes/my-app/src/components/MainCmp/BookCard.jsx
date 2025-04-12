@@ -15,8 +15,6 @@ const BookCard = (props) => {
   const daysSelectionId = `daysSelection-${props.Title.replace(/\s+/g, "-")}`;
   const finalPriceId = `finalPrice-${props.Title.replace(/\s+/g, "-")}`;
 
-  // console.log("BookCard props:", props);
-
   const handelCardClick = () => {
     navigate(`/Book/${props.Title}`);
   };

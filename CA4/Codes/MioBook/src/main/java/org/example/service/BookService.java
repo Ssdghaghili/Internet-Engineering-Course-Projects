@@ -106,8 +106,8 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public List<Book> searchBooks(String title, String author, String genre, Integer startYear, Integer endYear,
-                                  int page, int size, String sortBy, String order) throws BadRequestException {
+    public List<Book> searchBooks(String title, String author, String genre, Integer year,
+                                  Integer page, Integer size, String sortBy, String order) throws BadRequestException {
 
         Stream<Book> booksStream = db.books.stream();
 
@@ -123,17 +123,13 @@ public class BookService {
             booksStream = booksStream.filter(b -> b.getGenres().contains(genre));
         }
 
-        if (startYear != null) {
-            booksStream = booksStream.filter(b -> b.getYear() >= startYear);
-        }
-
-        if (endYear != null) {
-            booksStream = booksStream.filter(b -> b.getYear() <= endYear);
+        if (year != null) {
+            booksStream = booksStream.filter(b -> b.getYear() == year);
         }
 
         Comparator<Book> comparator = switch (sortBy) {
-            case "averageRating" -> Comparator.comparingDouble(Book::getAverageRate);
-            case "ReviewsCount" -> Comparator.comparing(Book::getReviewsCount);
+            case "rating" -> Comparator.comparingDouble(Book::getAverageRate);
+            case "reviews" -> Comparator.comparing(Book::getReviewsCount);
             default -> throw new BadRequestException("Invalid sortBy value");
         };
 
@@ -146,7 +142,7 @@ public class BookService {
         if (size > MAX_PAGE_SIZE)
             size = MAX_PAGE_SIZE;
 
-        return booksStream.skip((long) page * size).limit(size).collect(Collectors.toList());
+        return booksStream.skip((long) (page-1) * size).limit(size).collect(Collectors.toList());
     }
 
     public double getBookAverageRating(String title) throws NotFoundException {

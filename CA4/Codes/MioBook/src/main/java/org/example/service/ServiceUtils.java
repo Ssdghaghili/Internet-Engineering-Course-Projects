@@ -4,7 +4,7 @@ import java.util.regex.Pattern;
 
 public class ServiceUtils {
 
-    public static final int MAX_PAGE_SIZE = 20;
+    public static final int MAX_PAGE_SIZE = 50;
 
     private static final Pattern USERNAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_-]+$");
     private static final Pattern EMAIL_PATTERN = Pattern.compile("^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$");
