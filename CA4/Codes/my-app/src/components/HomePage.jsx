@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect, useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./MainCmp/Navbar";
@@ -11,6 +12,73 @@ import { ToastContainer } from "react-toastify";
 
 
 const HomePage = () => {
+
+  const [newBooksLoading, setNewBooksLoading] = useState(true);
+  const [topBooksLoading, setTopBooksLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [newBooks, setNewBooks] = useState([]);
+  const [topBooks, setTopBooks] = useState([]);
+
+  useEffect(() => {
+    const fetchNewReleaseBooks = async () => {
+      try {
+        const res = await fetch(`/api/books/book/new-releases?size=5`);
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await res.json();
+        setNewBooks(data.data);
+      } catch (err) {
+        console.error("Failed to load New Books:", err);
+        setError("Failed to load New Books.");
+      } finally {
+        setNewBooksLoading(false);
+      }
+    };
+
+    fetchNewReleaseBooks();
+  }, [newBooks]);
+
+
+  useEffect(() => {
+    const fetchTopRatedBooks = async () => {
+      try {
+        const res = await fetch(`/api/books/book/top-rated?size=5`);
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await res.json();
+        setTopBooks(data.data);
+      } catch (err) {
+        console.error("Failed to load Top Books:", err);
+        setError("Failed to load Top Books.");
+      } finally {
+        setTopBooksLoading(false);
+      }
+    };
+
+    fetchTopRatedBooks();
+  }, [topBooks]);
+
+  if (newBooksLoading || topBooksLoading) {
+    return (
+      <div className="container mt-5 text-center">
+        <Navbar />
+        <h3>Loading books ...</h3>
+      </div>
+    );
+  }
+  if (error) {
+    return (
+      <>
+        <Navbar />
+        <div className="container mt-5 text-center">
+          <h3>{error}</h3>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <ToastContainer />
@@ -59,11 +127,16 @@ const HomePage = () => {
         <div className="row justify-content-center d-flex">
           <div className="col-11 d-flex justify-content-start">
             <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 mt-3 mb-3 gx-3 gx-md-5 gy-3 justify-content-start d-flex">
-              <BookCard Title="The Shadow Hour" Author="Author 1" Price="30" Rate="2.5" To="/Book/the shadow hour"/>
-              <BookCard Title="Whispers in the Dark" Author="Author 2" Price="15" Rate="3" To="/Book/Whispers in the Dark"/>
-              <BookCard Title="The Lost Chronicles" Author="Author 3" Price="20" Rate="3.2" To="/Book/The Lost Chronicles"/>
-              <BookCard Title="Book 4" Author="Author 4" Price="25" Rate="5"/>
-              <BookCard Title="Book 5" Author="Author 5" Price="30" Rate="4.7"/>
+              {newBooks.map((book, index) => (
+                <BookCard
+                  key={index}
+                  Title={book.title}
+                  Author={book.author}
+                  Price={(book.price/100).toFixed(1)}
+                  Rate={book.averageRating}
+                  To={`/Book/${book.title}`}
+                />
+              ))}
             </div>
           </div>
         </div>
@@ -79,11 +152,16 @@ const HomePage = () => {
         <div className="row justify-content-center d-flex">
           <div className="col-11 d-flex justify-content-start">
             <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 mt-3 mb-3 gx-3 gx-md-5 gy-3 justify-content-start d-flex">
-              <BookCard Title="Book 6" Author="Author 6" Price="35"  />
-              <BookCard Title="Book 7" Author="Author 7" Price="40" />
-              <BookCard Title="Book 8" Author="Author 8" Price="45" />
-              <BookCard Title="Book 9" Author="Author 9" Price="50" />
-              <BookCard Title="Book 10" Author="Author 10" Price="55" />
+              {topBooks.map((book, index) => (
+                <BookCard
+                  key={index}
+                  Title={book.title}
+                  Author={book.author}
+                  Price={(book.price/100).toFixed(1)}
+                  Rate={book.averageRating}
+                  To={`/Book/${book.title}`}
+                />
+              ))}
             </div>
           </div>
         </div>

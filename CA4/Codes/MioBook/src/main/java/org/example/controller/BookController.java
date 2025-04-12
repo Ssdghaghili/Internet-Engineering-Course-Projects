@@ -59,6 +59,22 @@ public class BookController {
         return Response.ok("Book reviews retrieved successfully.", reviews);
     }
 
+    @GetMapping("/book/top-rated")
+    public Response<List<Book>> getTopRatedBooks(
+            @RequestParam(required = false, defaultValue = "5") int size
+    ) throws NotFoundException {
+        List<Book> topRatedBooks = bookService.getTopRatedBooks(size);
+        return Response.ok("Top-rated books retrieved successfully.", topRatedBooks);
+    }
+
+    @GetMapping("/book/new-releases")
+    public Response<List<Book>> getNewReleases(
+            @RequestParam(required = false, defaultValue = "5") int size
+    ) throws NotFoundException {
+        List<Book> newReleases = bookService.getNewReleases(size);
+        return Response.ok("New releases retrieved successfully.", newReleases);
+    }
+
     @GetMapping("/search")
     public Response<List<Book>> searchBooks(
             @RequestParam(required = false) String title,

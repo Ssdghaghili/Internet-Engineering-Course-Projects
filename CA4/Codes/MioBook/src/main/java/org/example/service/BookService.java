@@ -92,6 +92,20 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
+    public List<Book> getTopRatedBooks(int size){
+        return db.books.stream()
+                .sorted(Comparator.comparingDouble(Book::getAverageRate).reversed())
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
+    public List<Book> getNewReleases(int size) {
+        return db.books.stream()
+                .sorted(Comparator.comparingInt(Book::getYear).reversed())
+                .limit(size)
+                .collect(Collectors.toList());
+    }
+
     public List<Book> searchBooks(String title, String author, String genre, Integer startYear, Integer endYear,
                                   int page, int size, String sortBy, String order) throws BadRequestException {
 
