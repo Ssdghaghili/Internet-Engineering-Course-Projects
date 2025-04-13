@@ -108,7 +108,7 @@ const Navbar = () => {
                 if (searchKey === "Book") {
                   handleNavigation(`/books/search?title=${e.target.value}`);
                 } else {
-                  handleNavigation(`/books/Author/${e.target.value}`);
+                  handleNavigation(`/Author/${e.target.value}`);
                 }
               }
           }}
