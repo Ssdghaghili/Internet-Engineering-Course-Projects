@@ -13,9 +13,11 @@ import Footer from "./MainCmp/Footer"
 
 export default function SearchResult() {
     const genres = ["fiction", "non-fiction", "science", "history", "fantasy", "biography", "mystery", "romance"];
-    const Title = "What?"
 
     const [searchParams] = useSearchParams();
+    const [resultParams, setResultParams] = useState({});
+    const [error, setError] = useState(null);
+
     useEffect(() => {
         fetchBooks(searchParams);
     }, [searchParams])
@@ -47,18 +49,18 @@ export default function SearchResult() {
 
             const response = await fetch(url);
 
-            if (!response.ok) {
+            const res = await response.json();
+
+            if (res.success == false) {
+                console.log(res);
                 throw new Error(`HTTP error! Status: ${response.status}`);
             }
 
-            const res = await response.json();
-
-            ToastNotification({ type: (res.status === "OK") ? "success" : "error", message: res.message });
-
             setBooks(res.data);
+            setResultParams(query);
 
         } catch (err) {
-            ToastNotification({ type: "error", message: err.message });
+            setError(err);
         }
     }
 
@@ -72,13 +74,26 @@ export default function SearchResult() {
         fetchBooks(filters);
     }
 
+
+    if (error) {
+        return (
+          <>
+            <Navbar />
+            <div className="container mt-5 text-center text-danger">
+              <h4>{error}</h4>
+            </div>
+          </>
+        );
+    }
+
     return (
         <>
         <Navbar />
 
         <div className="container mb-5">
           <div className="row mt-5 justify-content-center align-items-center">
-            <div className="col-12 col-md-6 h5 fw-semibold text-md-start text-center"> Results for {Title} </div>
+            <div className="col-12 col-md-6 h5 fw-semibold text-md-start text-center"> Results for {resultParams.toString()} </div>
+
             <div className="col-12 col-md-6 d-flex justify-content-end me-5 me-md-0">
               <div className="col-12 col-md-5 d-flex justify-content-end me-5 me-md-0">
                 <a className="btn btn-main fw-medium p-2" style={{ width: 120 }} data-bs-toggle="offcanvas" href="#FilterOffcanvas" role="button" aria-controls="FilterOffcanvas">
@@ -112,8 +127,8 @@ export default function SearchResult() {
                   <label htmlFor="genre" className="form-label fw-light me-3" style={{ minWidth: 120 }}> Genre: </label>
                   <select className="form-select form-select-filter fw-light flex-grow-1" name="genre" >
                         <option key="none" value="">Select a genre</option>
-                    {genres.map((genre) => (
-                        <option key={genre} value={genre}>{genre}</option>
+                    {genres.map((genre, index) => (
+                        <option key={index} value={genre}>{genre}</option>
                       ))}
                   </select>
                 </div>
@@ -147,8 +162,15 @@ export default function SearchResult() {
           <div className="row justify-content-center d-flex">
             <div className="col-11 d-flex justify-content-start">
               <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 mt-3 mb-3 gx-3 gx-md-5 gy-3 justify-content-start d-flex">
-                {books.map((book) => (
-                    <BookCard Title={book.title} Author={book.author} Price={book.price} Rate={book.averageRating} To="/Book/the shadow hour" key={book.title} />
+                {books.map((book, index) => (
+                    <BookCard
+                    key={index}
+                    Title={book.title}
+                    Author={book.author}
+                    Price={(book.price/100).toFixed(1)}
+                    Rate={book.averageRating}
+                    To={`/Book/${book.title}`}
+                    />
                 ))}
               </div>
             </div>

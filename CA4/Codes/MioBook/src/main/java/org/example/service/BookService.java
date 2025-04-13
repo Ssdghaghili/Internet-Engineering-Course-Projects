@@ -77,7 +77,7 @@ public class BookService {
         return bookContent;
     }
 
-    public List<Review> getBookReviews(String title, int page, int size) throws NotFoundException {
+    public List<Review> getBookReviews(String title, Integer page, Integer size) throws NotFoundException {
         Book book = findBookByTitle(title);
 
         if (book == null)
@@ -87,7 +87,7 @@ public class BookService {
             size = MAX_PAGE_SIZE;
 
         return book.getReviews().stream()
-                .skip((long) page * size)
+                .skip((long) (page-1) * size)
                 .limit(size)
                 .collect(Collectors.toList());
     }

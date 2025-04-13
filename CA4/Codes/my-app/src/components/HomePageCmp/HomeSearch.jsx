@@ -1,4 +1,5 @@
 import React from "react";
+import SearchDropdown from "../MainCmp/SearchMenu";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 
@@ -13,24 +14,11 @@ const HomeSearch = () => {
           data-bs-toggle="dropdown"
           aria-expanded="false"
         >
-          Author
+          Book
         </button>
         <ul className="dropdown-menu" aria-labelledby="searchDropdown">
-          <li>
-            <a className="dropdown-item color-dark-gray" href="#">
-              Name
-            </a>
-          </li>
-          <li>
-            <a className="dropdown-item color-dark-gray" href="#">
-              Author
-            </a>
-          </li>
-          <li>
-            <a className="dropdown-item color-dark-gray" href="#">
-              Genre
-            </a>
-          </li>
+          <SearchDropdown Name={"Book"} />
+          <SearchDropdown Name={"Author"} />
         </ul>
       </div>
       <div className="divider"></div>

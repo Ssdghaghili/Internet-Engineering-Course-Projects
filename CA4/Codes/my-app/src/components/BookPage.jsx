@@ -36,10 +36,36 @@ const BookPage = () => {
         setError("Failed to load book details.");
         setLoading(false);
       });
-  }, [bookSlug, reviews, book]);
+  }, [bookSlug, book]);
+
+  const [reviewPage, setReviewPage] = useState(1);
+  function changeReviewPage(newPage) {
+    setReviewPage(newPage);
+    fetchReviews({page: newPage, size: 5});
+  }
+
+  const fetchReviews = async (filters) => {
+    try {
+      const query = new URLSearchParams(filters).toString();
+      console.log(query)
+
+      const response = await fetch(`/api/books/book/${bookSlug}/reviews?${query}`);
+
+      const res = await response.json();
+
+      if (res.success === false) {
+        throw new Error(`HTTP error! Status: ${response.status}`);
+      }
+
+      setReviews(res.data);
+
+    } catch (err) {
+      setError(err);
+    }
+  }
 
   useEffect(() => {
-    fetch(`/api/books/book/${bookSlug}/reviews`)
+    fetch(`/api/books/book/${bookSlug}/reviews?page=1&size=5`)
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -52,7 +78,8 @@ const BookPage = () => {
       .catch(() => {
         setError("Failed to load reviews.");
       });
-  }, [bookSlug, reviews]);
+  }, [bookSlug]);
+
 
   if (loading) {
     return (
@@ -265,11 +292,11 @@ const BookPage = () => {
                   />
                 ))
               ) : (
-                <div className="text-muted">No reviews yet.</div>
+                <div className="text-muted">{reviewPage === 1 ? "No reviews yet." : "No more reviews to show." }</div>
               )}
             </div>
 
-            <Pagination />
+            <Pagination currentPage={reviewPage} changeCurrentPage={changeReviewPage} />
           </div>
         </div>
       </div>

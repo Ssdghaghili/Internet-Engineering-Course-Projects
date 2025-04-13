@@ -19,6 +19,7 @@ const Navbar = () => {
 
   const [isProfileMenuVisible, setIsProfileMenuVisible] = useState(false);
   const [isSearchDropdownVisible, setIsSearchDropdownVisible] = useState(false);
+  const [searchKey, setSearchKey] =  useState("Book");
 
   const toggleProfileMenu = () => {
     setIsProfileMenuVisible(!isProfileMenuVisible);
@@ -80,22 +81,38 @@ const Navbar = () => {
               aria-expanded={isSearchDropdownVisible}
               onClick={toggleSearchDropdown}
             >
-              Author
+              {searchKey}
             </button>
             {isSearchDropdownVisible && (
               <ul
                 className="dropdown-menu show"
                 aria-labelledby="searchDropdown"
               >
-                <SearchDropdown Name={"Title"} />
-                <SearchDropdown Name={"Author"} />
+                <li>
+                    <a className="dropdown-item color-dark-gray" href="#" onClick={() => { setSearchKey("Book"); toggleSearchDropdown() }} >Book</a>
+                </li>
+                <li>
+                    <a className="dropdown-item color-dark-gray" href="#" onClick={() => { setSearchKey("Author"); toggleSearchDropdown() }} >Author</a>
+                </li>
               </ul>
             )}
           </div>
 
           <div className="divider"></div>
 
-          <input type="text" placeholder="Search" />
+          <input
+          type="text"
+          placeholder="Search"
+          onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                if (searchKey === "Book") {
+                  handleNavigation(`/books/search?title=${e.target.value}`);
+                } else {
+                  handleNavigation(`/books/Author/${e.target.value}`);
+                }
+              }
+          }}
+          />
         </div>
 
         <div className="profile-container d-flex align-items-center">
