@@ -11,8 +11,8 @@ import SearchResult from "./components/SearchResult";
 import Error from "./components/Error";
 import ProtectedRoute from "./components/MainCmp/ProtectedRoute";
 import BookContent from "./components/BookContent";
+import AuthorPage from "./components/AuthorPage";
 import { ToastContainer } from "react-toastify";
-
 
 import "./App.css";
 
@@ -47,6 +47,14 @@ function App() {
           element={
             <ProtectedRoute allowedRoles={["admin", "customer"]}>
               <SearchResult />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/Author/:authorSlug"
+          element={
+            <ProtectedRoute allowedRoles={["admin", "customer"]}>
+              <AuthorPage />
             </ProtectedRoute>
           }
         />

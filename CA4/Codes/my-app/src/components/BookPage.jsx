@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import Navbar from "./MainCmp/Navbar";
+import { useNavigate } from "react-router-dom";
 import Footer from "./MainCmp/Footer";
 import Comment from "./MainCmp/Comment";
 import Pagination from "./MainCmp/Pagination";
@@ -14,6 +15,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPencilAlt } from "@fortawesome/free-solid-svg-icons";
 
 const BookPage = () => {
+  const navigate = useNavigate();
   const { bookSlug } = useParams();
   const [book, setBook] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -100,6 +102,10 @@ const BookPage = () => {
     );
   }
 
+  const handleAuthorClick = () => {
+    navigate(`/Author/${book.author}`);
+  };
+
   const modalId = `addCartModal-${book.title.replace(/\s+/g, "-")}`;
   const checkboxId = `borrowCheckbox-${book.title.replace(/\s+/g, "-")}`;
   const daysSelectionId = `daysSelection-${book.title.replace(/\s+/g, "-")}`;
@@ -142,10 +148,18 @@ const BookPage = () => {
                 </div>
 
                 <div className="row mt-2">
-                  <div className="col-3 text-black-50">{book.author}</div>
+                  <div
+                    className="col-3 text-black-50"
+                    onClick={handleAuthorClick}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {book.author}
+                  </div>
                   <div className="col-3 text-black-50">{book.publisher}</div>
                   <div className="col-2 text-black-50">{book.year}</div>
-                  <div className="col-3 text-black-50">{book.genres?.join(", ")}</div>
+                  <div className="col-3 text-black-50">
+                    {book.genres?.join(", ")}
+                  </div>
                 </div>
 
                 <div className="row card-light-word mt-2">
@@ -209,7 +223,9 @@ const BookPage = () => {
                   <div className="col-12">Genre</div>
                 </div>
 
-                <div className="col-12 text-black-50">{book.genres?.join(", ")}</div>
+                <div className="col-12 text-black-50">
+                  {book.genres?.join(", ")}
+                </div>
 
                 <div className="row card-light-word mt-3">
                   <div className="col-12">About</div>
