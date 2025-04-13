@@ -124,9 +124,9 @@ const HomePage = () => {
           </div>
         </div>
 
-        <div className="row justify-content-center d-flex">
+        <div className="row justify-content-center">
           <div className="col-11 d-flex justify-content-start">
-            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 mt-3 mb-3 gx-3 gx-md-5 gy-3 justify-content-start d-flex">
+            <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 mt-3 mb-3 gx-3 gx-md-5 gy-3 justify-content-start">
               {newBooks.map((book, index) => (
                 <BookCard
                   key={index}

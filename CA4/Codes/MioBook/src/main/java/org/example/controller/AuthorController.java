@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/authors")
+@RequestMapping("api/authors")
 public class AuthorController {
     @Autowired
     private AuthorService authorService;

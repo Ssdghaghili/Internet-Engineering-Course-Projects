@@ -24,7 +24,7 @@ const PHistoryBody = ({ history, image }) => {
                   aria-controls={`collapse-${index}`}
                 >
                   <p className="m-0 font-semi-samll fw-light">
-                    {entry.purchaseDate} &nbsp; | &nbsp; ${entry.totalCost}
+                    {entry.purchaseDate} &nbsp; | &nbsp; ${(entry.totalCost/100).toFixed(2)}
                   </p>
                 </button>
               </div>
