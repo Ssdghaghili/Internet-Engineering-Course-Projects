@@ -22,6 +22,8 @@ public class AddAuthorRequest {
 
     private Date died;
 
+    private String imageLink;
+
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -37,4 +39,7 @@ public class AddAuthorRequest {
 
     public Date getDied() { return died; }
     public void setDied(Date died) { this.died = died; }
+
+    public String getImageLink() { return imageLink; }
+    public void setImageLink(String imageLink) { this.imageLink = imageLink; }
 }

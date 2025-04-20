@@ -132,9 +132,10 @@ const HomePage = () => {
                   key={index}
                   Title={book.title}
                   Author={book.author}
-                  Price={(book.price/100).toFixed(1)}
+                  Price={(book.price/100).toFixed(2)}
                   Rate={book.averageRating}
                   To={`/Book/${book.title}`}
+                  imageLink={book.imageLink}
                 />
               ))}
             </div>
@@ -157,9 +158,10 @@ const HomePage = () => {
                   key={index}
                   Title={book.title}
                   Author={book.author}
-                  Price={(book.price/100).toFixed(1)}
+                  Price={(book.price/100).toFixed(2)}
                   Rate={book.averageRating}
                   To={`/Book/${book.title}`}
+                  imageLink={book.imageLink}
                 />
               ))}
             </div>

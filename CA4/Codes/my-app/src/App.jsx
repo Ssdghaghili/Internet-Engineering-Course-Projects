@@ -12,6 +12,7 @@ import Error from "./components/Error";
 import ProtectedRoute from "./components/MainCmp/ProtectedRoute";
 import BookContent from "./components/BookContent";
 import AuthorPage from "./components/AuthorPage";
+import AdminDashboard from "./components/AdminDashboard"
 import { ToastContainer } from "react-toastify";
 
 import "./App.css";
@@ -93,15 +94,15 @@ function App() {
           }
         />
 
-        {/* Protected Routes for Admin only */}
-        {/* <Route
-          path="/admin-dashboard"
+        Protected Routes for Admin only
+        <Route
+          path="/admin"
           element={
             <ProtectedRoute allowedRoles={["admin"]}>
               <AdminDashboard />
             </ProtectedRoute>
           }
-        /> */}
+        />
 
         {/* Fallback */}
         <Route path="/error" element={<Error />} />

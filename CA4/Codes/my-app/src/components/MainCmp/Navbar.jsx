@@ -134,24 +134,38 @@ const Navbar = () => {
                 <hr />
                 <ProfileMenu
                   Icon={faUser}
-                  Title={"My Profile"}
-                  onClick={() => handleNavigation("/user-profile")}
+                  Title={user.role === "customer" ? "My Profile" : "Dashboard" }
+                  onClick={user.role === "customer" ? (() => handleNavigation("/user-profile")) :
+                      (() => handleNavigation("/admin"))
+                  }
                 />
-                <ProfileMenu
-                  Icon={faBook}
-                  Title={"My Books"}
-                  onClick={() => handleNavigation("/user-profile")}
-                />
-                <ProfileMenu
-                  Icon={faShoppingCart}
-                  Title={"Buy Cart"}
-                  onClick={() => handleNavigation("/buycart")}
-                />
-                <ProfileMenu
-                  Icon={faHistory}
-                  Title={"Purchase History"}
-                  onClick={() => handleNavigation("/purchase-history")}
-                />
+                {
+                  user.role === "customer" && (
+                    <ProfileMenu
+                      Icon={faBook}
+                      Title={"My Books"}
+                      onClick={() => handleNavigation("/user-profile")}
+                    />
+                  )
+                }
+                {
+                  user.role === "customer" && (
+                    <ProfileMenu
+                      Icon={faShoppingCart}
+                      Title={"Buy Cart"}
+                      onClick={() => handleNavigation("/buycart")}
+                    />
+                  )
+                }
+                {
+                  user.role === "customer" && (
+                    <ProfileMenu
+                      Icon={faHistory}
+                      Title={"Purchase History"}
+                      onClick={() => handleNavigation("/purchase-history")}
+                    />
+                  )
+                }
                 <hr />
                 <ProfileMenu
                   Icon={faSignOutAlt}

@@ -34,6 +34,8 @@ public class AddBookRequest {
     @NotEmpty(message = "Genres is missing")
     private List<String> genres;
 
+    private String imageLink;
+
 
     public String getTitle() { return title; }
     public void setTitle(String title) { this.title = title; }
@@ -58,4 +60,7 @@ public class AddBookRequest {
 
     public List<String> getGenres() { return genres; }
     public void setGenres(List<String> genres) { this.genres = genres; }
+
+    public String getImageLink() { return imageLink; }
+    public void setImageLink(String imageLink) { this.imageLink = imageLink; }
 }

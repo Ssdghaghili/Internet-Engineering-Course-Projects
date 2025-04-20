@@ -43,6 +43,7 @@ public class UserService {
             throw new BadRequestException("Book is already purchased");
 
         user.addCart(book);
+        book.addBuy();
     }
 
     public void removeCart(String bookTitle)

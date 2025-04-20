@@ -31,6 +31,10 @@ public class AuthorService {
         return author;
     }
 
+    public List<Author> getAllAuthors() {
+        return db.authors;
+    }
+
     public Author findAuthorByName(String name) {
         for (Author author : db.authors) {
             if (author.getName().equals(name)) {

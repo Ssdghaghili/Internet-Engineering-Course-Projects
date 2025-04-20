@@ -186,7 +186,7 @@ const AuthorPage = () => {
               }}
             >
               <img
-                src={authorImage}
+                src={author.imageLink ?? authorImage}
                 alt="Author"
                 className="img-fluid rounded shadow"
                 style={{
@@ -260,9 +260,10 @@ const AuthorPage = () => {
                     key={index}
                     Title={book.title}
                     Author={book.author}
-                    Price={(book.price / 100).toFixed(1)}
+                    Price={(book.price / 100).toFixed(2)}
                     Rate={book.averageRating}
                     To={`/Book/${book.title}`}
+                    imageLink={book.imageLink}
                   />
                 ))}
               </div>

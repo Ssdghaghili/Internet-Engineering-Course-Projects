@@ -19,12 +19,14 @@ public class Book {
     private String content;
     private List<String> genres;
     private List<Review> reviews;
+    private int totalBuys;
+    private String imageLink;
 
     public Book() {
         this.reviews = new ArrayList<>();
     }
 
-    public Book(String title, String author, String publisher, int year, int price, String synopsis, String content, List<String> genres) {
+    public Book(String title, String author, String publisher, int year, int price, String synopsis, String content, List<String> genres, String imageLink) {
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -34,6 +36,8 @@ public class Book {
         this.content = content;
         this.genres = genres;
         this.reviews = new ArrayList<>();
+        this.totalBuys = 0;
+        this.imageLink = imageLink;
     }
 
     public void addReview(Review newReview) {
@@ -66,6 +70,7 @@ public class Book {
         return sum / reviews.size();
     }
 
+    public void addBuy() { this.totalBuys++; };
     public int getReviewsCount() {
         return reviews.size();
     }
@@ -79,4 +84,6 @@ public class Book {
     public String getContent() { return content; }
     public List<String> getGenres() {return genres;}
     public List<Review> getReviews() { return reviews; }
+    public int getTotalBuys() { return totalBuys; }
+    public String getImageLink() { return imageLink; }
 }

@@ -32,7 +32,7 @@ public class BookController {
         authService.validateAdmin();
         Book newBook = new Book(addBookRequest.getTitle(), addBookRequest.getAuthor(), addBookRequest.getPublisher(),
                 addBookRequest.getYear(), addBookRequest.getPrice(), addBookRequest.getSynopsis(),
-                addBookRequest.getContent(), addBookRequest.getGenres());
+                addBookRequest.getContent(), addBookRequest.getGenres(), addBookRequest.getImageLink());
         bookService.addBook(newBook);
         return Response.ok("Book added successfully.");
     }
@@ -89,5 +89,12 @@ public class BookController {
     ) throws BadRequestException {
         List<Book> books = bookService.searchBooks(title, author, genre, year, page, size, sortBy, order);
         return Response.ok("Search results retrieved successfully", books);
+    }
+
+    @GetMapping("/all")
+    public Response<List<Book>> getAllBooks() throws ForbiddenException, UnauthorizedException {
+        authService.validateAdmin();
+        List<Book> books = bookService.getAllBooks();
+        return Response.ok("Books retrieved successfully", books);
     }
 }

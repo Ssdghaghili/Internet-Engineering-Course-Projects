@@ -26,6 +26,8 @@ public class BookSerializer extends JsonSerializer<Book> {
         jsonGen.writeNumberField("price", book.getPrice());
         jsonGen.writeStringField("synopsis", book.getSynopsis());
         jsonGen.writeNumberField("averageRating", book.getAverageRate());
+        jsonGen.writeNumberField("totalBuys", book.getTotalBuys());
+        jsonGen.writeStringField("imageLink", book.getImageLink());
 
         jsonGen.writeEndObject();
     }

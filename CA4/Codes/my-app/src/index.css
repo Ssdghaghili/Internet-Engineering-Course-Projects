@@ -670,6 +670,42 @@ footer {
   box-shadow: 0 0 5px #16423c;
 }
 
+.modal-input {
+    width: 100%;
+    height: 48px;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+}
+
+.add-synopsis-textarea {
+    width: 100%;
+    height: 160px;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+}
+.add-synopsis-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 5px #16423c;
+}
+
+::placeholder {
+    color: #b8bbbf;
+}
+
+.add-Content-textarea {
+    width: 100%;
+    height: 300px;
+    padding: 10px;
+    font-size: 16px;
+    resize: none;
+}
+.add-Content-textarea:focus {
+  outline: none;
+  box-shadow: 0 0 5px #16423c;
+}
+
 .btn-submit {
   background-color: #16423c !important;
   color: #ffffff !important;
@@ -758,4 +794,13 @@ footer {
 .img-fluid.rounded.shadow {
   border-radius: 1rem;
   box-shadow: 0 0.5rem 1rem rgba(0,0,0,0.15);
+}
+
+.border-red {
+  border: 2px solid red;
+}
+
+.input-error {
+  color: red;
+  font-size: 14px;
 }

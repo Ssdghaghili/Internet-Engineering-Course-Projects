@@ -14,6 +14,8 @@ import org.example.service.AuthorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("api/authors")
 public class AuthorController {
@@ -28,7 +30,7 @@ public class AuthorController {
             throws ForbiddenException, UnauthorizedException, DuplicateEntityException {
         authService.validateAdmin();
         Author newAuthor = new Author(addAuthorRequest.getName(), addAuthorRequest.getPenName(),
-                addAuthorRequest.getNationality(), addAuthorRequest.getBorn(), addAuthorRequest.getDied());
+                addAuthorRequest.getNationality(), addAuthorRequest.getBorn(), addAuthorRequest.getDied(), addAuthorRequest.getImageLink());
         authorService.addAuthor(newAuthor);
         return Response.ok("Author added successfully");
     }
@@ -37,5 +39,12 @@ public class AuthorController {
     public Response<Author> getAuthorDetails(@PathVariable String name) throws NotFoundException {
         Author author = authorService.showAuthorDetails(name);
         return Response.ok("Author details retrieved successfully", author);
+    }
+
+    @GetMapping("/all")
+    public Response<List<Author>> getAuthors() throws ForbiddenException, UnauthorizedException {
+        authService.validateAdmin();
+        List<Author> authors = authorService.getAllAuthors();
+        return Response.ok("Authors retrieved successfully", authors);
     }
 }

@@ -145,6 +145,10 @@ public class BookService {
         return booksStream.skip((long) (page-1) * size).limit(size).collect(Collectors.toList());
     }
 
+    public List<Book> getAllBooks() {
+        return db.books;
+    }
+
     public double getBookAverageRating(String title) throws NotFoundException {
         Book book = findBookByTitle(title);
         if (book == null) {

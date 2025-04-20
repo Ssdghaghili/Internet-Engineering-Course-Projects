@@ -81,7 +81,7 @@ const BookCard = (props) => {
   return (
     <div className="col col-8 mx-auto" ref={cardRef}>
       <div className="card card-preview" onClick={handelCardClick}>
-        <img src={cardImage} className="card-img-top" alt="..." />
+        <img src={props.imageLink ?? cardImage} className="card-img-top" alt="..." />
         <div className="card-body">
           <h5
             className="card-title text-center fw-bold mb-1 mt-2"

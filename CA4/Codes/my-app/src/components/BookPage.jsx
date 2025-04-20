@@ -120,7 +120,7 @@ const BookPage = () => {
             <div className="row">
               <div className="col-12 col-lg-4 d-flex justify-content-center">
                 <img
-                  src={cardImage}
+                  src={book.imageLink ?? cardImage}
                   alt="Book"
                   className="img-fluid card-img-book"
                 />

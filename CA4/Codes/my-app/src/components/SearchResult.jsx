@@ -45,7 +45,7 @@ export default function SearchResult() {
     const fetchBooks = async (filters) => {
         try {
             const query = new URLSearchParams(filters).toString();
-            const url = `http://localhost:8080/api/books/search?${query}`;
+            const url = `/api/books/search?${query}`;
 
             const response = await fetch(url);
 
@@ -164,12 +164,13 @@ export default function SearchResult() {
               <div className="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 row-cols-xl-5 mt-3 mb-3 gx-3 gx-md-5 gy-3 justify-content-start d-flex">
                 {books.map((book, index) => (
                     <BookCard
-                    key={index}
-                    Title={book.title}
-                    Author={book.author}
-                    Price={(book.price/100).toFixed(1)}
-                    Rate={book.averageRating}
-                    To={`/Book/${book.title}`}
+                      key={index}
+                      Title={book.title}
+                      Author={book.author}
+                      Price={(book.price/100).toFixed(2)}
+                      Rate={book.averageRating}
+                      To={`/Book/${book.title}`}
+                      imageLink={book.imageLink}
                     />
                 ))}
               </div>
