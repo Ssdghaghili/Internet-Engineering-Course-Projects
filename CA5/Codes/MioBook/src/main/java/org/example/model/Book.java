@@ -1,48 +1,89 @@
 package org.example.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import jakarta.validation.constraints.NotNull;
 import org.example.model.serializer.BookSerializer;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
-@JsonIgnoreProperties(ignoreUnknown = true)
+import jakarta.persistence.*;
+
 @JsonSerialize(using = BookSerializer.class)
+@Entity
 public class Book {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
+
+    @ManyToOne
+    @JoinColumn(name = "author_id", nullable = false)
+    private Author author;
+
+    @NotNull
+    @Column(unique = true, nullable = false)
     private String title;
-    private String author;
+
     private String publisher;
     private int year;
     private int price;
     private String synopsis;
     private String content;
-    private List<String> genres;
-    private List<Review> reviews;
-    private int totalBuys;
     private String imageLink;
+    private int totalBuys = 0;
 
-    public Book() {
-        this.reviews = new ArrayList<>();
-    }
+    @ManyToMany
+    @JoinTable(
+            name = "book_genre",
+            joinColumns = @JoinColumn(name = "book_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id"))
+    private Set<Genre> genres = new HashSet<>();
 
-    public Book(String title, String author, String publisher, int year, int price, String synopsis, String content, List<String> genres, String imageLink) {
-        this.title = title;
+    @OneToMany(mappedBy = "book", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<Review> reviews = new HashSet<>();
+
+
+    public Book() {}
+
+    public Book(Admin admin, Author author, String title, String publisher, int year, int price,
+                String synopsis, String content, String imageLink) {
+        this.admin = admin;
         this.author = author;
+        this.title = title;
         this.publisher = publisher;
         this.year = year;
         this.price = price;
         this.synopsis = synopsis;
         this.content = content;
-        this.genres = genres;
-        this.reviews = new ArrayList<>();
-        this.totalBuys = 0;
         this.imageLink = imageLink;
     }
 
+    public Admin getAdmin() { return admin; }
+    public Author getAuthor() { return author; }
+    public String getTitle() { return title; }
+    public String getPublisher() { return publisher; }
+    public int getYear() { return year; }
+    public int getPrice() { return price; }
+    public String getSynopsis() { return synopsis; }
+    public String getContent() { return content; }
+    public String getImageLink() { return imageLink; }
+    public int getTotalBuys() { return totalBuys; }
+    public Set<Genre> getGenres() { return genres; }
+    public Set<Review> getReviews() { return reviews; }
+
+    public void addGenre(Genre genre) {
+        genres.add(genre);
+    }
+
+
     public void addReview(Review newReview) {
         for (Review r : reviews) {
-            if (r.getUser().equals(newReview.getUser())) {
+            if (r.getCustomer().equals(newReview.getCustomer())) {
                 reviews.remove(r);
                 break;
             }
@@ -50,9 +91,9 @@ public class Book {
         reviews.add(newReview);
     }
 
-    public void removeReview(User user) {
+    public void removeReview(Customer customer) {
         for (Review r : reviews) {
-            if (r.getUser().equals(user)) {
+            if (r.getCustomer().equals(customer)) {
                 reviews.remove(r);
                 break;
             }
@@ -70,20 +111,11 @@ public class Book {
         return sum / reviews.size();
     }
 
-    public void addBuy() { this.totalBuys++; };
+    public void addBuy() {
+        totalBuys++;
+    }
+
     public int getReviewsCount() {
         return reviews.size();
     }
-
-    public String getTitle() { return title; }
-    public String getAuthor() { return author; }
-    public String getPublisher() { return publisher; }
-    public int getYear() { return year; }
-    public int getPrice() { return price; }
-    public String getSynopsis() { return synopsis; }
-    public String getContent() { return content; }
-    public List<String> getGenres() {return genres;}
-    public List<Review> getReviews() { return reviews; }
-    public int getTotalBuys() { return totalBuys; }
-    public String getImageLink() { return imageLink; }
 }

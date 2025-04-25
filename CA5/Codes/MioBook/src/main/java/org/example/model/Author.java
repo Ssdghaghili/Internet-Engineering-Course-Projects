@@ -1,28 +1,42 @@
 package org.example.model;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.util.HashSet;
+import java.util.Set;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Entity
 public class Author {
-    private String username;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @ManyToOne
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
+
+    @NotNull
+    @Column(unique = true, nullable = false)
     private String name;
+
+    @OneToMany(mappedBy = "author")
+    private Set<Book> books = new HashSet<>();
+
     private String penName;
     private String nationality;
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date born;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private Date died;
+    private LocalDate born;
+    private LocalDate died;
     private String imageLink;
 
     public Author() {
     }
 
-    public Author(String name, String penName, String nationality, Date born, Date died, String imageLink) {
+    public Author(String name, String penName, String nationality, LocalDate born, LocalDate died, String imageLink) {
         this.name = name;
         this.penName = penName;
         this.nationality = nationality;
@@ -34,7 +48,7 @@ public class Author {
     public String getName() { return name; }
     public String getPenName() { return penName; }
     public String getNationality() { return nationality; }
-    public Date getBorn() { return born; }
-    public Date getDied() { return died; }
+    public LocalDate getBorn() { return born; }
+    public LocalDate getDied() { return died; }
     public String getImageLink() { return imageLink; }
 }

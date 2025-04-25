@@ -1,4 +1,6 @@
 package org.example.model.serializer;
+import org.example.model.Admin;
+import org.example.model.Customer;
 import org.example.model.User;
 
 import com.fasterxml.jackson.core.JsonGenerator;
@@ -13,14 +15,21 @@ public class UserSerializer extends JsonSerializer<User> {
         jsonGen.writeStartObject();
 
         jsonGen.writeStringField("username", user.getUsername());
-        jsonGen.writeStringField("role", user.getRole().name());
         jsonGen.writeStringField("email", user.getEmail());
         jsonGen.writeObjectFieldStart("address");
         jsonGen.writeStringField("country", user.getAddress().getCountry());
         jsonGen.writeStringField("city", user.getAddress().getCity());
         jsonGen.writeEndObject();
-        if (user.getRole() == User.Role.customer)
-            jsonGen.writeNumberField("balance", user.getBalance());
+        if (user instanceof Customer customer) {
+            jsonGen.writeStringField("role", "customer");
+            jsonGen.writeNumberField("balance", customer.getBalance());
+        }
+        else if (user instanceof Admin admin) {
+            jsonGen.writeStringField("role", "admin");
+        }
+        else {
+            jsonGen.writeStringField("role", "unknown");
+        }
 
         jsonGen.writeEndObject();
     }
