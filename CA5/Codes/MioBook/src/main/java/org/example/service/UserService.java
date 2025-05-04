@@ -1,26 +1,53 @@
 package org.example.service;
 
-import org.example.database.Database;
+//import org.example.database.Database;
 import org.example.exception.*;
 import org.example.model.*;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.example.model.Customer;
+import org.example.model.Admin;
+import org.example.repository.UserRepository;
 
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
 public class UserService {
     @Autowired
-    private Database db;
+    private UserRepository userRepository;
     @Autowired
     private BookService bookService;
     @Autowired
     private UserSession userSession;
 
+    private Customer getCurrentCustomer() throws UnauthorizedException, ForbiddenException {
+        User user = userSession.getCurrentUser();
+        if (user == null)
+            throw new UnauthorizedException("User is not logged in");
+
+        if (!(user instanceof Customer))
+            throw new ForbiddenException("Only customers can perform this action");
+
+        return (Customer) user;
+    }
+
+    private Admin getCurrentAdmin() throws UnauthorizedException, ForbiddenException {
+        User user = userSession.getCurrentUser();
+        if (user == null)
+            throw new UnauthorizedException("User is not logged in");
+
+        if (!(user instanceof Admin))
+            throw new ForbiddenException("Only admins can perform this action");
+
+        return (Admin) user;
+    }
+
     public void addCart(String bookTitle)
             throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
         Book book = bookService.findBookByTitle(bookTitle);
+        Customer customer = getCurrentCustomer();
 
         if (book == null)
             throw new NotFoundException("Book not found");
@@ -30,25 +57,26 @@ public class UserService {
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() == User.Role.admin)
+        if (Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("Admins cannot add to cart");
 
-        if (user.getCart().size() >= 10)
+        if (customer.getCart().size() >= 10)
             throw new BadRequestException("Cart cannot have more than 10 items");
 
-        if (user.hasBookInCart(book))
+        if (customer.hasBookInCart(book))
             throw new BadRequestException("Book is already in the cart");
 
-        if (user.isBookPurchased(book))
+        if (customer.isBookPurchased(book))
             throw new BadRequestException("Book is already purchased");
 
-        user.addCart(book);
+        customer.addCart(book);
         book.addBuy();
     }
 
     public void removeCart(String bookTitle)
             throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
         Book book = bookService.findBookByTitle(bookTitle);
+        Customer customer = getCurrentCustomer();
 
         if (book == null)
             throw new NotFoundException("Book not found");
@@ -58,46 +86,48 @@ public class UserService {
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() == User.Role.admin)
+        if (Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("Admins cannot remove from cart");
 
-        if (!user.removeBookFromCart(book))
+        if (!customer.removeBookFromCart(book))
             throw new BadRequestException("Book is not in the user's cart");
     }
 
     public void addCredit(int amount)
             throws UnauthorizedException, ForbiddenException, BadRequestException {
         User user = userSession.getCurrentUser();
+        Customer customer = getCurrentCustomer();
 
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() != User.Role.customer)
+        if (Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("Admins cannot add credit");
 
         if (amount < 100)
             throw new BadRequestException("Minimum deposit amount is 100 cents (1 dollar)");
 
-        user.setBalance(user.getBalance() + amount);
+        customer.setBalance(customer.getBalance() + amount);
     }
 
     public PurchaseReceipt purchaseCart()
             throws UnauthorizedException, ForbiddenException, BadRequestException {
         User user = userSession.getCurrentUser();
+        Customer customer = getCurrentCustomer();
 
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() != User.Role.customer)
+        if (!Objects.equals(user.getRole(), "customer"))
             throw new ForbiddenException("Only customers can purchase");
 
-        if (user.getCart().isEmpty())
+        if (customer.getCart().isEmpty())
             throw new BadRequestException("Cart cannot be empty");
 
-        if (!user.hasEnoughCreditForCart())
+        if (!customer.hasEnoughCreditForCart())
             throw new BadRequestException("User has not enough credit");
 
-        return user.purchaseCart();
+        return customer.purchaseCart();
     }
 
     public void borrowBook(String bookTitle, int days)
@@ -108,88 +138,87 @@ public class UserService {
             throw new NotFoundException("Book not found");
 
         User user = userSession.getCurrentUser();
+        Customer customer = getCurrentCustomer();
 
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() == User.Role.admin)
+        if (Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("Admins cannot add to cart");
 
-        if (user.getCart().size() >= 10)
+        if (customer.getCart().size() >= 10)
             throw new BadRequestException("Cart cannot have more than 10 items");
 
-        if (user.hasBookInCart(book))
+        if (customer.hasBookInCart(book))
             throw new BadRequestException("Book is already in the cart");
 
-        if (user.isBookPurchased(book))
+        if (customer.isBookPurchased(book))
             throw new BadRequestException("Book is already purchased");
 
         if (days < 1 || days > 9)
             throw new BadRequestException("Borrow days should be between 1 and 9");
 
-        user.borrowBook(book, days);
+        customer.borrowBook(book, days);
     }
 
     public Map<String, Object> showCart()
             throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
+        Customer customer = getCurrentCustomer();
 
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() == User.Role.admin)
+        if (Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("Admins cannot have a cart");
 
         Map<String, Object> userCart = new LinkedHashMap<>();
 
-        userCart.put("totalCost", user.calculateCartCost());
-        userCart.put("items", user.getCart());
+        userCart.put("totalCost", customer.calculateCartCost());
+        userCart.put("items", customer.getCart());
 
         return userCart;
     }
 
     public List<PurchaseRecord> showPurchaseHistory() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
+        Customer customer = getCurrentCustomer();
 
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() == User.Role.admin)
+        if (Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("Admins cannot have a purchase history");
 
-        return user.getPurchaseHistory();
+        return customer.getPurchaseHistory();
     }
 
     public List<CartItem> showPurchasedBooks() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
+        Customer customer = getCurrentCustomer();
 
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() == User.Role.admin)
+        if (Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("Admins cannot have purchased books");
 
-        return user.getPurchasedBooks();
+        return customer.getCart();
     }
 
     public User findUserByUsername(String username) {
-        for (User user : db.users) {
-            if (user.getUsername().equals(username)) {
-                return user;
-            }
-        }
-        return null;
+        return userRepository.findByUsername(username).orElse(null);
     }
 
     public boolean usernameExists(String username) {
-        return db.users.stream().anyMatch(u -> u.getUsername().equals(username));
+        return userRepository.findByUsername(username).isPresent();
     }
 
     public boolean emailExists(String email) {
-        return db.users.stream().anyMatch(u -> u.getEmail().equals(email));
+        return userRepository.findByEmail(email) != null;
     }
 
     public List<User> getUsers() {
-        return db.users;
+        return userRepository.findAll();
     }
 }

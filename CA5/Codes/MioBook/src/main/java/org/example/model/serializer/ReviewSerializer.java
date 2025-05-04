@@ -12,7 +12,7 @@ public class ReviewSerializer extends JsonSerializer<Review> {
     public void serialize(Review review, JsonGenerator jsonGen, SerializerProvider serializers) throws IOException {
         jsonGen.writeStartObject();
 
-        jsonGen.writeStringField("username", review.getUser().getUsername());
+        jsonGen.writeStringField("username", review.getCustomer().getUsername());
         jsonGen.writeNumberField("rate", review.getRate());
         jsonGen.writeStringField("comment", review.getComment());
         jsonGen.writeStringField("date", review.getDateTime().toString());

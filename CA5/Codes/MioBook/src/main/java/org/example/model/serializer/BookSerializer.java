@@ -4,6 +4,7 @@ import org.example.model.Book;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+import org.example.model.Genre;
 
 import java.io.IOException;
 
@@ -13,12 +14,12 @@ public class BookSerializer extends JsonSerializer<Book> {
         jsonGen.writeStartObject();
 
         jsonGen.writeStringField("title", book.getTitle());
-        jsonGen.writeStringField("author", book.getAuthor());
+        jsonGen.writeStringField("author", book.getAuthor().getName());
         jsonGen.writeStringField("publisher", book.getPublisher());
 
         jsonGen.writeArrayFieldStart("genres");
-        for (String genre : book.getGenres()) {
-            jsonGen.writeString(genre);
+        for (Genre genre : book.getGenres()) {
+            jsonGen.writeString(genre.getName());
         }
         jsonGen.writeEndArray();
 

@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import org.example.model.serializer.BookSerializer;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
@@ -51,7 +52,7 @@ public class Book {
     public Book() {}
 
     public Book(Admin admin, Author author, String title, String publisher, int year, int price,
-                String synopsis, String content, String imageLink) {
+                String synopsis, String content, Set<Genre> genres , String imageLink) {
         this.admin = admin;
         this.author = author;
         this.title = title;
@@ -59,6 +60,7 @@ public class Book {
         this.year = year;
         this.price = price;
         this.synopsis = synopsis;
+        this.genres = genres;
         this.content = content;
         this.imageLink = imageLink;
     }

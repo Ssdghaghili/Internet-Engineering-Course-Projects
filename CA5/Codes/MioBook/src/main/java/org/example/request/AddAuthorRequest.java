@@ -4,6 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Past;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 public class AddAuthorRequest {
@@ -18,9 +19,9 @@ public class AddAuthorRequest {
 
     @NotNull(message = "Born date is missing")
     @Past(message = "Born date must be in the past")
-    private Date born;
+    private LocalDate born;
 
-    private Date died;
+    private LocalDate died;
 
     private String imageLink;
 
@@ -34,11 +35,11 @@ public class AddAuthorRequest {
     public String getNationality() { return nationality; }
     public void setNationality(String nationality) { this.nationality = nationality; }
 
-    public Date getBorn() { return born; }
-    public void setBorn(Date born) { this.born = born; }
+    public LocalDate getBorn() { return born; }
+    public void setBorn(LocalDate born) { this.born = born; }
 
-    public Date getDied() { return died; }
-    public void setDied(Date died) { this.died = died; }
+    public LocalDate getDied() { return died; }
+    public void setDied(LocalDate died) { this.died = died; }
 
     public String getImageLink() { return imageLink; }
     public void setImageLink(String imageLink) { this.imageLink = imageLink; }

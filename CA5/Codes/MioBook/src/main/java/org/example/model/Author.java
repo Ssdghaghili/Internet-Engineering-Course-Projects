@@ -51,4 +51,12 @@ public class Author {
     public LocalDate getBorn() { return born; }
     public LocalDate getDied() { return died; }
     public String getImageLink() { return imageLink; }
+
+    public void setName(String name) { this.name = name; }
+    public void setPenName(String penName) { this.penName = penName; }
+    public void setNationality(String nationality) { this.nationality = nationality; }
+    public void setBorn(LocalDate born) { this.born = born; }
+    public void setDied(LocalDate died) { this.died = died; }
+    public void setImageLink(String imageLink) { this.imageLink = imageLink; }
+    public void setAdmin(Admin admin) { this.admin = admin; }
 }

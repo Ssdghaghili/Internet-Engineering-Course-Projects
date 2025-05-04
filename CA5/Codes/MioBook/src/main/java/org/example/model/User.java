@@ -1,11 +1,19 @@
 package org.example.model;
 
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotNull;
 import org.example.model.serializer.UserSerializer;
 
 import jakarta.persistence.*;
 import org.hibernate.annotations.Formula;
+
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "role")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = Admin.class, name = "admin"),
+        @JsonSubTypes.Type(value = Customer.class, name = "customer")
+})
 
 @JsonSerialize(using = UserSerializer.class)
 @Entity

@@ -2,17 +2,24 @@ package org.example.service;
 
 import org.example.exception.*;
 
+import org.example.model.Admin;
 import org.example.model.User;
 
+import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Objects;
+
 @Service
 public class AuthService {
+
     @Autowired
     private UserService userService;
     @Autowired
     private UserSession userSession;
+    @Autowired
+    private UserRepository userRepository;
 
     public User showUserDetails() throws UnauthorizedException {
         User user = userSession.getCurrentUser();
@@ -59,8 +66,10 @@ public class AuthService {
         if (userService.emailExists(newUser.getEmail()))
             throw new DuplicateEntityException("Email already exists");
 
-        userService.getUsers().add(newUser);
+        userRepository.save(newUser);
+
     }
+
 
     public void validateAdmin() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
@@ -68,7 +77,18 @@ public class AuthService {
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (user.getRole() != User.Role.admin)
+        if (!Objects.equals(user.getRole(), "admin"))
             throw new ForbiddenException("User is not an admin");
+    }
+
+    public Admin validateAndGetAdmin() throws UnauthorizedException, ForbiddenException {
+        User user = userSession.getCurrentUser();
+
+        if (user == null)
+            throw new UnauthorizedException("User not logged in");
+
+        if (!(user instanceof Admin))
+            throw new ForbiddenException("Only admins can perform this action");
+        return (Admin) user;
     }
 }

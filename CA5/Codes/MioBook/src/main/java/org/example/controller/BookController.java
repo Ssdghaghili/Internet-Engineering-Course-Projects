@@ -3,36 +3,59 @@ package org.example.controller;
 import jakarta.validation.Valid;
 
 import org.example.exception.*;
-import org.example.model.Book;
-import org.example.model.Review;
+import org.example.model.*;
+import org.example.repository.GenreRepository;
 import org.example.request.AddBookRequest;
 import org.example.response.Response;
 import org.example.service.AuthService;
+import org.example.repository.AuthorRepository;
 
 import org.example.service.BookService;
+import org.example.service.UserSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/books")
 public class BookController {
+    @Autowired
+    private AuthorRepository authorRepository;
+
+    @Autowired
+    private GenreRepository genreRepository;
+
     @Autowired
     private BookService bookService;
 
     @Autowired
     private AuthService authService;
 
+    @Autowired
+    private UserSession userSession;
+
     @PostMapping("/add")
     public Response<Object> addBook(@Valid @RequestBody AddBookRequest addBookRequest)
             throws ForbiddenException, UnauthorizedException, NotFoundException, DuplicateEntityException {
-        authService.validateAdmin();
-        Book newBook = new Book(addBookRequest.getTitle(), addBookRequest.getAuthor(), addBookRequest.getPublisher(),
+
+        Admin admin = authService.validateAndGetAdmin();
+        Author author = authorRepository.findByName(addBookRequest.getAuthor())
+                .orElseThrow(() -> new NotFoundException("Author not found"));
+
+        Set<Genre> genres = new HashSet<>();
+        for (String name : addBookRequest.getGenres()) {
+            Genre genre = genreRepository.findByName(name)
+                    .orElseThrow(() -> new NotFoundException("Genre not found: " + name));
+            genres.add(genre);
+        }
+
+        Book newBook = new Book(admin, author, addBookRequest.getTitle(), addBookRequest.getPublisher(),
                 addBookRequest.getYear(), addBookRequest.getPrice(), addBookRequest.getSynopsis(),
-                addBookRequest.getContent(), addBookRequest.getGenres(), addBookRequest.getImageLink());
+                addBookRequest.getContent(), genres, addBookRequest.getImageLink());
+
         bookService.addBook(newBook);
         return Response.ok("Book added successfully.");
     }

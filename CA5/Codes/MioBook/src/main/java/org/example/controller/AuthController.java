@@ -4,6 +4,8 @@ import jakarta.validation.Valid;
 
 import org.example.exception.*;
 import org.example.model.Address;
+import org.example.model.Admin;
+import org.example.model.Customer;
 import org.example.model.User;
 import org.example.request.LoginRequest;
 import org.example.request.SignupRequest;
@@ -37,10 +39,27 @@ public class AuthController {
     public Response<Object> signup(@Valid @RequestBody SignupRequest signupRequest)
             throws InvalidFormatException, DuplicateEntityException {
 
-        User.Role role = User.Role.valueOf(signupRequest.getRole());
-        Address address = new Address(signupRequest.getAddress().getCountry(), signupRequest.getAddress().getCity());
-        User newUser = new User(role, signupRequest.getUsername(), signupRequest.getPassword(),
-                signupRequest.getEmail(), address);
+        Address address = new Address(
+                signupRequest.getAddress().getCountry(),
+                signupRequest.getAddress().getCity()
+        );
+
+        User newUser;
+        if ("admin".equalsIgnoreCase(signupRequest.getRole())) {
+            newUser = new Admin(
+                    signupRequest.getUsername(),
+                    signupRequest.getPassword(),
+                    signupRequest.getEmail(),
+                    address
+            );
+        } else {
+            newUser = new Customer(
+                    signupRequest.getUsername(),
+                    signupRequest.getPassword(),
+                    signupRequest.getEmail(),
+                    address
+            );
+        }
 
         authService.signup(newUser);
         return Response.ok("signup successful", null);

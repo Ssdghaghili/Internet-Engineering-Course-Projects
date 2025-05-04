@@ -1,11 +1,24 @@
 package org.example.database;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
+import jakarta.annotation.PostConstruct;
 import org.example.model.*;
 
-import javax.xml.crypto.Data;
+import org.example.repository.UserRepository;
+import org.example.repository.AuthorRepository;
+import org.example.repository.BookRepository;
+import org.example.repository.ReviewRepository;
+import org.example.repository.CustomerRepository;
+import org.example.repository.AdminRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+
+import javax.swing.text.html.Option;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -14,20 +27,34 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
-
+@Service
 public class DataInitializer {
+    @Autowired
+    private UserRepository userRepository;
+    @Autowired
+    private AuthorRepository authorRepository;
+    @Autowired
+    private BookRepository bookRepository;
+    @Autowired
+    private ReviewRepository reviewRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
+    @Autowired
+    private AdminRepository adminRepository;
+
 
     private static final String BASE_URL = "http://194.60.231.242:8000/";
 
-    private Database db;
-    private final ObjectMapper objectMapper;
+//    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    public DataInitializer(Database db) {
-        this.db = db;
-        this.objectMapper = new ObjectMapper();
-    }
+    ObjectMapper objectMapper = new ObjectMapper()
+            .registerModule(new JavaTimeModule())
+            .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
 
+
+    @PostConstruct
     public void initializeData() {
         fetchUsers();
         fetchAuthors();
@@ -39,7 +66,14 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Users");
             List<User> users = objectMapper.readValue(json, new TypeReference<List<User>>() {});
-            db.users.addAll(users);
+            for (User user : users) {
+                if (user instanceof Admin) {
+                    adminRepository.save((Admin) user);
+                } else if (user instanceof Customer) {
+                    customerRepository.save((Customer) user);
+                }
+            }
+            System.out.println("Fetched " + users.size() + " users");
         } catch (Exception e) {
             System.out.println("Failed to fetch users: " + e.getMessage());
         }
@@ -49,7 +83,8 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Authors");
             List<Author> authors = objectMapper.readValue(json, new TypeReference<List<Author>>() {});
-            db.authors.addAll(authors);
+            //db.authors.addAll(authors);
+            authorRepository.saveAll(authors);
         } catch (Exception e) {
             System.out.println("Failed to fetch authors: " + e.getMessage());
         }
@@ -59,7 +94,18 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Books");
             List<Book> books = objectMapper.readValue(json, new TypeReference<List<Book>>() {});
-            db.books.addAll(books);
+            for (Book book : books) {
+
+                Optional<Author> optionalAuthor = authorRepository.findByName(book.getAuthor().getName());
+
+                if (optionalAuthor.isPresent()) {
+                    //book.setAuthor(optionalAuthor.get());
+                } else {
+                    System.out.println("Author not found for book: " + book.getTitle());
+                }
+            }
+
+            bookRepository.saveAll(books);
         } catch (Exception e) {
             System.out.println("Failed to fetch books: " + e.getMessage());
         }
@@ -80,10 +126,22 @@ public class DataInitializer {
                 String dateString = (String) review.get("date");
                 LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
 
-                User user = findUserByUsername(db.users, username);
-                Book book = findBookByTitle(db.books, bookTitle);
-                Review newReview = new Review(user, rate, comment, dateTime);
-                book.addReview(newReview);
+                //User user = findUserByUsername(db.users, username);
+                //Book book = findBookByTitle(db.books, bookTitle);
+                //book.addReview(newReview);
+
+                Optional<User> optionalUser = userRepository.findByUsername(username);
+                Optional<Book> optionalBook = bookRepository.findByTitle(bookTitle);
+
+                if (optionalUser.isPresent() && optionalBook.isPresent()) {
+                    User user = optionalUser.get();
+                    Book book = optionalBook.get();
+
+                    Review newReview = new Review((Customer) user, book, rate, comment, dateTime);
+                    reviewRepository.save(newReview);
+                } else {
+                    System.out.println("User or Book not found for review: " + username + ", " + bookTitle);
+                }
             }
         } catch (Exception e) {
             System.out.println("Failed to fetch reviews: " + e.getMessage());
@@ -113,21 +171,5 @@ public class DataInitializer {
         in.close();
         connection.disconnect();
         return content.toString();
-    }
-
-    User findUserByUsername(List<User> users, String username) {
-        for (User user : users) {
-            if (user.getUsername().equals(username))
-                return user;
-        }
-        return null;
-    }
-
-    Book findBookByTitle(List<Book> books, String title) {
-        for (Book book : books) {
-            if (book.getTitle().equals(title))
-                return book;
-        }
-        return null;
     }
 }

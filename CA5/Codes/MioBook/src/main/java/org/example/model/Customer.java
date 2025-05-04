@@ -17,10 +17,12 @@ public class Customer extends User {
     private Balance balance = new Balance(this);
 
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<CartItem> cart = new HashSet<>();
+    @OrderColumn(name = "cart_order")
+    private List<CartItem> cart = new ArrayList<>();
 
     @OneToMany(mappedBy="customer", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<PurchaseRecord> purchaseHistory = new HashSet<>();
+    @OrderColumn(name = "purchase_order")
+    private List<PurchaseRecord> purchaseHistory = new ArrayList<>();
 
     public Customer() {
         super();
@@ -31,8 +33,8 @@ public class Customer extends User {
     }
 
     public int getBalance() { return balance.getAmount(); }
-    public Set<CartItem> getCart() { return cart; }
-    public Set<PurchaseRecord> getPurchaseHistory() { return purchaseHistory; }
+    public List<CartItem> getCart() { return cart; }
+    public List<PurchaseRecord> getPurchaseHistory() { return purchaseHistory; }
 
     public void setBalance(int amount) {
         balance.setAmount(amount);

@@ -1,12 +1,14 @@
 package org.example.service;
 
-import org.example.database.Database;
+//import org.example.database.Database;
 import org.example.exception.*;
 import org.example.model.Author;
 import org.example.model.Book;
 import org.example.model.Review;
 import org.example.model.User;
+import org.example.model.Customer;
 
+import org.example.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,7 +25,7 @@ import static org.example.service.ServiceUtils.MAX_PAGE_SIZE;
 @Service
 public class BookService {
     @Autowired
-    private Database db;
+    private BookRepository bookRepository;
 
     @Autowired
     private AuthorService authorService;
@@ -33,7 +35,7 @@ public class BookService {
 
     public void addBook(Book book)
             throws NotFoundException, DuplicateEntityException {
-        Author author = authorService.findAuthorByName(book.getAuthor());
+        Author author = authorService.findAuthorByName(book.getAuthor().getName());
 
         if (author == null)
             throw new NotFoundException("Author not found");
@@ -41,7 +43,7 @@ public class BookService {
         if (bookTitleExists(book.getTitle()))
             throw new DuplicateEntityException("Book already exists");
 
-        db.books.add(book);
+        bookRepository.save(book);
     }
 
     public Book showBookDetails(String title) throws NotFoundException {
@@ -65,7 +67,10 @@ public class BookService {
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (!user.isBookPurchased(book))
+        if (!(user instanceof Customer customer))
+            throw new UnauthorizedException("Only customers can access book content");
+
+        if (!customer.isBookPurchased(book))
             throw new ForbiddenException("The book is not in your possession");
 
         Map<String, Object> bookContent = new LinkedHashMap<>();
@@ -92,31 +97,34 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    public List<Book> getTopRatedBooks(int size){
-        return db.books.stream()
+    public List<Book> getTopRatedBooks(int size) {
+        List<Book> books = bookRepository.findAll();
+        return books.stream()
                 .sorted(Comparator.comparingDouble(Book::getAverageRate).reversed())
                 .limit(size)
                 .collect(Collectors.toList());
     }
 
     public List<Book> getNewReleases(int size) {
-        return db.books.stream()
+        List<Book> books = bookRepository.findAll();
+        return books.stream()
                 .sorted(Comparator.comparingInt(Book::getYear).reversed())
                 .limit(size)
                 .collect(Collectors.toList());
     }
 
+
     public List<Book> searchBooks(String title, String author, String genre, Integer year,
                                   Integer page, Integer size, String sortBy, String order) throws BadRequestException {
 
-        Stream<Book> booksStream = db.books.stream();
+        Stream<Book> booksStream = bookRepository.findAll().stream();
 
         if (title != null) {
             booksStream = booksStream.filter(b -> b.getTitle().toLowerCase().contains(title.toLowerCase()));
         }
 
         if (author != null) {
-            booksStream = booksStream.filter(b -> b.getAuthor().toLowerCase().contains(author.toLowerCase()));
+            booksStream = booksStream.filter(b -> b.getAuthor().getName().toLowerCase().contains(author.toLowerCase()));
         }
 
         if (genre != null) {
@@ -145,29 +153,22 @@ public class BookService {
         return booksStream.skip((long) (page-1) * size).limit(size).collect(Collectors.toList());
     }
 
+
     public List<Book> getAllBooks() {
-        return db.books;
+        return bookRepository.findAll();
     }
 
     public double getBookAverageRating(String title) throws NotFoundException {
-        Book book = findBookByTitle(title);
-        if (book == null) {
-            throw new NotFoundException("Book not found");
-        }
+        Book book = bookRepository.findByTitle(title)
+                .orElseThrow(() -> new NotFoundException("Book not found"));
         return book.getAverageRate();
     }
 
-
     public Book findBookByTitle(String title) {
-        for (Book book : db.books) {
-            if (book.getTitle().equals(title)) {
-                return book;
-            }
-        }
-        return null;
+        return bookRepository.findByTitle(title).orElse(null);
     }
 
     public boolean bookTitleExists(String title) {
-        return db.books.stream().anyMatch(b -> b.getTitle().equals(title));
+        return bookRepository.findByTitle(title).isPresent();
     }
 }
