@@ -78,6 +78,24 @@ public class Book {
     public Set<Genre> getGenres() { return genres; }
     public Set<Review> getReviews() { return reviews; }
 
+    public void setAdmin(Admin admin) { this.admin = admin; }
+    public void setAuthor(Author author) { this.author = author; }
+    public void setTitle(String title) { this.title = title; }
+    public void setPublisher(String publisher) { this.publisher = publisher; }
+    public void setYear(int year) { this.year = year; }
+    public void setPrice(int price) { this.price = price; }
+    public void setSynopsis(String synopsis) { this.synopsis = synopsis; }
+    public void setContent(String content) { this.content = content; }
+    public void setImageLink(String imageLink) { this.imageLink = imageLink; }
+    public void setTotalBuys(int totalBuys) { this.totalBuys = totalBuys; }
+    public void setGenres(Set<Genre> genres) { this.genres = genres; }
+    public void setReviews(Set<Review> reviews) { this.reviews = reviews; }
+    public void addGenre(String genreName) {
+        Genre genre = new Genre(genreName);
+        genres.add(genre);
+    }
+
+
     public void addGenre(Genre genre) {
         genres.add(genre);
     }

@@ -18,13 +18,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 
-import javax.swing.text.html.Option;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -47,8 +47,6 @@ public class DataInitializer {
 
     private static final String BASE_URL = "http://194.60.231.242:8000/";
 
-//    private final ObjectMapper objectMapper = new ObjectMapper();
-
     ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -56,21 +54,26 @@ public class DataInitializer {
 
     @PostConstruct
     public void initializeData() {
-        fetchUsers();
-        fetchAuthors();
-        fetchBooks();
-        fetchReviews();
+//        fetchUsers();
+//        fetchAuthors();
+//        fetchBooks();
+//        fetchReviews();
     }
 
     private void fetchUsers() {
         try {
             String json = getJsonFromApi("Users");
             List<User> users = objectMapper.readValue(json, new TypeReference<List<User>>() {});
+
             for (User user : users) {
-                if (user instanceof Admin) {
-                    adminRepository.save((Admin) user);
-                } else if (user instanceof Customer) {
-                    customerRepository.save((Customer) user);
+                if (user instanceof Admin a) {
+                    if (!adminRepository.existsByUsername(a.getUsername())) {
+                        adminRepository.save(a);
+                    }
+                } else if (user instanceof Customer c) {
+                    if (!customerRepository.existsByUsername(c.getUsername())) {
+                        customerRepository.save(c);
+                    }
                 }
             }
             System.out.println("Fetched " + users.size() + " users");
@@ -83,7 +86,15 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Authors");
             List<Author> authors = objectMapper.readValue(json, new TypeReference<List<Author>>() {});
-            //db.authors.addAll(authors);
+
+            for (Author author : authors) {
+                Admin admin = adminRepository.findByUsername(author.getUsername());
+                if (admin == null) {
+                    throw new IllegalStateException("Admin with username '" + author.getUsername() + "' not found!");
+                }
+                author.setAdmin(admin);
+            }
+
             authorRepository.saveAll(authors);
         } catch (Exception e) {
             System.out.println("Failed to fetch authors: " + e.getMessage());
@@ -93,18 +104,32 @@ public class DataInitializer {
     private void fetchBooks() {
         try {
             String json = getJsonFromApi("Books");
-            List<Book> books = objectMapper.readValue(json, new TypeReference<List<Book>>() {});
-            for (Book book : books) {
 
-                Optional<Author> optionalAuthor = authorRepository.findByName(book.getAuthor().getName());
+            List<Map<String, Object>> rawBooks = objectMapper.readValue(json, new TypeReference<>() {});
 
-                if (optionalAuthor.isPresent()) {
-                    //book.setAuthor(optionalAuthor.get());
-                } else {
-                    System.out.println("Author not found for book: " + book.getTitle());
-                }
+            List<Book> books = new ArrayList<>();
+
+            for (Map<String, Object> rawBook : rawBooks) {
+                Book book = new Book();
+
+                book.setTitle((String) rawBook.get("title"));
+                book.setPublisher((String) rawBook.get("publisher"));
+                book.setYear((int) rawBook.get("year"));
+                book.setPrice((int) rawBook.get("price"));
+                book.setSynopsis((String) rawBook.get("synopsis"));
+                book.setContent((String) rawBook.get("content"));
+
+
+                String authorName = (String) rawBook.get("author");
+                Author author = authorRepository.findByName(authorName).orElse(null);
+                book.setAuthor(author);
+
+                String adminUsername = (String) rawBook.get("username");
+                Admin admin = adminRepository.findByUsername(adminUsername);
+                book.setAdmin(admin);
+
+                books.add(book);
             }
-
             bookRepository.saveAll(books);
         } catch (Exception e) {
             System.out.println("Failed to fetch books: " + e.getMessage());
@@ -125,10 +150,6 @@ public class DataInitializer {
                 String comment = (String) review.get("comment");
                 String dateString = (String) review.get("date");
                 LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-
-                //User user = findUserByUsername(db.users, username);
-                //Book book = findBookByTitle(db.books, bookTitle);
-                //book.addReview(newReview);
 
                 Optional<User> optionalUser = userRepository.findByUsername(username);
                 Optional<Book> optionalBook = bookRepository.findByTitle(bookTitle);

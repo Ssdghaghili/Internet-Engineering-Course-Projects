@@ -53,6 +53,7 @@ public class User {
         this.address = address;
     }
 
+    public Long getId() { return id; }
     public String getRole() { return role; }
     public String getUsername() { return username; }
     public String getPassword() { return password; }

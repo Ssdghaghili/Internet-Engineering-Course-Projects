@@ -27,6 +27,9 @@ public class Author {
     @OneToMany(mappedBy = "author")
     private Set<Book> books = new HashSet<>();
 
+    @Transient
+    private String username;
+
     private String penName;
     private String nationality;
     private LocalDate born;
@@ -46,6 +49,7 @@ public class Author {
     }
 
     public String getName() { return name; }
+    public String getUsername() { return username; }
     public String getPenName() { return penName; }
     public String getNationality() { return nationality; }
     public LocalDate getBorn() { return born; }
@@ -53,6 +57,7 @@ public class Author {
     public String getImageLink() { return imageLink; }
 
     public void setName(String name) { this.name = name; }
+    public void setUsername(String username) { this.username = username; }
     public void setPenName(String penName) { this.penName = penName; }
     public void setNationality(String nationality) { this.nationality = nationality; }
     public void setBorn(LocalDate born) { this.born = born; }
