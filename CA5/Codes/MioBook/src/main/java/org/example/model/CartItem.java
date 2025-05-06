@@ -26,7 +26,8 @@ public class CartItem {
 
     public CartItem() {}
 
-    public CartItem(Book book, boolean isBorrowed, int borrowDays) {
+    public CartItem(Customer customer, Book book, boolean isBorrowed, int borrowDays) {
+        this.customer = customer;
         this.book = book;
         this.isBorrowed = isBorrowed;
         this.borrowDays = borrowDays;

@@ -134,6 +134,12 @@ public class Book {
         totalBuys++;
     }
 
+    public void removeBuy() {
+        if (totalBuys > 0) {
+            totalBuys--;
+        }
+    }
+
     public int getReviewsCount() {
         return reviews.size();
     }
