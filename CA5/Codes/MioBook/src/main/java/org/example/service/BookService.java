@@ -46,6 +46,7 @@ public class BookService {
         bookRepository.save(book);
     }
 
+    /// ///////
     public Book showBookDetails(String title) throws NotFoundException {
         Book book = findBookByTitle(title);
 
@@ -55,6 +56,7 @@ public class BookService {
         return book;
     }
 
+    /// ////////
     public Map<String, Object> showBookContent(String title)
             throws NotFoundException, UnauthorizedException, ForbiddenException {
         Book book = findBookByTitle(title);
@@ -82,6 +84,7 @@ public class BookService {
         return bookContent;
     }
 
+    /// ////
     public List<Review> getBookReviews(String title, Integer page, Integer size) throws NotFoundException {
         Book book = findBookByTitle(title);
 
@@ -97,6 +100,7 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
+    /// ////////
     public List<Book> getTopRatedBooks(int size) {
         List<Book> books = bookRepository.findAll();
         return books.stream()
@@ -105,6 +109,7 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
+    /// //////
     public List<Book> getNewReleases(int size) {
         List<Book> books = bookRepository.findAll();
         return books.stream()

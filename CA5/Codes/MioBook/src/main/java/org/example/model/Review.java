@@ -42,4 +42,7 @@ public class Review {
     public int getRate() { return rate; }
     public String getComment() { return comment; }
     public LocalDateTime getDateTime() { return dateTime; }
+
+    public void setCustomer(Customer customer) { this.customer = customer; }
+    public void setBook(Book book) { this.book = book; }
 }

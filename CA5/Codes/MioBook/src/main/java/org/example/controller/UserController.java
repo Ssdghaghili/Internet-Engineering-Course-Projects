@@ -7,6 +7,7 @@ import org.example.exception.UnauthorizedException;
 import org.example.model.CartItem;
 import org.example.model.PurchaseReceipt;
 import org.example.model.PurchaseRecord;
+import org.example.repository.CartItemRepository;
 import org.example.response.Response;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,7 @@ import java.util.Map;
 public class UserController {
     @Autowired
     private UserService userService;
+
 
     @PostMapping("/addCart")
     public Response<Object> addCart(@RequestParam String title)

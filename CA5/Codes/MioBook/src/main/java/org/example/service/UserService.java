@@ -1,9 +1,12 @@
 package org.example.service;
 
 //import org.example.database.Database;
+import jakarta.transaction.Transactional;
 import org.example.exception.*;
 import org.example.model.*;
 
+import org.example.repository.BookRepository;
+import org.example.repository.CartItemRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.example.model.Customer;
@@ -21,6 +24,10 @@ public class UserService {
     private BookService bookService;
     @Autowired
     private UserSession userSession;
+    @Autowired
+    private BookRepository bookRepository;
+    @Autowired
+    private CartItemRepository cartItemRepository;
 
     private Customer getCurrentCustomer() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
@@ -33,20 +40,11 @@ public class UserService {
         return (Customer) user;
     }
 
-    private Admin getCurrentAdmin() throws UnauthorizedException, ForbiddenException {
-        User user = userSession.getCurrentUser();
-        if (user == null)
-            throw new UnauthorizedException("User is not logged in");
-
-        if (!(user instanceof Admin))
-            throw new ForbiddenException("Only admins can perform this action");
-
-        return (Admin) user;
-    }
-
+    @Transactional
     public void addCart(String bookTitle)
             throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
-        Book book = bookService.findBookByTitle(bookTitle);
+
+        Book book = bookRepository.findByTitle(bookTitle).orElse(null);
         Customer customer = getCurrentCustomer();
 
         if (book == null)
@@ -71,6 +69,8 @@ public class UserService {
 
         customer.addCart(book);
         book.addBuy();
+        bookRepository.save(book);
+        cartItemRepository.save(new CartItem());
     }
 
     public void removeCart(String bookTitle)
@@ -108,6 +108,7 @@ public class UserService {
             throw new BadRequestException("Minimum deposit amount is 100 cents (1 dollar)");
 
         customer.setBalance(customer.getBalance() + amount);
+        userRepository.save(customer);
     }
 
     public PurchaseReceipt purchaseCart()
@@ -130,6 +131,7 @@ public class UserService {
         return customer.purchaseCart();
     }
 
+    @Transactional
     public void borrowBook(String bookTitle, int days)
             throws UnauthorizedException, NotFoundException, ForbiddenException, BadRequestException {
         Book book = bookService.findBookByTitle(bookTitle);
@@ -161,6 +163,7 @@ public class UserService {
         customer.borrowBook(book, days);
     }
 
+    @Transactional
     public Map<String, Object> showCart()
             throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
@@ -180,6 +183,7 @@ public class UserService {
         return userCart;
     }
 
+    @Transactional
     public List<PurchaseRecord> showPurchaseHistory() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
         Customer customer = getCurrentCustomer();
@@ -193,6 +197,7 @@ public class UserService {
         return customer.getPurchaseHistory();
     }
 
+    @Transactional
     public List<CartItem> showPurchasedBooks() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
         Customer customer = getCurrentCustomer();

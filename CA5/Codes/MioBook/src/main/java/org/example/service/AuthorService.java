@@ -1,11 +1,9 @@
 package org.example.service;
 
-//import org.example.database.Database;
 import org.example.exception.*;
 import org.example.model.Author;
 
 import org.example.repository.AuthorRepository;
-import org.example.repository.BookRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -17,7 +15,6 @@ public class AuthorService {
     private AuthorRepository authorRepository;
 
     public void addAuthor(Author newAuthor) throws DuplicateEntityException {
-
         if (authorNameExists(newAuthor.getName()))
             throw new DuplicateEntityException("Author already exists");
 

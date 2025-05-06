@@ -90,10 +90,6 @@ public class Book {
     public void setTotalBuys(int totalBuys) { this.totalBuys = totalBuys; }
     public void setGenres(Set<Genre> genres) { this.genres = genres; }
     public void setReviews(Set<Review> reviews) { this.reviews = reviews; }
-    public void addGenre(String genreName) {
-        Genre genre = new Genre(genreName);
-        genres.add(genre);
-    }
 
 
     public void addGenre(Genre genre) {
@@ -105,15 +101,18 @@ public class Book {
         for (Review r : reviews) {
             if (r.getCustomer().equals(newReview.getCustomer())) {
                 reviews.remove(r);
+                r.setBook(null);
                 break;
             }
         }
+        newReview.setBook(this);
         reviews.add(newReview);
     }
 
     public void removeReview(Customer customer) {
         for (Review r : reviews) {
             if (r.getCustomer().equals(customer)) {
+                r.setBook(null);
                 reviews.remove(r);
                 break;
             }
