@@ -73,7 +73,6 @@ public class DataInitializer {
                     }
                 }
             }
-            System.out.println("Fetched " + users.size() + " users");
         } catch (Exception e) {
             System.out.println("Failed to fetch users: " + e.getMessage());
         }

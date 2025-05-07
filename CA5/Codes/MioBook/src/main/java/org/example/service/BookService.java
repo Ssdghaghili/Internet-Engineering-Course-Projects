@@ -9,6 +9,7 @@ import org.example.model.User;
 import org.example.model.Customer;
 
 import org.example.repository.BookRepository;
+import org.example.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +25,9 @@ import static org.example.service.ServiceUtils.MAX_PAGE_SIZE;
 
 @Service
 public class BookService {
+    @Autowired
+    private CustomerRepository customerRepository;
+
     @Autowired
     private BookRepository bookRepository;
 
@@ -46,7 +50,6 @@ public class BookService {
         bookRepository.save(book);
     }
 
-    /// ///////
     public Book showBookDetails(String title) throws NotFoundException {
         Book book = findBookByTitle(title);
 
@@ -56,21 +59,26 @@ public class BookService {
         return book;
     }
 
-    /// ////////
     public Map<String, Object> showBookContent(String title)
             throws NotFoundException, UnauthorizedException, ForbiddenException {
+
         Book book = findBookByTitle(title);
+        User userSess = userSession.getCurrentUser();
 
-        if (book == null)
+        if (book == null) {
             throw new NotFoundException("Book not found");
+        }
 
-        User user = userSession.getCurrentUser();
-
-        if (user == null)
+        if (userSess == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (!(user instanceof Customer customer))
-            throw new UnauthorizedException("Only customers can access book content");
+        if (!(userSess instanceof Customer))
+            throw new ForbiddenException("Only customers can access book content");
+
+        Customer customer = customerRepository.findById(userSess.getId())
+                .filter(u -> u instanceof Customer)
+                .map(u -> (Customer) u)
+                .orElseThrow(() -> new UnauthorizedException("Customer not found"));
 
         if (!customer.isBookPurchased(book))
             throw new ForbiddenException("The book is not in your possession");
@@ -84,7 +92,6 @@ public class BookService {
         return bookContent;
     }
 
-    /// ////
     public List<Review> getBookReviews(String title, Integer page, Integer size) throws NotFoundException {
         Book book = findBookByTitle(title);
 
@@ -94,17 +101,12 @@ public class BookService {
         if (size > MAX_PAGE_SIZE)
             size = MAX_PAGE_SIZE;
 
-//        Pagable pagable = PageRequest.of(page - 1, size);
-//
-//        return ReviewRepository.
-
         return book.getReviews().stream()
                 .skip((long) (page-1) * size)
                 .limit(size)
                 .collect(Collectors.toList());
     }
 
-    /// ////////
     public List<Book> getTopRatedBooks(int size) {
         List<Book> books = bookRepository.findAll();
         return books.stream()
@@ -113,7 +115,6 @@ public class BookService {
                 .collect(Collectors.toList());
     }
 
-    /// //////
     public List<Book> getNewReleases(int size) {
         List<Book> books = bookRepository.findAll();
         return books.stream()
@@ -121,7 +122,6 @@ public class BookService {
                 .limit(size)
                 .collect(Collectors.toList());
     }
-
 
     public List<Book> searchBooks(String title, String author, String genre, Integer year,
                                   Integer page, Integer size, String sortBy, String order) throws BadRequestException {
@@ -161,7 +161,6 @@ public class BookService {
 
         return booksStream.skip((long) (page-1) * size).limit(size).collect(Collectors.toList());
     }
-
 
     public List<Book> getAllBooks() {
         return bookRepository.findAll();

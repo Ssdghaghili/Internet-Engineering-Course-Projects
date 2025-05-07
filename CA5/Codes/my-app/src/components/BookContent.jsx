@@ -25,8 +25,8 @@ const BookContent = () => {
         const data = await res.json();
         setBook(data.data);
       } catch (err) {
-        console.error("Failed to load cart:", err);
-        setError("Failed to load cart.");
+        console.error("Failed to load book content:", err);
+        setError("Failed to load book content.");
       } finally {
         setLoading(false);
       }
@@ -37,7 +37,7 @@ const BookContent = () => {
   if (loading) {
     return (
       <div className="container mt-5 text-center">
-        <h3>Loading book details...</h3>
+        <h3>Loading book content...</h3>
       </div>
     );
   }
@@ -65,7 +65,7 @@ const BookContent = () => {
                 {book.title}
               </p>
 
-              <p className="fw-light me-4 mb-0">By {book.author}</p>
+              <p className="fw-light me-4 mb-0">By {book.author.name}</p>
             </div>
           </div>
         </div>
