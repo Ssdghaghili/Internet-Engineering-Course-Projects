@@ -61,13 +61,14 @@ const AddReviewModal = ({ Book, Image, onReviewAdded }) => {
         } else {
           ToastNotification({
             type: "error",
-            message: data.message || "Failed to add book to cart.",
+            message: data.message || "Failed to add Review.",
+            
           });
           //   console.error("Backend message:", data.message);
         }
       })
       .catch((error) => {
-        console.error("Error adding book to cart:", error);
+        console.error("Error adding Review:", error);
         ToastNotification({
           type: "error",
           message: "An unexpected error occurred. Please try again later.",
