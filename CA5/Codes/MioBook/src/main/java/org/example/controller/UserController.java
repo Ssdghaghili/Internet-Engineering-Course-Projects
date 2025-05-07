@@ -74,8 +74,8 @@ public class UserController {
 
     @GetMapping("/purchased-books")
     public Response<List<ItemDTO>> showPurchasedBooks() throws ForbiddenException, UnauthorizedException {
-        List<CartItem> purchaseBooks = userService.showPurchasedBooks();
+        List<PurchaseItem> purchaseBooks = userService.showPurchasedBooks();
         return Response.ok("Purchase books retrieved successfully",
-                purchaseBooks.stream().map(DtoMapper::cartItemToDTO).collect(Collectors.toList()));
+                purchaseBooks.stream().map(DtoMapper::purchaseItemToDTO).collect(Collectors.toList()));
     }
 }

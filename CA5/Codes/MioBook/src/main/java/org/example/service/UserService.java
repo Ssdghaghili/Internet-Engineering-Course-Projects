@@ -107,8 +107,9 @@ public class UserService {
             throw new BadRequestException("User has not enough credit");
 
         for (CartItem cartItem : customer.getCart()) {
-            cartItem.getBook().addBuy();
-            bookRepository.save(cartItem.getBook());
+            Book book = cartItem.getBook();
+            book.addBuy();
+            bookRepository.save(book);
         }
 
         return customer.purchaseCart();
@@ -158,11 +159,11 @@ public class UserService {
     }
 
     @Transactional
-    public List<CartItem> showPurchasedBooks() throws UnauthorizedException, ForbiddenException {
+    public List<PurchaseItem> showPurchasedBooks() throws UnauthorizedException, ForbiddenException {
 
         Customer customer = userInitialCheck();
 
-        return customer.getCart();
+        return customer.getPurchasedBooks();
     }
 
     public User findUserByUsername(String username) {

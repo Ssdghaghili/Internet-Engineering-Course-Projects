@@ -12,6 +12,7 @@ const CartItem = ({ Item, Image }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
+          setItem
           ToastNotification({
             type: "success",
             message: `${Item.title} removed successfully!`,

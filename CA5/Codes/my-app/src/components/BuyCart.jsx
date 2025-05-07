@@ -13,7 +13,7 @@ import { faCartShopping } from "@fortawesome/free-solid-svg-icons";
 const BuyCart = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [cartItems, setCartItems] = useState(null);
+  const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
     fetch(`/api/user/cart`)
@@ -66,6 +66,7 @@ const BuyCart = () => {
             type: "success",
             message: `Purchase successful!`,
           });
+          setCartItems(null);
         } else {
           ToastNotification({
             type: "error",
@@ -98,7 +99,7 @@ const BuyCart = () => {
               </div>
             </div>
 
-            {cartItems.items.length === 0 ? (
+            {cartItems === null || cartItems.items.length === 0 ? (
               <div className="row d-flex justify-content-center">
                 <img
                   src={NoCart}
