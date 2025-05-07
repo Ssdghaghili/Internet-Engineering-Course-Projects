@@ -80,6 +80,7 @@ const BuyCart = () => {
           message: "An unexpected error occurred. Please try again later.",
         });
       });
+   window.dispatchEvent(new Event("purchaseSuccess"));
   };
 
   return (

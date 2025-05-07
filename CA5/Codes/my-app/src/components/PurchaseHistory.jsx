@@ -13,7 +13,7 @@ const PurchaseHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [history, setHistory] = useState(null);
-
+  // const [reloadFlag, setReloadFlag] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
@@ -34,7 +34,19 @@ const PurchaseHistory = () => {
       }
     };
     fetchHistory();
-  }, [history]);
+
+    const handlePurchaseSuccess = () => {
+      fetchHistory(); // وقتی event اومد دوباره fetch کن
+    };
+  
+    window.addEventListener("purchaseSuccess", handlePurchaseSuccess);
+  
+    return () => {
+      window.removeEventListener("purchaseSuccess", handlePurchaseSuccess);
+    };
+
+    
+  }, []);
 
   if (loading) {
     return (

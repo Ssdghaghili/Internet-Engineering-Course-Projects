@@ -41,11 +41,11 @@ public class Customer extends User {
     }
 
     public void addCart(Book book) {
-        cart.add(new CartItem(book, false, 0));
+        cart.add(new CartItem(this, book, false, 0));
     }
 
     public void borrowBook(Book book, int days) {
-        cart.add(new CartItem(book, true, days));
+        cart.add(new CartItem(this, book, true, days));
     }
 
     public boolean removeBookFromCart(Book book) {
@@ -70,6 +70,7 @@ public class Customer extends User {
         purchaseHistory.add(record);
         balance.decreaseAmount(cartCost);
         cart.clear();
+
         return purchaseReceipt;
     }
 
