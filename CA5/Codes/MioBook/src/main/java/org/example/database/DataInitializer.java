@@ -179,7 +179,11 @@ public class DataInitializer {
                     Book book = optionalBook.get();
 
                     Review newReview = new Review((Customer) user, book, rate, comment, dateTime);
-                    reviewRepository.save(newReview);
+
+                    if (!reviewRepository.existsByBookAndCustomer(book, (Customer) user)) {
+                        reviewRepository.save(newReview);
+                    }
+
                 } else {
                     System.out.println("User or Book not found for review: " + username + ", " + bookTitle);
                 }

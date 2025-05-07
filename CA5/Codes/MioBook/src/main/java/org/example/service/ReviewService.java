@@ -51,10 +51,11 @@ public class ReviewService {
 
         Customer customer = (Customer) user;
 
-//        if (!customer.isBookPurchased(book))
-//            throw new BadRequestException("Only customers who have purchased the book can add reviews");
+        if (reviewRepository.existsByBookAndCustomer(book, customer)) {
+            reviewRepository.deleteByBookAndCustomer(book, customer);
+        }
 
-        reviewRepository.deleteByBookAndCustomer(book, customer);
+        //reviewRepository.deleteByBookAndCustomer(book, customer);
 
         Review newReview = new Review(customer, book, rate, comment, dateTime);
         book.addReview(newReview);

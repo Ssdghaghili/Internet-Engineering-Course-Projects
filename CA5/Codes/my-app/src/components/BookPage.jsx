@@ -43,15 +43,17 @@ const BookPage = () => {
   const [reviewPage, setReviewPage] = useState(1);
   function changeReviewPage(newPage) {
     setReviewPage(newPage);
-    fetchReviews({page: newPage, size: 5});
+    fetchReviews({ page: newPage, size: 5 });
   }
 
   const fetchReviews = async (filters) => {
     try {
       const query = new URLSearchParams(filters).toString();
-      console.log(query)
+      //console.log(query)
 
-      const response = await fetch(`/api/books/book/${bookSlug}/reviews?${query}`);
+      const response = await fetch(
+        `/api/books/book/${bookSlug}/reviews?${query}`
+      );
 
       const res = await response.json();
 
@@ -60,11 +62,10 @@ const BookPage = () => {
       }
 
       setReviews(res.data);
-
     } catch (err) {
       setError(err);
     }
-  }
+  };
 
   useEffect(() => {
     fetch(`/api/books/book/${bookSlug}/reviews?page=1&size=5`)
@@ -81,7 +82,6 @@ const BookPage = () => {
         setError("Failed to load reviews.");
       });
   }, [bookSlug]);
-
 
   if (loading) {
     return (
@@ -135,9 +135,9 @@ const BookPage = () => {
                   {book.title}
                 </div>
                 <div className="col-3 d-flex rating p-0 mb-2 mt-1 justify-content-start align-items-center">
-                  <Rating Rate={book.averageRating} />
+                  <Rating Rate={book.averageRating.toFixed(2)} />
                   <span className="text-dark ms-2 text-black-50">
-                    {book.averageRating}
+                    {book.averageRating.toFixed(1)}
                   </span>
                 </div>
                 <div className="row card-light-word">
@@ -304,15 +304,22 @@ const BookPage = () => {
                     Name={review.username}
                     Comment={review.comment}
                     Rate={review.rate}
-                    Date={review.date}
+                    Date={review.dateTime}
                   />
                 ))
               ) : (
-                <div className="text-muted">{reviewPage === 1 ? "No reviews yet." : "No more reviews to show." }</div>
+                <div className="text-muted">
+                  {reviewPage === 1
+                    ? "No reviews yet."
+                    : "No more reviews to show."}
+                </div>
               )}
             </div>
 
-            <Pagination currentPage={reviewPage} changeCurrentPage={changeReviewPage} />
+            <Pagination
+              currentPage={reviewPage}
+              changeCurrentPage={changeReviewPage}
+            />
           </div>
         </div>
       </div>
@@ -320,7 +327,17 @@ const BookPage = () => {
       <Footer />
 
       {/* Add Review Modal */}
-      <AddReviewModal Book={book} Image={cardImage} />
+      <AddReviewModal
+        Book={book}
+        Image={cardImage}
+        onReviewAdded={() => {
+          fetchReviews({ page: 1, size: 5 });
+          
+          fetch(`/api/books/${bookSlug}`)
+            .then((res) => res.json())
+            .then((data) => setBook(data.data));
+        }}
+      />
     </>
   );
 };
