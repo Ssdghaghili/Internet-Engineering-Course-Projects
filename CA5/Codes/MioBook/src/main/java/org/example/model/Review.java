@@ -1,13 +1,9 @@
 package org.example.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.example.model.serializer.ReviewSerializer;
-
 import java.time.LocalDateTime;
 
 import jakarta.persistence.*;
 
-@JsonSerialize(using = ReviewSerializer.class)
 @Entity
 public class Review {
 
@@ -15,11 +11,11 @@ public class Review {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id")
     private Customer customer;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "book_id")
     private Book book;
 

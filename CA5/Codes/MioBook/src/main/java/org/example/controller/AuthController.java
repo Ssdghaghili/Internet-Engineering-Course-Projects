@@ -2,6 +2,8 @@ package org.example.controller;
 
 import jakarta.validation.Valid;
 
+import org.example.dto.DtoMapper;
+import org.example.dto.UserDTO;
 import org.example.exception.*;
 import org.example.model.Address;
 import org.example.model.Admin;
@@ -22,9 +24,10 @@ public class AuthController {
     private AuthService authService;
 
     @GetMapping("/user")
-    public Response<User> user() throws UnauthorizedException {
+    public Response<UserDTO> user() throws UnauthorizedException {
         User user = authService.showUserDetails();
-        return Response.ok("User details retrieved successfully", user);
+        return Response.ok("User details retrieved successfully",
+                DtoMapper.userToDTO(user));
     }
 
     @PostMapping("/login")

@@ -1,6 +1,8 @@
 package org.example.controller;
 
 import jakarta.validation.Valid;
+import org.example.dto.AuthorDTO;
+import org.example.dto.DtoMapper;
 import org.example.exception.DuplicateEntityException;
 import org.example.exception.ForbiddenException;
 import org.example.exception.NotFoundException;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("api/authors")
@@ -36,15 +39,16 @@ public class AuthorController {
     }
 
     @GetMapping("/{name}")
-    public Response<Author> getAuthorDetails(@PathVariable String name) throws NotFoundException {
+    public Response<AuthorDTO> getAuthorDetails(@PathVariable String name) throws NotFoundException {
         Author author = authorService.showAuthorDetails(name);
-        return Response.ok("Author details retrieved successfully", author);
+        return Response.ok("Author details retrieved successfully", DtoMapper.authorToDTO(author));
     }
 
     @GetMapping("/all")
-    public Response<List<Author>> getAuthors() throws ForbiddenException, UnauthorizedException {
+    public Response<List<AuthorDTO>> getAuthors() throws ForbiddenException, UnauthorizedException {
         authService.validateAdmin();
         List<Author> authors = authorService.getAllAuthors();
-        return Response.ok("Authors retrieved successfully", authors);
+        return Response.ok("Authors retrieved successfully",
+                authors.stream().map(DtoMapper::authorToDTO).collect(Collectors.toList()));
     }
 }

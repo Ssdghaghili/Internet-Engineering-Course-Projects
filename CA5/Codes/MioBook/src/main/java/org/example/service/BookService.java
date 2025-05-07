@@ -94,6 +94,10 @@ public class BookService {
         if (size > MAX_PAGE_SIZE)
             size = MAX_PAGE_SIZE;
 
+//        Pagable pagable = PageRequest.of(page - 1, size);
+//
+//        return ReviewRepository.
+
         return book.getReviews().stream()
                 .skip((long) (page-1) * size)
                 .limit(size)

@@ -2,18 +2,15 @@ package org.example.database;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
+import org.example.exception.NotFoundException;
 import org.example.model.*;
 
-import org.example.repository.UserRepository;
-import org.example.repository.AuthorRepository;
-import org.example.repository.BookRepository;
-import org.example.repository.ReviewRepository;
-import org.example.repository.CustomerRepository;
-import org.example.repository.AdminRepository;
+import org.example.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,12 +19,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class DataInitializer {
@@ -43,6 +38,8 @@ public class DataInitializer {
     private CustomerRepository customerRepository;
     @Autowired
     private AdminRepository adminRepository;
+    @Autowired
+    private GenreRepository genreRepository;
 
 
     private static final String BASE_URL = "http://194.60.231.242:8000/";
@@ -54,10 +51,10 @@ public class DataInitializer {
 
     @PostConstruct
     public void initializeData() {
-//        fetchUsers();
-//        fetchAuthors();
-//        fetchBooks();
-//        fetchReviews();
+        fetchUsers();
+        fetchAuthors();
+        fetchBooks();
+        fetchReviews();
     }
 
     private void fetchUsers() {
@@ -85,14 +82,30 @@ public class DataInitializer {
     private void fetchAuthors() {
         try {
             String json = getJsonFromApi("Authors");
-            List<Author> authors = objectMapper.readValue(json, new TypeReference<List<Author>>() {});
+            List<Author> authors = new ArrayList<>();
+            JsonNode root = objectMapper.readTree(json);
 
-            for (Author author : authors) {
-                Admin admin = adminRepository.findByUsername(author.getUsername());
+            for (JsonNode authorNode : root) {
+                String adminUsername = authorNode.get("username").asText();
+                Author author = new Author();
+
+                author.setName(authorNode.get("name").asText());
+                author.setPenName(authorNode.get("penName").asText());
+                author.setBorn(LocalDate.parse(authorNode.get("born").asText()));
+                author.setNationality(authorNode.get("nationality").asText());
+
+                LocalDate died = null;
+                if (authorNode.has("died")) {
+                    died = LocalDate.parse(authorNode.get("died").asText());
+                }
+                author.setDied(died);
+
+                Admin admin = adminRepository.findByUsername(adminUsername);
                 if (admin == null) {
-                    throw new IllegalStateException("Admin with username '" + author.getUsername() + "' not found!");
+                    throw new IllegalStateException("Admin with username '" + adminUsername + "' not found!");
                 }
                 author.setAdmin(admin);
+                authors.add(author);
             }
 
             authorRepository.saveAll(authors);
@@ -104,27 +117,34 @@ public class DataInitializer {
     private void fetchBooks() {
         try {
             String json = getJsonFromApi("Books");
-
-            List<Map<String, Object>> rawBooks = objectMapper.readValue(json, new TypeReference<>() {});
-
+            JsonNode root = objectMapper.readTree(json);
             List<Book> books = new ArrayList<>();
 
-            for (Map<String, Object> rawBook : rawBooks) {
+            for (JsonNode bookNode : root) {
                 Book book = new Book();
 
-                book.setTitle((String) rawBook.get("title"));
-                book.setPublisher((String) rawBook.get("publisher"));
-                book.setYear((int) rawBook.get("year"));
-                book.setPrice((int) rawBook.get("price"));
-                book.setSynopsis((String) rawBook.get("synopsis"));
-                book.setContent((String) rawBook.get("content"));
+                book.setTitle(bookNode.get("title").asText());
+                book.setPublisher(bookNode.get("publisher").asText());
+                book.setYear(bookNode.get("year").asInt());
+                book.setPrice(bookNode.get("price").asInt());
+                book.setSynopsis(bookNode.get("synopsis").asText());
+                book.setContent(bookNode.get("content").asText());
 
+                JsonNode genres = bookNode.get("genres");
+                for (JsonNode g : genres) {
+                    Genre genre = genreRepository.findByName(g.asText()).orElse(null);
+                    if (genre == null) {
+                        Genre newGenre = new Genre(g.asText());
+                        genreRepository.save(newGenre);
+                    }
+                    book.addGenre(genre);
+                }
 
-                String authorName = (String) rawBook.get("author");
+                String authorName = bookNode.get("author").asText();
                 Author author = authorRepository.findByName(authorName).orElse(null);
                 book.setAuthor(author);
 
-                String adminUsername = (String) rawBook.get("username");
+                String adminUsername = bookNode.get("username").asText();
                 Admin admin = adminRepository.findByUsername(adminUsername);
                 book.setAdmin(admin);
 

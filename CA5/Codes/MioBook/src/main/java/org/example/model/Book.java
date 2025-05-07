@@ -1,16 +1,12 @@
 package org.example.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.validation.constraints.NotNull;
-import org.example.model.serializer.BookSerializer;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.*;
 
-@JsonSerialize(using = BookSerializer.class)
 @Entity
 public class Book {
 
