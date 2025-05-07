@@ -15,7 +15,7 @@ const BuyCart = () => {
   const [error, setError] = useState(null);
   const [cartItems, setCartItems] = useState([]);
 
-  useEffect(() => {
+  const fetchCart = async () => {
     fetch(`/api/user/cart`)
       .then((res) => {
         if (!res.ok) {
@@ -31,6 +31,10 @@ const BuyCart = () => {
         setError("Failed to load book details.");
         setLoading(false);
       });
+  }
+
+  useEffect(() => {
+    fetchCart();
   }, []);
 
   if (loading) {
@@ -124,7 +128,7 @@ const BuyCart = () => {
                 <div className="col-11 ps-4 pe-4  mb-1">
                   <div className="row fw-light font-small pt-2 pb-2">
                     {cartItems.items.map((item, index) => (
-                      <CartItem key={index} Item={item} Image={BookImage} />
+                      <CartItem key={index} Item={item} Image={BookImage} onRemove={fetchCart} />
                     ))}
                   </div>
                   <div className="row mb-2 d-flex justify-content-center">

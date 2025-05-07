@@ -1,7 +1,7 @@
 import React from "react";
 import ToastNotification from "./ToastNotification";
 
-const CartItem = ({ Item, Image }) => {
+const CartItem = ({ Item, Image, onRemove }) => {
   const handelRemoveButtonClick = () => {
     fetch(`/api/user/removeCart?title=${Item.title}`, {
       method: "POST",
@@ -12,7 +12,7 @@ const CartItem = ({ Item, Image }) => {
       .then((response) => response.json())
       .then((data) => {
         if (data.success) {
-          setItem
+          onRemove();
           ToastNotification({
             type: "success",
             message: `${Item.title} removed successfully!`,
