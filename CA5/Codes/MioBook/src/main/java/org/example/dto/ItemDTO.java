@@ -2,7 +2,7 @@ package org.example.dto;
 
 import java.util.List;
 
-public class CartItemDTO {
+public class ItemDTO {
     private String title;
     private String author;
     private String publisher;
@@ -12,9 +12,10 @@ public class CartItemDTO {
     private boolean isBorrowed;
     private int finalPrice;
     private int borrowDays;
+    private String bookImage;
 
-    public CartItemDTO(String title, String author, String publisher, List<String> genres, int year, int price,
-                   boolean isBorrowed, int finalPrice, int borrowDays) {
+    public ItemDTO(String title, String author, String publisher, List<String> genres, int year, int price,
+                   boolean isBorrowed, int finalPrice, int borrowDays, String bookImage) {
         this.title = title;
         this.author = author;
         this.publisher = publisher;
@@ -24,6 +25,7 @@ public class CartItemDTO {
         this.isBorrowed = isBorrowed;
         this.finalPrice = finalPrice;
         this.borrowDays = borrowDays;
+        this.bookImage = bookImage;
     }
 
     public String getTitle() {
@@ -96,5 +98,13 @@ public class CartItemDTO {
 
     public void setBorrowDays(int borrowDays) {
         this.borrowDays = borrowDays;
+    }
+
+    public String getBookImage() {
+        return bookImage;
+    }
+
+    public void setBookImage(String bookImage) {
+        this.bookImage = bookImage;
     }
 }

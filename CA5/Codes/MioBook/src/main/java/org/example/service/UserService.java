@@ -65,6 +65,7 @@ public class UserService {
         bookRepository.save(book);
     }
 
+    @Transactional
     public void removeCart(String bookTitle)
             throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
 
@@ -111,7 +112,6 @@ public class UserService {
         }
 
         return customer.purchaseCart();
-
     }
 
     @Transactional

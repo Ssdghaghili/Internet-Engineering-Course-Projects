@@ -27,8 +27,8 @@ const PurchaseHistory = () => {
         const data = await res.json();
         setHistory(data.data);
       } catch (err) {
-        console.error("Failed to load cart:", err);
-        setError("Failed to load cart.");
+        console.error("Failed to load history:", err);
+        setError("Failed to load history.");
       } finally {
         setLoading(false);
       }

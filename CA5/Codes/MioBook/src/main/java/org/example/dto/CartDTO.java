@@ -4,9 +4,9 @@ import java.util.List;
 
 public class CartDTO {
     private int totalCost;
-    private List<CartItemDTO>  items;
+    private List<ItemDTO>  items;
 
-    public CartDTO(int totalCost, List<CartItemDTO> items) {
+    public CartDTO(int totalCost, List<ItemDTO> items) {
         this.totalCost = totalCost;
         this.items = items;
     }
@@ -19,11 +19,11 @@ public class CartDTO {
         this.totalCost = totalCost;
     }
 
-    public List<CartItemDTO> getItems() {
+    public List<ItemDTO> getItems() {
         return items;
     }
 
-    public void setItems(List<CartItemDTO> items) {
+    public void setItems(List<ItemDTO> items) {
         this.items = items;
     }
 }

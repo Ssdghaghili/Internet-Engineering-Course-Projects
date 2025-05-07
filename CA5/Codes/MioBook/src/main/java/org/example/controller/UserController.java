@@ -6,14 +6,12 @@ import org.example.exception.ForbiddenException;
 import org.example.exception.NotFoundException;
 import org.example.exception.UnauthorizedException;
 import org.example.model.*;
-import org.example.repository.CartItemRepository;
 import org.example.response.Response;
 import org.example.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -68,13 +66,14 @@ public class UserController {
     }
 
     @GetMapping("/purchase-history")
-    public Response<List<PurchaseRecord>> showPurchaseHistory() throws ForbiddenException, UnauthorizedException {
+    public Response<List<PurchaseRecordDTO>> showPurchaseHistory() throws ForbiddenException, UnauthorizedException {
         List<PurchaseRecord> purchaseHistory = userService.showPurchaseHistory();
-        return Response.ok("Purchase history retrieved successfully", purchaseHistory);
+        return Response.ok("Purchase history retrieved successfully",
+                purchaseHistory.stream().map(DtoMapper::purchaseRecordToDTO).collect(Collectors.toList()));
     }
 
     @GetMapping("/purchased-books")
-    public Response<List<CartItemDTO>> showPurchasedBooks() throws ForbiddenException, UnauthorizedException {
+    public Response<List<ItemDTO>> showPurchasedBooks() throws ForbiddenException, UnauthorizedException {
         List<CartItem> purchaseBooks = userService.showPurchasedBooks();
         return Response.ok("Purchase books retrieved successfully",
                 purchaseBooks.stream().map(DtoMapper::cartItemToDTO).collect(Collectors.toList()));

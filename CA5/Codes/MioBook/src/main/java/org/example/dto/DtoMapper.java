@@ -62,9 +62,9 @@ public class DtoMapper {
         }
     }
 
-    public static CartItemDTO cartItemToDTO(CartItem cartItem) {
+    public static ItemDTO cartItemToDTO(CartItem cartItem) {
         Book book = cartItem.getBook();
-        return new CartItemDTO(
+        return new ItemDTO(
                 book.getTitle(),
                 book.getAuthor().getName(),
                 book.getPublisher(),
@@ -73,7 +73,24 @@ public class DtoMapper {
                 book.getPrice(),
                 cartItem.isBorrowed(),
                 cartItem.getFinalPrice(),
-                cartItem.getBorrowDays()
+                cartItem.getBorrowDays(),
+                book.getImageLink()
+        );
+    }
+
+    public static ItemDTO purchaseItemToDTO(PurchaseItem purchaseItem) {
+        Book book = purchaseItem.getBook();
+        return new ItemDTO(
+                book.getTitle(),
+                book.getAuthor().getName(),
+                book.getPublisher(),
+                book.getGenres().stream().map(Genre::getName).collect(Collectors.toList()),
+                book.getYear(),
+                book.getPrice(),
+                purchaseItem.isBorrowed(),
+                purchaseItem.getFinalPrice(),
+                purchaseItem.getBorrowDays(),
+                book.getImageLink()
         );
     }
 
@@ -81,6 +98,14 @@ public class DtoMapper {
         return new CartDTO(
                 cart.getTotalCost(),
                 cart.getItems().stream().map(DtoMapper::cartItemToDTO).collect(Collectors.toList())
+        );
+    }
+
+    public static PurchaseRecordDTO purchaseRecordToDTO(PurchaseRecord purchaseRecord) {
+        return new PurchaseRecordDTO(
+                purchaseRecord.getPurchaseDate(),
+                purchaseRecord.getItems().stream().map(DtoMapper::purchaseItemToDTO).collect(Collectors.toList()),
+                purchaseRecord.getTotalCost()
         );
     }
 }
