@@ -38,7 +38,7 @@ const BookPage = () => {
         setError("Failed to load book details.");
         setLoading(false);
       });
-  }, [bookSlug, book]);
+  }, [bookSlug]);
 
   const [reviewPage, setReviewPage] = useState(1);
   function changeReviewPage(newPage) {

@@ -36,7 +36,7 @@ const AuthorPage = () => {
     };
 
     fetchAuthor();
-  }, [books, authorSlug]);
+  }, [authorSlug]);
 
   useEffect(() => {
     const fetchAuthorBooks = async () => {
@@ -56,7 +56,7 @@ const AuthorPage = () => {
     };
 
     fetchAuthorBooks();
-  }, [books, authorSlug]);
+  }, [authorSlug]);
 
   if (authorLoading || booksLoading) {
     return (

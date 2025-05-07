@@ -50,7 +50,7 @@ const AdminDashboard = () => {
       };
 
       fetchUser();
-    }, [user]);
+    }, []);
 
   useEffect(() => {
       const fetchBooks = async () => {
@@ -71,7 +71,7 @@ const AdminDashboard = () => {
         }
       };
       fetchBooks();
-    }, [user, books]);
+    }, [user]);
 
   useEffect(() => {
       const fetchAuthors = async () => {
@@ -92,7 +92,7 @@ const AdminDashboard = () => {
         }
       };
       fetchAuthors();
-    }, [user, authors]);
+    }, [user]);
 
   const handleLogout = async () => {
       try {

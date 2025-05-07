@@ -45,7 +45,7 @@ const UserProfile = () => {
     };
 
     fetchUser();
-  }, [user]);
+  }, []);
 
   useEffect(() => {
     const fetchCart = async () => {
@@ -66,7 +66,7 @@ const UserProfile = () => {
       }
     };
     fetchCart();
-  }, [user, book]);
+  }, [user]);
 
   if (userLoading || cartLoading) {
     return (

@@ -31,7 +31,7 @@ const BuyCart = () => {
         setError("Failed to load book details.");
         setLoading(false);
       });
-  }, [cartItems]);
+  }, []);
 
   if (loading) {
     return (

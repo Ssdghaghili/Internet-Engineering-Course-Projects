@@ -37,7 +37,7 @@ const HomePage = () => {
     };
 
     fetchNewReleaseBooks();
-  }, [newBooks]);
+  }, []);
 
 
   useEffect(() => {
@@ -58,7 +58,7 @@ const HomePage = () => {
     };
 
     fetchTopRatedBooks();
-  }, [topBooks]);
+  }, []);
 
   if (newBooksLoading || topBooksLoading) {
     return (
