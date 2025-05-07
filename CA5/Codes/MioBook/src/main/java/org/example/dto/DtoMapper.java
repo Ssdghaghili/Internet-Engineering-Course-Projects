@@ -41,12 +41,46 @@ public class DtoMapper {
     }
 
     public static UserDTO userToDTO(User user) {
-        return new UserDTO(
-                user.getUsername(),
-                user.getEmail(),
-                user.getAddress().getCountry(),
-                user.getAddress().getCity(),
-                user.getRole(),
-                (user instanceof Customer c) ? c.getBalance() : null);
+        if (user instanceof Customer customer) {
+            return new CustomerDTO(
+                    customer.getUsername(),
+                    customer.getEmail(),
+                    customer.getAddress().getCountry(),
+                    customer.getAddress().getCity(),
+                    customer.getRole(),
+                    customer.getBalance()
+            );
+        }
+        else {
+            return new AdminDTO(
+                    user.getUsername(),
+                    user.getEmail(),
+                    user.getAddress().getCountry(),
+                    user.getAddress().getCity(),
+                    user.getRole()
+            );
+        }
+    }
+
+    public static CartItemDTO cartItemToDTO(CartItem cartItem) {
+        Book book = cartItem.getBook();
+        return new CartItemDTO(
+                book.getTitle(),
+                book.getAuthor().getName(),
+                book.getPublisher(),
+                book.getGenres().stream().map(Genre::getName).collect(Collectors.toList()),
+                book.getYear(),
+                book.getPrice(),
+                cartItem.isBorrowed(),
+                cartItem.getFinalPrice(),
+                cartItem.getBorrowDays()
+        );
+    }
+
+    public static CartDTO CartToDTO(Cart cart) {
+        return new CartDTO(
+                cart.getTotalCost(),
+                cart.getItems().stream().map(DtoMapper::cartItemToDTO).collect(Collectors.toList())
+        );
     }
 }

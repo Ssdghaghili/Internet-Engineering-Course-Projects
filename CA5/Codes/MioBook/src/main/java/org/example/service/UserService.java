@@ -37,12 +37,10 @@ public class UserService {
         if (!(user instanceof Customer))
             throw new ForbiddenException("Only customers can perform this action");
 
-        Customer customer = userRepository.findById(user.getId())
+        return userRepository.findById(user.getId())
                 .filter(u -> u instanceof Customer)
                 .map(u -> (Customer) u)
                 .orElseThrow(() -> new UnauthorizedException("Customer not found"));
-
-        return customer;
     }
 
     @Transactional
@@ -52,7 +50,7 @@ public class UserService {
         Book book = bookRepository.findByTitle(bookTitle)
                 .orElseThrow(() -> new NotFoundException("Book not found"));
 
-       Customer customer = userInitialCheck();
+        Customer customer = userInitialCheck();
 
         if (customer.getCart().size() >= 10)
             throw new BadRequestException("Cart cannot have more than 10 items");
@@ -81,7 +79,8 @@ public class UserService {
         bookRepository.save(book);
     }
 
-    public void addCredit(int amount)
+    @Transactional
+    public Customer addCredit(int amount)
             throws UnauthorizedException, ForbiddenException, BadRequestException {
 
         Customer customer = userInitialCheck();
@@ -89,8 +88,9 @@ public class UserService {
         if (amount < 100)
             throw new BadRequestException("Minimum deposit amount is 100 cents (1 dollar)");
 
-        customer.setBalance(customer.getBalance() + amount);
+        customer.increaseAmount(amount);
         userRepository.save(customer);
+        return customer;
     }
 
     @Transactional
@@ -121,7 +121,7 @@ public class UserService {
         Book book = bookRepository.findByTitle(bookTitle)
                 .orElseThrow(() -> new NotFoundException("Book not found"));
 
-       Customer customer = userInitialCheck();
+        Customer customer = userInitialCheck();
 
         if (customer.getCart().size() >= 10)
             throw new BadRequestException("Cart cannot have more than 10 items");
@@ -139,15 +139,12 @@ public class UserService {
     }
 
     @Transactional
-    public Map<String, Object> showCart()
+    public Cart showCart()
             throws UnauthorizedException, ForbiddenException {
 
         Customer customer = userInitialCheck();
 
-        Map<String, Object> userCart = new LinkedHashMap<>();
-
-        userCart.put("totalCost", customer.calculateCartCost());
-        userCart.put("items", customer.getCart());
+        Cart userCart = new Cart(customer.calculateCartCost(), customer.getCart());
 
         return userCart;
     }

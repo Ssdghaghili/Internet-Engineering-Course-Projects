@@ -36,8 +36,8 @@ public class Customer extends User {
     public List<CartItem> getCart() { return cart; }
     public List<PurchaseRecord> getPurchaseHistory() { return purchaseHistory; }
 
-    public void setBalance(int amount) {
-        balance.setAmount(amount);
+    public void increaseAmount(int amount) {
+        balance.increaseAmount(amount);
     }
 
     public void addCart(Book book) {

@@ -1,10 +1,7 @@
 package org.example.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
-import org.example.model.serializer.CartItemSerializer;
 
-@JsonSerialize(using = CartItemSerializer.class)
 @Entity
 public class CartItem {
 

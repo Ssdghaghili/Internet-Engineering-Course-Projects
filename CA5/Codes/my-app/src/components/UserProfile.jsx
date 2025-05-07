@@ -128,6 +128,7 @@ const UserProfile = () => {
             type: "success",
             message: "Credit added successfully",
           });
+          setUser(data.data);
         }
       } else {
         console.error("Failed to add credit");
