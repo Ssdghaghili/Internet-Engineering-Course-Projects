@@ -5,7 +5,7 @@ import ToastNotification from "./ToastNotification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faStar } from "@fortawesome/free-solid-svg-icons";
 
-const AddReviewModal = ({ Book, Image }) => {
+const AddReviewModal = ({ Book, Image, onReviewAdded }) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
@@ -30,7 +30,6 @@ const AddReviewModal = ({ Book, Image }) => {
         type: "error",
         message: "Please signIn first to add a review.",
       });
-      //navigate("/SignIn");
       return;
     }
 
@@ -56,16 +55,20 @@ const AddReviewModal = ({ Book, Image }) => {
           });
           setRating(0);
           setComment("");
+          if (onReviewAdded) {
+            onReviewAdded();
+          }
         } else {
           ToastNotification({
             type: "error",
-            message: data.message || "Failed to add book to cart.",
+            message: data.message || "Failed to add Review.",
+            
           });
           //   console.error("Backend message:", data.message);
         }
       })
       .catch((error) => {
-        console.error("Error adding book to cart:", error);
+        console.error("Error adding Review:", error);
         ToastNotification({
           type: "error",
           message: "An unexpected error occurred. Please try again later.",

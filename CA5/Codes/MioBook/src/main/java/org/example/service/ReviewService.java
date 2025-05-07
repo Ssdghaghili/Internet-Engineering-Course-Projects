@@ -11,6 +11,7 @@ import org.example.model.Review;
 import org.example.model.User;
 
 import org.example.repository.BookRepository;
+import org.example.repository.CustomerRepository;
 import org.example.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,19 +30,27 @@ public class ReviewService {
     private UserSession  userSession;
     @Autowired
     private BookRepository bookRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     @Transactional
     public void addReview(String bookTitle, int rate, String comment, LocalDateTime dateTime)
             throws UnauthorizedException, ForbiddenException, NotFoundException, BadRequestException {
-        User user = userSession.getCurrentUser();
 
-        if (user == null)
+        User userSess = userSession.getCurrentUser();
+        if (userSess == null)
             throw new UnauthorizedException("User is not logged in");
 
-        if (!Objects.equals(user.getRole(), "customer"))
+        if (!(userSess instanceof Customer))
             throw new ForbiddenException("Only customers can add reviews");
 
-        Book book = bookService.findBookByTitle(bookTitle);
+        Customer customer = customerRepository.findById(userSess.getId())
+                .filter(u -> u instanceof Customer)
+                .map(u -> (Customer) u)
+                .orElseThrow(() -> new UnauthorizedException("Customer not found"));
+
+        Book book = bookRepository.findByTitle(bookTitle)
+                .orElseThrow(() -> new NotFoundException("Book not found"));
 
         if (book == null)
             throw new NotFoundException("Book not found");
@@ -49,12 +58,12 @@ public class ReviewService {
         if (rate < 1 || rate > 5)
             throw new BadRequestException("Rate should be between 1 and 5");
 
-        Customer customer = (Customer) user;
+        if (!customer.isBookPurchased(book))
+            throw new BadRequestException("Only customers who have purchased the book can add reviews");
 
-//        if (!customer.isBookPurchased(book))
-//            throw new BadRequestException("Only customers who have purchased the book can add reviews");
-
-        reviewRepository.deleteByBookAndCustomer(book, customer);
+        if (reviewRepository.existsByBookAndCustomer(book, customer)) {
+            reviewRepository.deleteByBookAndCustomer(book, customer);
+        }
 
         Review newReview = new Review(customer, book, rate, comment, dateTime);
         book.addReview(newReview);
