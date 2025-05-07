@@ -47,7 +47,7 @@ const CartItem = ({ Item, Image, onRemove }) => {
         <div className="col-3">{Item.title}</div>
         <div className="col-2">{Item.author}</div>
         <div className="col-2">
-          {Item.isBorrowed ? (
+          {Item.borrowed ? (
             <>
               <span className="text-decoration-line-through me-1">
                 ${(Item.price / 100).toFixed(2)}
