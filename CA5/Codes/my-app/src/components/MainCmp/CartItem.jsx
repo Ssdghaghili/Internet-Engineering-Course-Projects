@@ -59,7 +59,7 @@ const CartItem = ({ Item, Image, onRemove }) => {
           )}
         </div>
         <div className="col-2">
-          {Item.isBorrowed ? Item.borrowDays : "Not Borrowed"}
+          {Item.borrowed ? Item.borrowDays : "Not Borrowed"}
         </div>
         <div className="col-2 d-flex justify-content-end">
           <button className=" btn-gray" onClick={handelRemoveButtonClick}>

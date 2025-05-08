@@ -7,6 +7,7 @@ import org.example.exception.DuplicateEntityException;
 import org.example.exception.ForbiddenException;
 import org.example.exception.NotFoundException;
 import org.example.exception.UnauthorizedException;
+import org.example.model.Admin;
 import org.example.model.Author;
 import org.example.request.AddAuthorRequest;
 import org.example.response.Response;
@@ -17,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RestController
@@ -31,9 +33,8 @@ public class AuthorController {
     @PostMapping("/add")
     public Response<Object> addAuthor(@Valid @RequestBody AddAuthorRequest addAuthorRequest)
             throws ForbiddenException, UnauthorizedException, DuplicateEntityException {
-        authService.validateAdmin();
-        Author newAuthor = new Author(addAuthorRequest.getName(), addAuthorRequest.getPenName(),
-                addAuthorRequest.getNationality(), addAuthorRequest.getBorn(), addAuthorRequest.getDied(), addAuthorRequest.getImageLink());
+        Author newAuthor = new Author(addAuthorRequest.getName(), addAuthorRequest.getPenName(), addAuthorRequest.getNationality()
+                , addAuthorRequest.getBorn(), addAuthorRequest.getDied(), addAuthorRequest.getImageLink());
         authorService.addAuthor(newAuthor);
         return Response.ok("Author added successfully");
     }
@@ -45,9 +46,9 @@ public class AuthorController {
     }
 
     @GetMapping("/all")
-    public Response<List<AuthorDTO>> getAuthors() throws ForbiddenException, UnauthorizedException {
-        authService.validateAdmin();
-        List<Author> authors = authorService.getAllAuthors();
+    public Response<List<AuthorDTO>> getAdminAuthors() throws ForbiddenException, UnauthorizedException {
+        Admin admin = authService.validateAndGetAdmin();
+        Set<Author> authors = admin.getAuthors();
         return Response.ok("Authors retrieved successfully",
                 authors.stream().map(DtoMapper::authorToDTO).collect(Collectors.toList()));
     }

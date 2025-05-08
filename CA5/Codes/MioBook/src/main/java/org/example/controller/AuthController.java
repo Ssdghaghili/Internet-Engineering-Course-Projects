@@ -24,7 +24,7 @@ public class AuthController {
     private AuthService authService;
 
     @GetMapping("/user")
-    public Response<UserDTO> user() throws UnauthorizedException {
+    public Response<UserDTO> user() throws UnauthorizedException, ForbiddenException {
         User user = authService.showUserDetails();
         return Response.ok("User details retrieved successfully",
                 DtoMapper.userToDTO(user));
@@ -32,7 +32,7 @@ public class AuthController {
 
     @PostMapping("/login")
     public Response<Object> login(@Valid @RequestBody LoginRequest loginRequest)
-            throws UnauthorizedException {
+            throws UnauthorizedException, ForbiddenException {
 
         authService.login(loginRequest.getUsername(), loginRequest.getPassword());
         return Response.ok("User logged in successfully", user());

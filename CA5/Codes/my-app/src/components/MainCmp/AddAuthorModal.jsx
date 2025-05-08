@@ -4,23 +4,23 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ToastNotification from "../MainCmp/ToastNotification";
 
-const AddAuthorModal = ({ ModalID }) => {
+const AddAuthorModal = ({ ModalID, refreshAuthors }) => {
   const [name, setName] = useState("");
   const [penName, setPenName] = useState("");
   const [nationality, setNationality] = useState("");
-  const [born, setBorn] = useState(null);
+  const [born, setBorn] = useState("");
   const [died, setDied] = useState(null);
-  const [imageLink, setImageLink] = useState("");
-  const [submitError, setSubmitError] = useState(null);
+  const [imageLink, setImageLink] = useState(null);
+  const [submitError, setSubmitError] = useState("");
 
   const resetModal = () => {
     setName("");
     setPenName("");
     setNationality("");
-    setBorn(null);
+    setBorn("");
     setDied(null);
-    setImageLink("");
-    setSubmitError(null);
+    setImageLink(null);
+    setSubmitError("");
   }
 
   const handleSubmit = async () => {
@@ -44,6 +44,7 @@ const AddAuthorModal = ({ ModalID }) => {
       })
 
       const data = await response.json();
+      console.log(data.data)
 
       if (response.ok) {
         if (data.success) {
@@ -51,6 +52,7 @@ const AddAuthorModal = ({ ModalID }) => {
             type: "success",
             message: "Author added successfully!",
           });
+          refreshAuthors();
           resetModal();
         } else {
           setSubmitError(data.message)

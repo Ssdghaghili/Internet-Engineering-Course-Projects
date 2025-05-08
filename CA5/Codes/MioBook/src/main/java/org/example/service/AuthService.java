@@ -3,6 +3,7 @@ package org.example.service;
 import org.example.exception.*;
 
 import org.example.model.Admin;
+import org.example.model.Customer;
 import org.example.model.User;
 
 import org.example.repository.UserRepository;
@@ -15,14 +16,21 @@ import java.util.Objects;
 public class AuthService {
 
     @Autowired
-    private UserService userService;
-    @Autowired
     private UserSession userSession;
     @Autowired
     private UserRepository userRepository;
 
-    public User showUserDetails() throws UnauthorizedException {
+    public User getCurrentUser() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
+        if (user == null)
+            throw new UnauthorizedException("User is not logged in");
+
+        return userRepository.findById(user.getId())
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
+    }
+
+    public User showUserDetails() throws UnauthorizedException, ForbiddenException {
+        User user = getCurrentUser();
 
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
@@ -31,7 +39,7 @@ public class AuthService {
     }
 
     public void login(String username, String password) throws UnauthorizedException {
-        User user = userService.findUserByUsername(username);
+        User user = findUserByUsername(username);
 
         if (user == null)
             throw new UnauthorizedException("Invalid username or password");
@@ -60,14 +68,13 @@ public class AuthService {
         if (!ServiceUtils.validatePassword(newUser.getPassword()))
             throw new InvalidFormatException("Password is invalid");
 
-        if (userService.usernameExists(newUser.getUsername()))
+        if (usernameExists(newUser.getUsername()))
             throw new DuplicateEntityException("Username already exists");
 
-        if (userService.emailExists(newUser.getEmail()))
+        if (emailExists(newUser.getEmail()))
             throw new DuplicateEntityException("Email already exists");
 
         userRepository.save(newUser);
-
     }
 
 
@@ -85,10 +92,27 @@ public class AuthService {
         User user = userSession.getCurrentUser();
 
         if (user == null)
-            throw new UnauthorizedException("User not logged in");
+            throw new UnauthorizedException("User is not logged in");
+
+        user = userRepository.findById(user.getId())
+                .orElseThrow(() -> new UnauthorizedException("User not found"));
 
         if (!(user instanceof Admin))
             throw new ForbiddenException("Only admins can perform this action");
+
         return (Admin) user;
     }
+
+    public User findUserByUsername(String username) {
+        return userRepository.findByUsername(username).orElse(null);
+    }
+
+    public boolean usernameExists(String username) {
+        return userRepository.findByUsername(username).isPresent();
+    }
+
+    public boolean emailExists(String email) {
+        return userRepository.findByEmail(email) != null;
+    }
+
 }

@@ -29,7 +29,7 @@ public class UserService {
     @Autowired
     private CartItemRepository cartItemRepository;
 
-    private Customer userInitialCheck() throws UnauthorizedException, ForbiddenException {
+    public Customer userInitialCheck() throws UnauthorizedException, ForbiddenException {
         User user = userSession.getCurrentUser();
         if (user == null)
             throw new UnauthorizedException("User is not logged in");
@@ -145,9 +145,7 @@ public class UserService {
 
         Customer customer = userInitialCheck();
 
-        Cart userCart = new Cart(customer.calculateCartCost(), customer.getCart());
-
-        return userCart;
+        return new Cart(customer.calculateCartCost(), customer.getCart());
     }
 
     @Transactional

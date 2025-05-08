@@ -7,7 +7,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import jakarta.annotation.PostConstruct;
-import org.example.exception.NotFoundException;
 import org.example.model.*;
 
 import org.example.repository.*;
@@ -23,6 +22,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+
+import static org.example.database.utils.BASE_URL;
+import static org.example.database.utils.genreList;
 
 @Service
 public class DataInitializer {
@@ -41,9 +43,6 @@ public class DataInitializer {
     @Autowired
     private GenreRepository genreRepository;
 
-
-    private static final String BASE_URL = "http://194.60.231.242:8000/";
-
     ObjectMapper objectMapper = new ObjectMapper()
             .registerModule(new JavaTimeModule())
             .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -51,26 +50,47 @@ public class DataInitializer {
 
     @PostConstruct
     public void initializeData() {
-        fetchUsers();
-        fetchAuthors();
-        fetchBooks();
-        fetchReviews();
+//        fetchGenres();
+//        fetchUsers();
+//        fetchAuthors();
+//        fetchBooks();
+//        fetchReviews();
+    }
+
+    private void fetchGenres() {
+        for (String genreName : genreList) {
+            Genre genre = genreRepository.findByName(genreName).orElse(null);
+            if (genre == null) {
+                Genre newGenre = new Genre(genreName);
+                genreRepository.save(newGenre);
+            }
+        }
     }
 
     private void fetchUsers() {
         try {
             String json = getJsonFromApi("Users");
-            List<User> users = objectMapper.readValue(json, new TypeReference<List<User>>() {});
+            JsonNode root = objectMapper.readTree(json);
+            List<User> users = new ArrayList<>();
 
-            for (User user : users) {
-                if (user instanceof Admin a) {
-                    if (!adminRepository.existsByUsername(a.getUsername())) {
-                        adminRepository.save(a);
-                    }
-                } else if (user instanceof Customer c) {
-                    if (!customerRepository.existsByUsername(c.getUsername())) {
-                        customerRepository.save(c);
-                    }
+            for (JsonNode userNode : root) {
+                if (userNode.get("role").asText().equals("customer")) {
+                    Customer newCustomer = new Customer(
+                            userNode.get("username").asText(),
+                            userNode.get("password").asText(),
+                            userNode.get("email").asText(),
+                            new Address(userNode.get("address").get("country").asText(), userNode.get("address").get("city").asText())
+                    );
+                    customerRepository.save(newCustomer);
+                }
+                else {
+                    Admin newAdmin = new Admin(
+                            userNode.get("username").asText(),
+                            userNode.get("password").asText(),
+                            userNode.get("email").asText(),
+                            new Address(userNode.get("address").get("country").asText(), userNode.get("address").get("city").asText())
+                    );
+                    adminRepository.save(newAdmin);
                 }
             }
         } catch (Exception e) {

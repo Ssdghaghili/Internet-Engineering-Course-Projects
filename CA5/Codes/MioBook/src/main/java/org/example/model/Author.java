@@ -34,7 +34,8 @@ public class Author {
     public Author() {
     }
 
-    public Author(String name, String penName, String nationality, LocalDate born, LocalDate died, String imageLink) {
+    public Author(String name, String penName, String nationality,
+                  LocalDate born, LocalDate died, String imageLink) {
         this.name = name;
         this.penName = penName;
         this.nationality = nationality;

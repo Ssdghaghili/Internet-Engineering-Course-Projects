@@ -16,6 +16,7 @@ import org.example.repository.AuthorRepository;
 import org.example.service.BookService;
 import org.example.service.UserSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
@@ -122,9 +123,9 @@ public class BookController {
     }
 
     @GetMapping("/all")
-    public Response<List<BookDTO>> getAllBooks() throws ForbiddenException, UnauthorizedException {
-        authService.validateAdmin();
-        List<Book> books = bookService.getAllBooks();
+    public Response<List<BookDTO>> getAllAdminBooks() throws ForbiddenException, UnauthorizedException {
+        Admin admin = authService.validateAndGetAdmin();
+        Set<Book> books = admin.getBooks();
         return Response.ok("Books retrieved successfully",
                 books.stream().map(DtoMapper::bookToDTO).collect(Collectors.toList()));
     }

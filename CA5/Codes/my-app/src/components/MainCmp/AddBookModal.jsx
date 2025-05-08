@@ -4,7 +4,7 @@ import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ToastNotification from "./ToastNotification";
 
-const AddBookModal = ({ ModalID }) => {
+const AddBookModal = ({ ModalID, refreshBooks }) => {
   const [step, setStep] = useState(1);
 
   const [name, setName] = useState("");
@@ -13,7 +13,7 @@ const AddBookModal = ({ ModalID }) => {
   const [genres, setGenres] = useState("");
   const [publishedYear, setPublishedYear] = useState(null);
   const [price, setPrice] = useState(null);
-  const [imageLink, setImageLink] = useState("");
+  const [imageLink, setImageLink] = useState(null);
   const [synopsis, setSynopsis] = useState("");
   const [content, setContent] = useState("");
 
@@ -26,7 +26,7 @@ const AddBookModal = ({ ModalID }) => {
     setGenres("");
     setPublishedYear(null);
     setPrice(null);
-    setImageLink("");
+    setImageLink(null);
     setSynopsis("");
     setContent("");
     setSubmitError(null);
@@ -64,6 +64,7 @@ const AddBookModal = ({ ModalID }) => {
             type: "success",
             message: "Book added successfully!",
           });
+          refreshBooks();
           resetModal();
         } else {
           setSubmitError(data.message)

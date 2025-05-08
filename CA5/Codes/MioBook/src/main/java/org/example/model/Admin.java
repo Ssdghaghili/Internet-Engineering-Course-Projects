@@ -31,6 +31,7 @@ public class Admin extends User {
     }
 
     public void addAuthor(Author author) {
+        author.setAdmin(this);
         authors.add(author);
     }
 }

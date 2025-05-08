@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -14,12 +14,35 @@ import Footer from "./MainCmp/Footer"
 export default function SearchResult() {
     const genres = ["fiction", "non-fiction", "science", "history", "fantasy", "biography", "mystery", "romance"];
 
+    const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [resultParams, setResultParams] = useState({});
     const [error, setError] = useState(null);
 
     useEffect(() => {
+        const fetchBooks = async (filters) => {
+          try {
+            const query = new URLSearchParams(filters).toString();
+            const url = `/api/books/search?${query}`;
+
+            const response = await fetch(url);
+
+            const res = await response.json();
+
+            if (res.success == false) {
+              console.log(res);
+              throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            setBooks(res.data);
+            setResultParams(query);
+          } catch (err) {
+            setError(err);
+          }
+        };
+
         fetchBooks(searchParams);
+        setPage(searchParams.get("page"))
     }, [searchParams])
 
     const [lastFilters, setLastFilters] = useState();
@@ -27,7 +50,8 @@ export default function SearchResult() {
     const [page, setPage] = useState(1);
     function changePage(newPage) {
         setPage(newPage);
-        fetchBooks({...lastFilters, page: newPage});
+        const query = new URLSearchParams({...lastFilters, page: newPage}).toString();
+        navigate(`/books/search?${query}`);
     }
 
     const [sortBy, setSortBy] = useState("");
@@ -42,28 +66,6 @@ export default function SearchResult() {
 
     const [books, setBooks] = useState([]);
 
-    const fetchBooks = async (filters) => {
-        try {
-            const query = new URLSearchParams(filters).toString();
-            const url = `/api/books/search?${query}`;
-
-            const response = await fetch(url);
-
-            const res = await response.json();
-
-            if (res.success == false) {
-                console.log(res);
-                throw new Error(`HTTP error! Status: ${response.status}`);
-            }
-
-            setBooks(res.data);
-            setResultParams(query);
-
-        } catch (err) {
-            setError(err);
-        }
-    }
-
     const applyFilter = async (e) => {
         e.preventDefault();
         const formData = new FormData(e.target);
@@ -71,7 +73,8 @@ export default function SearchResult() {
         const filters = {...formFilters, ...(sortBy ? { sortBy } : {}), ...(order ? { order } : {})};
         setLastFilters(filters);
         setPage(1);
-        fetchBooks(filters);
+        const query = new URLSearchParams(filters).toString();
+        navigate(`/books/search?${query}`);
     }
 
 

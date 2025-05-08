@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.exception.*;
+import org.example.model.Admin;
 import org.example.model.Author;
 
 import org.example.repository.AuthorRepository;
@@ -12,11 +13,17 @@ import java.util.List;
 @Service
 public class AuthorService {
     @Autowired
+    private AuthService authService;
+    @Autowired
     private AuthorRepository authorRepository;
 
-    public void addAuthor(Author newAuthor) throws DuplicateEntityException {
+    public void addAuthor(Author newAuthor) throws
+            DuplicateEntityException, ForbiddenException, UnauthorizedException {
         if (authorNameExists(newAuthor.getName()))
             throw new DuplicateEntityException("Author already exists");
+
+        Admin admin = authService.validateAndGetAdmin();
+        admin.addAuthor(newAuthor);
 
         authorRepository.save(newAuthor);
     }

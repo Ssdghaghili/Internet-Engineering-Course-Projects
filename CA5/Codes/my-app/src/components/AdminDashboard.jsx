@@ -52,45 +52,41 @@ const AdminDashboard = () => {
       fetchUser();
     }, []);
 
+  const fetchBooks = async () => {
+    try {
+      const res = await fetch(`/api/books/all`);
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await res.json();
+      setBooks(data.data);
+    } catch (err) {
+      console.error("Failed to load books:", err);
+      setError("Failed to load books.");
+    } finally {
+      setBooksLoading(false);
+    }
+  };
   useEffect(() => {
-      const fetchBooks = async () => {
-        try {
-          const res = await fetch(
-            `/api/books/all`
-          );
-          if (!res.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await res.json();
-          setBooks(data.data);
-        } catch (err) {
-          console.error("Failed to load books:", err);
-          setError("Failed to load books.");
-        } finally {
-          setBooksLoading(false);
-        }
-      };
       fetchBooks();
     }, [user]);
 
+  const fetchAuthors = async () => {
+    try {
+      const res = await fetch("/api/authors/all");
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      const data = await res.json();
+      setAuthors(data.data);
+    } catch (err) {
+      console.error("Failed to load authors:", err);
+      setError("Failed to load authors.");
+    } finally {
+      setAuthorsLoading(false);
+    }
+  };
   useEffect(() => {
-      const fetchAuthors = async () => {
-        try {
-          const res = await fetch(
-            "/api/authors/all"
-          );
-          if (!res.ok) {
-            throw new Error("Network response was not ok");
-          }
-          const data = await res.json();
-          setAuthors(data.data);
-        } catch (err) {
-          console.error("Failed to load authors:", err);
-          setError("Failed to load authors.");
-        } finally {
-          setAuthorsLoading(false);
-        }
-      };
       fetchAuthors();
     }, [user]);
 
@@ -182,11 +178,11 @@ const AdminDashboard = () => {
         </div>
 
         <AddBookModal
-          ModalID="addBookModal"
+          ModalID="addBookModal" refreshBooks={fetchBooks}
         />
 
         <AddAuthorModal
-          ModalID="addAuthorModal"
+          ModalID="addAuthorModal" refreshAuthors={fetchAuthors}
         />
 
         <div className="row bg-white rounded-3 p-4 mt-5 justify-content-center align-items-center">

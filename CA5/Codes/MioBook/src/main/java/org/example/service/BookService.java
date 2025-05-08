@@ -11,6 +11,10 @@ import org.example.model.Customer;
 import org.example.repository.BookRepository;
 import org.example.repository.CustomerRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -108,58 +112,40 @@ public class BookService {
     }
 
     public List<Book> getTopRatedBooks(int size) {
-        List<Book> books = bookRepository.findAll();
-        return books.stream()
-                .sorted(Comparator.comparingDouble(Book::getAverageRate).reversed())
-                .limit(size)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(0, size);
+        return bookRepository.findTopRatedBooks(pageable);
     }
 
     public List<Book> getNewReleases(int size) {
-        List<Book> books = bookRepository.findAll();
-        return books.stream()
-                .sorted(Comparator.comparingInt(Book::getYear).reversed())
-                .limit(size)
-                .collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(0, size);
+        return bookRepository.findNewReleasedBooks(pageable);
     }
 
     public List<Book> searchBooks(String title, String author, String genre, Integer year,
                                   Integer page, Integer size, String sortBy, String order) throws BadRequestException {
-
-        Stream<Book> booksStream = bookRepository.findAll().stream();
-
-        if (title != null) {
-            booksStream = booksStream.filter(b -> b.getTitle().toLowerCase().contains(title.toLowerCase()));
-        }
-
-        if (author != null) {
-            booksStream = booksStream.filter(b -> b.getAuthor().getName().toLowerCase().contains(author.toLowerCase()));
-        }
-
-        if (genre != null) {
-            booksStream = booksStream.filter(b -> b.getGenres().contains(genre));
-        }
-
-        if (year != null) {
-            booksStream = booksStream.filter(b -> b.getYear() == year);
-        }
-
-        Comparator<Book> comparator = switch (sortBy) {
-            case "rating" -> Comparator.comparingDouble(Book::getAverageRate);
-            case "reviews" -> Comparator.comparing(Book::getReviewsCount);
-            default -> throw new BadRequestException("Invalid sortBy value");
-        };
-
-        if (order.equals("desc")) {
-            comparator = comparator.reversed();
-        }
-
-        booksStream = booksStream.sorted(comparator);
-
         if (size > MAX_PAGE_SIZE)
             size = MAX_PAGE_SIZE;
 
-        return booksStream.skip((long) (page-1) * size).limit(size).collect(Collectors.toList());
+        Pageable pageable = PageRequest.of(page - 1, size);
+
+
+        if (sortBy.equals("rating")) {
+            if (order.equals("desc"))
+                return bookRepository.searchBooksSortedByRatingDesc(title, author, genre, year, pageable);
+            else {
+                return bookRepository.searchBooksSortedByRatingAsc(title, author, genre, year, pageable);
+            }
+        }
+        else if (sortBy.equals("reviews")) {
+            if (order.equals("desc"))
+                return bookRepository.searchBooksSortedByReviewsDesc(title, author, genre, year, pageable);
+            else {
+                return bookRepository.searchBooksSortedByReviewsAsc(title, author, genre, year, pageable);
+            }
+        }
+        else {
+            throw new BadRequestException("SortBy value is invalid");
+        }
     }
 
     public List<Book> getAllBooks() {
