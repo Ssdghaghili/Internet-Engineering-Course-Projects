@@ -26,7 +26,8 @@ public class UserController {
     public Response<Object> addCart(@RequestParam String title,
                                     @RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException, NotFoundException, BadRequestException {
-        userService.addCart(title);
+
+        userService.addCart(title, token);
         return Response.ok("Added book to cart");
     }
 
@@ -34,7 +35,8 @@ public class UserController {
     public Response<Object> removeCart(@RequestParam String title,
                                        @RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException, NotFoundException, BadRequestException {
-        userService.removeCart(title);
+
+        userService.removeCart(title, token);
         return Response.ok("Removed book from cart");
     }
 
@@ -42,7 +44,8 @@ public class UserController {
     public Response<UserDTO> addCredit(@RequestParam int amount,
                                        @RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException, BadRequestException {
-        User updatedCustomer = userService.addCredit(amount);
+
+        User updatedCustomer = userService.addCredit(amount, token);
         return Response.ok("Credit added successfully",
                 DtoMapper.userToDTO(updatedCustomer));
     }
@@ -50,7 +53,8 @@ public class UserController {
     @PostMapping("/purchase")
     public Response<PurchaseReceipt> Purchase(@RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException, BadRequestException {
-        PurchaseReceipt purchaseReceipt = userService.purchaseCart();
+
+        PurchaseReceipt purchaseReceipt = userService.purchaseCart(token);
         return Response.ok("Purchase completed successfully", purchaseReceipt);
     }
 
@@ -58,14 +62,16 @@ public class UserController {
     public Response<Object> borrow(@RequestParam String title, @RequestParam Integer days,
                                    @RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException, NotFoundException, BadRequestException {
-        userService.borrowBook(title, days);
+
+        userService.borrowBook(title, days, token);
         return Response.ok("Added borrowed book to cart");
     }
 
     @GetMapping("/cart")
     public Response<CartDTO> showCart(@RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException {
-        Cart cart = userService.showCart();
+
+        Cart cart = userService.showCart(token);
         return Response.ok("Cart retrieved successfully",
                 DtoMapper.CartToDTO(cart));
     }
@@ -73,7 +79,8 @@ public class UserController {
     @GetMapping("/purchase-history")
     public Response<List<PurchaseRecordDTO>> showPurchaseHistory(@RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException {
-        List<PurchaseRecord> purchaseHistory = userService.showPurchaseHistory();
+
+        List<PurchaseRecord> purchaseHistory = userService.showPurchaseHistory(token);
         return Response.ok("Purchase history retrieved successfully",
                 purchaseHistory.stream().map(DtoMapper::purchaseRecordToDTO).collect(Collectors.toList()));
     }
@@ -81,7 +88,8 @@ public class UserController {
     @GetMapping("/purchased-books")
     public Response<List<ItemDTO>> showPurchasedBooks(@RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException {
-        List<PurchaseItem> purchaseBooks = userService.showPurchasedBooks();
+
+        List<PurchaseItem> purchaseBooks = userService.showPurchasedBooks(token);
         return Response.ok("Purchase books retrieved successfully",
                 purchaseBooks.stream().map(DtoMapper::purchaseItemToDTO).collect(Collectors.toList()));
     }

@@ -2,10 +2,12 @@ package org.example.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.StringRedisTemplate;
+import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.util.UUID;
 
+@Service
 public class SessionService {
     @Autowired
     private StringRedisTemplate redisTemplate;
