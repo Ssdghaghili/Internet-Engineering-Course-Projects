@@ -12,42 +12,70 @@ import Footer from "./MainCmp/Footer"
 
 
 export default function SearchResult() {
-    const genres = ["fiction", "non-fiction", "science", "history", "fantasy", "biography", "mystery", "romance"];
-
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
     const [resultParams, setResultParams] = useState({});
     const [error, setError] = useState(null);
+    const [genres, setGenres] = useState([]);
+    const [lastFilters, setLastFilters] = useState();
+    const [page, setPage] = useState(1);
 
     useEffect(() => {
-        const fetchBooks = async (filters) => {
-          try {
-            const query = new URLSearchParams(filters).toString();
-            const url = `/api/books/search?${query}`;
+      const fetchBooks = async (filters) => {
+        try {
+          const query = new URLSearchParams(filters).toString();
+          const url = `/api/books/search?${query}`;
 
-            const response = await fetch(url);
-
-            const res = await response.json();
-
-            if (res.success == false) {
-              console.log(res);
-              throw new Error(`HTTP error! Status: ${response.status}`);
+          const response = await fetch(url, {
+            method: "GET",
+            headers: {
+              'Authorization': localStorage.getItem("token")
             }
+          });
 
-            setBooks(res.data);
-            setResultParams(query);
-          } catch (err) {
-            setError(err);
+          const res = await response.json();
+
+          if (res.success == false) {
+            console.log(res);
+            throw new Error(`HTTP error! Status: ${response.status}`);
           }
-        };
+
+          setBooks(res.data);
+          setResultParams(query);
+        } catch (err) {
+          setError(err);
+        }
+      };
 
         fetchBooks(searchParams);
         setPage(searchParams.get("page"))
     }, [searchParams])
 
-    const [lastFilters, setLastFilters] = useState();
+    useEffect(() => {
+      const fetchGenres = async () => {
+        try {
+          const response = await fetch("/api/books/genres", {
+            method: "GET",
+            headers: {
+              'Authorization': localStorage.getItem("token")
+            }
+          });
 
-    const [page, setPage] = useState(1);
+          const res = await response.json();
+
+          if (res.success == false) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+          }
+
+          setGenres(res.data);
+        } catch (err) {
+         setError(err);
+        }
+      };
+
+      fetchGenres();
+        }, [])
+
     function changePage(newPage) {
         setPage(newPage);
         const query = new URLSearchParams({...lastFilters, page: newPage}).toString();

@@ -22,7 +22,12 @@ const HomePage = () => {
   useEffect(() => {
     const fetchNewReleaseBooks = async () => {
       try {
-        const res = await fetch(`/api/books/book/new-releases?size=5`);
+        const res = await fetch(`/api/books/book/new-releases?size=5`, {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token"),
+          },
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -43,7 +48,12 @@ const HomePage = () => {
   useEffect(() => {
     const fetchTopRatedBooks = async () => {
       try {
-        const res = await fetch(`/api/books/book/top-rated?size=5`);
+        const res = await fetch(`/api/books/book/top-rated?size=5`, {
+          method: "GET",
+          headers: {
+          'Authorization': localStorage.getItem("token"),
+          },
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }

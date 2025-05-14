@@ -35,7 +35,12 @@ const AdminDashboard = () => {
   useEffect(() => {
       const fetchUser = async () => {
         try {
-          const res = await fetch(`/api/user`);
+          const res = await fetch(`/api/user`, {
+            method: "GET",
+            headers: {
+              'Authorization': localStorage.getItem("token"),
+            },
+          });
           if (!res.ok) {
             throw new Error("Network response was not ok");
           }
@@ -43,7 +48,7 @@ const AdminDashboard = () => {
           setUser(data.data);
         } catch (err) {
           console.error("Failed to load user:", err);
-          setError("Failed to load user.");
+          setError("Failed to load user");
         } finally {
           setUserLoading(false);
         }
@@ -54,7 +59,12 @@ const AdminDashboard = () => {
 
   const fetchBooks = async () => {
     try {
-      const res = await fetch(`/api/books/all`);
+      const res = await fetch(`/api/books/all`, {
+        method: "GET",
+        headers: {
+          'Authorization': localStorage.getItem("token"),
+        },
+      });
       if (!res.ok) {
         throw new Error("Network response was not ok");
       }
@@ -73,7 +83,12 @@ const AdminDashboard = () => {
 
   const fetchAuthors = async () => {
     try {
-      const res = await fetch("/api/authors/all");
+      const res = await fetch("/api/authors/all", {
+        method: "GET",
+        headers: {
+          'Authorization': localStorage.getItem("token"),
+        },
+      });
       if (!res.ok) {
         throw new Error("Network response was not ok");
       }
@@ -94,6 +109,9 @@ const AdminDashboard = () => {
       try {
         const response = await fetch("/api/logout", {
           method: "POST",
+          headers: {
+            'Authorization': localStorage.getItem("token"),
+          },
         });
         if (response.ok) {
           ToastNotification({

@@ -21,7 +21,12 @@ const AuthorPage = () => {
   useEffect(() => {
     const fetchAuthor = async () => {
       try {
-        const res = await fetch(`/api/authors/${authorSlug}`);
+        const res = await fetch(`/api/authors/${authorSlug}`, {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token"),
+          },
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -41,7 +46,12 @@ const AuthorPage = () => {
   useEffect(() => {
     const fetchAuthorBooks = async () => {
       try {
-        const res = await fetch(`/api/books/search?author=${authorSlug}`);
+        const res = await fetch(`/api/books/search?author=${authorSlug}`, {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token"),
+          },
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -79,7 +89,6 @@ const AuthorPage = () => {
       </>
     );
   }
-  //   console.log(books);
 
   return (
     <>

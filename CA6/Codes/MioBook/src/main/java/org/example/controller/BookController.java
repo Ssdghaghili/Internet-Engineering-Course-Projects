@@ -107,4 +107,11 @@ public class BookController {
         return Response.ok("Books retrieved successfully",
                 books.stream().map(DtoMapper::bookToDTO).collect(Collectors.toList()));
     }
+
+    @GetMapping("/genres")
+    public Response<List<String>> getAllGenreNames() {
+        List<Genre> genres = bookService.getAllGenres();
+        return Response.ok("Genres retrieved successfully",
+                genres.stream().map(Genre::getName).collect(Collectors.toList()));
+    }
 }

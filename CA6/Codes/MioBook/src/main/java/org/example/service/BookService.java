@@ -153,6 +153,10 @@ public class BookService {
         return admin.getBooks();
     }
 
+    public List<Genre> getAllGenres() {
+        return genreRepository.findAll();
+    }
+
     public Book findBookByTitle(String title) {
         return bookRepository.findByTitle(title).orElse(null);
     }

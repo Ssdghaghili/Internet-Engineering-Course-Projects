@@ -16,9 +16,12 @@ const BookContent = () => {
   useEffect(() => {
     const fetchBookContent = async () => {
       try {
-        const res = await fetch(
-          `/api/books/book/${bookSlug}/content`
-        );
+        const res = await fetch(`/api/books/book/${bookSlug}/content`, {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token"),
+          },
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }

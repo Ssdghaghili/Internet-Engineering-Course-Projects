@@ -21,9 +21,16 @@ const BookPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [reviews, setReviews] = useState(null);
+  const [reviewPage, setReviewPage] = useState(1);
 
   useEffect(() => {
-    fetch(`/api/books/${bookSlug}`)
+    const fetchBook = async () => {
+      fetch(`/api/books/${bookSlug}`, {
+        method: "GET",
+        headers: {
+          'Authorization': localStorage.getItem("token"),
+        },
+      })
       .then((res) => {
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -38,9 +45,11 @@ const BookPage = () => {
         setError("Failed to load book details.");
         setLoading(false);
       });
+    }
+
+    fetchBook();
   }, [bookSlug]);
 
-  const [reviewPage, setReviewPage] = useState(1);
   function changeReviewPage(newPage) {
     setReviewPage(newPage);
     fetchReviews({ page: newPage, size: 5 });
@@ -49,11 +58,14 @@ const BookPage = () => {
   const fetchReviews = async (filters) => {
     try {
       const query = new URLSearchParams(filters).toString();
-      //console.log(query)
 
       const response = await fetch(
-        `/api/books/book/${bookSlug}/reviews?${query}`
-      );
+        `/api/books/book/${bookSlug}/reviews?${query}`, {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token"),
+          },
+        });
 
       const res = await response.json();
 
@@ -68,19 +80,7 @@ const BookPage = () => {
   };
 
   useEffect(() => {
-    fetch(`/api/books/book/${bookSlug}/reviews?page=1&size=5`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setReviews(data.data);
-      })
-      .catch(() => {
-        setError("Failed to load reviews.");
-      });
+    fetchReviews({ page: 1, size: 5 });
   }, [bookSlug]);
 
   if (loading) {
@@ -331,8 +331,8 @@ const BookPage = () => {
         Book={book}
         Image={cardImage}
         onReviewAdded={() => {
-          fetchReviews({ page: 1, size: 5 });
-          
+
+          changeReviewPage(1);
           fetch(`/api/books/${bookSlug}`)
             .then((res) => res.json())
             .then((data) => setBook(data.data));
