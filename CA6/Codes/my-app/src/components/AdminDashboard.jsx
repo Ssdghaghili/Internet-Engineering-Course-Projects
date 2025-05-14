@@ -120,7 +120,7 @@ const AdminDashboard = () => {
           });
 
           localStorage.removeItem("user");
-          // setUser(null);
+          localStorage.removeItem("token");
           navigate("/signin");
         } else {
           console.error("Logout failed");

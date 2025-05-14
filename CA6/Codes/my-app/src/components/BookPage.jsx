@@ -333,9 +333,14 @@ const BookPage = () => {
         onReviewAdded={() => {
 
           changeReviewPage(1);
-          fetch(`/api/books/${bookSlug}`)
-            .then((res) => res.json())
-            .then((data) => setBook(data.data));
+          fetch(`/api/books/${bookSlug}`, {
+            method: "GET",
+            headers: {
+              'Authorization': localStorage.getItem("token"),
+            },
+          })
+          .then((res) => res.json())
+          .then((data) => setBook(data.data));
         }}
       />
     </>

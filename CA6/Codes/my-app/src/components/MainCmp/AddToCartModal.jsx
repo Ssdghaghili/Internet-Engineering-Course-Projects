@@ -15,15 +15,13 @@ const AddToCartModal = ({
 }) => {
   const modalRef = useRef(null);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null);
 
   const handleAddButtonClick = () => {
-    if (!user) {
+    if (localStorage.getItem("token") == null) {
       ToastNotification({
         type: "error",
         message: "Please signIn first to add items to cart.",
       });
-      //navigate("/SignIn");
       return;
     }
 
@@ -36,6 +34,7 @@ const AddToCartModal = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          'Authorization': localStorage.getItem("token"),
         },
       })
         .then((response) => response.json())
@@ -50,7 +49,6 @@ const AddToCartModal = ({
               type: "error",
               message: data.message || "Failed to add book to cart.",
             });
-            // console.error("Backend message:", data.message);
           }
         })
         .catch((error) => {
@@ -75,12 +73,12 @@ const AddToCartModal = ({
 
       const dayNumber = parseFloat(selectedDays[0]);
 
-      fetch(
-        `/api/user/borrow?title=${Title}&days=${dayNumber}`,
+      fetch(`/api/user/borrow?title=${Title}&days=${dayNumber}`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            'Authorization': localStorage.getItem("token")
           },
         }
       )
@@ -109,16 +107,6 @@ const AddToCartModal = ({
     }
   };
 
-  useEffect(() => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-      if (storedUser.username) {
-        setUser(storedUser);
-      }
-    } catch (error) {
-      console.error("Error parsing user from localStorage:", error);
-    }
-  }, []);
 
   useEffect(() => {
     const root = modalRef.current;

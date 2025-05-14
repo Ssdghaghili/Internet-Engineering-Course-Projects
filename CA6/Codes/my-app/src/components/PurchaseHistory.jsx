@@ -13,14 +13,16 @@ const PurchaseHistory = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [history, setHistory] = useState(null);
-  // const [reloadFlag, setReloadFlag] = useState(false);
 
   useEffect(() => {
     const fetchHistory = async () => {
       try {
-        const res = await fetch(
-          `/api/user/purchase-history`
-        );
+        const res = await fetch("/api/user/purchase-history", {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token")
+          }
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }

@@ -12,7 +12,7 @@ public class SessionService {
     @Autowired
     private StringRedisTemplate redisTemplate;
 
-    private final Duration sessionTTL = Duration.ofMinutes(1);
+    private final Duration sessionTTL = Duration.ofMinutes(20);
 
     public String createSession(Long userId) {
         String token = UUID.randomUUID().toString();

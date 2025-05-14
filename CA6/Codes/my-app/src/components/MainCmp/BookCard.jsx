@@ -51,8 +51,6 @@ const BookCard = (props) => {
         finalPrice.textContent = "$0.00";
       }
 
-      // console.log("Final price:", finalPrice.textContent);
-
       root.querySelectorAll(".btn-filter").forEach((btn) => {
         btn.classList.remove("btn-filter-selected");
       });

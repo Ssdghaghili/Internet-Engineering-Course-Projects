@@ -7,31 +7,32 @@ const CartItem = ({ Item, Image, onRemove }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        'Authorization': localStorage.getItem("token"),
       },
     })
-      .then((response) => response.json())
-      .then((data) => {
-        if (data.success) {
-          onRemove();
-          ToastNotification({
-            type: "success",
-            message: `${Item.title} removed successfully!`,
-          });
-        } else {
-          ToastNotification({
-            type: "error",
-            message: data.message || "Failed to remove book to cart.",
-          });
-          console.error("Backend message:", data.message);
-        }
-      })
-      .catch((error) => {
-        console.error("Error removing book to cart:", error);
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.success) {
+        onRemove();
+        ToastNotification({
+          type: "success",
+          message: `${Item.title} removed successfully!`,
+        });
+      } else {
         ToastNotification({
           type: "error",
-          message: "An unexpected error occurred. Please try again later.",
+          message: data.message || "Failed to remove book to cart.",
         });
+        console.error("Backend message:", data.message);
+      }
+    })
+    .catch((error) => {
+      console.error("Error removing book to cart:", error);
+      ToastNotification({
+        type: "error",
+        message: "An unexpected error occurred. Please try again later.",
       });
+    });
   };
 
   return (

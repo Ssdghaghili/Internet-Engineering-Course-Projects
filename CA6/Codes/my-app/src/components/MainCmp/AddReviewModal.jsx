@@ -9,26 +9,14 @@ const AddReviewModal = ({ Book, Image, onReviewAdded }) => {
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState("");
-  const [user, setUser] = useState(null);
 
   const canSubmit = rating > 0 && comment.trim().length > 0;
 
-  useEffect(() => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-      if (storedUser.username) {
-        setUser(storedUser);
-      }
-    } catch (error) {
-      console.error("Error parsing user from localStorage:", error);
-    }
-  }, []);
-
   const handleSubmit = () => {
-    if (!user) {
+    if (localStorage.getItem("token") == null) {
       ToastNotification({
         type: "error",
-        message: "Please signIn first to add a review.",
+        message: "Please signIn first to add a review",
       });
       return;
     }
@@ -43,6 +31,7 @@ const AddReviewModal = ({ Book, Image, onReviewAdded }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        'Authorization': localStorage.getItem("token"),
       },
       body: JSON.stringify(reviewData),
     })

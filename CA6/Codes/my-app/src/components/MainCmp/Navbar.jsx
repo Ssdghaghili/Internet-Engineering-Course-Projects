@@ -20,6 +20,7 @@ const Navbar = () => {
   const [isProfileMenuVisible, setIsProfileMenuVisible] = useState(false);
   const [isSearchDropdownVisible, setIsSearchDropdownVisible] = useState(false);
   const [searchKey, setSearchKey] =  useState("Book");
+  const [user, setUser] = useState(null);
 
   const toggleProfileMenu = () => {
     setIsProfileMenuVisible(!isProfileMenuVisible);
@@ -29,17 +30,26 @@ const Navbar = () => {
     setIsSearchDropdownVisible(!isSearchDropdownVisible);
   };
 
-  const [user, setUser] = useState(null);
-
   useEffect(() => {
-    try {
-      const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
-      if (storedUser.username) {
-        setUser(storedUser);
+    const fetchUser = async () => {
+      try {
+        const res = await fetch(`/api/user`, {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token")
+          }
+        });
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const data = await res.json();
+        setUser(data.data);
+      } catch (err) {
+        console.error("Failed to load user:", err);
       }
-    } catch (error) {
-      console.error("Error parsing user from localStorage:", error);
-    }
+    };
+
+    fetchUser();
   }, []);
 
   const handleNavigation = (path) => {
@@ -51,11 +61,14 @@ const Navbar = () => {
     try {
       const response = await fetch("/api/logout", {
         method: "POST",
+        headers: {
+          'Authorization': localStorage.getItem("token"),
+        },
       });
       if (response.ok) {
         ToastNotification({ type: "success", message: "Logout successful!" });
-        localStorage.removeItem("user");
-        setUser(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
         setTimeout(() => navigate("/signin"), 2000);
       } else {
         console.error("Logout failed");

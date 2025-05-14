@@ -5,7 +5,6 @@ import HistoryItem from "./HistoryItem";
 
 
 const PHistoryBody = ({ history, image }) => {
-  // console.log(history);
   return (
     <>
       <div

@@ -16,21 +16,26 @@ const BuyCart = () => {
   const [cartItems, setCartItems] = useState([]);
 
   const fetchCart = async () => {
-    fetch(`/api/user/cart`)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-        return res.json();
-      })
-      .then((data) => {
-        setCartItems(data.data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setError("Failed to load book details.");
-        setLoading(false);
-      });
+    fetch(`/api/user/cart`, {
+      method: "GET",
+      headers: {
+        'Authorization': localStorage.getItem("token")
+      }
+    })
+    .then((res) => {
+      if (!res.ok) {
+        throw new Error("Network response was not ok");
+      }
+      return res.json();
+    })
+    .then((data) => {
+      setCartItems(data.data);
+      setLoading(false);
+    })
+    .catch(() => {
+     setError("Failed to load book details.");
+     setLoading(false);
+    });
   }
 
   useEffect(() => {
@@ -61,6 +66,7 @@ const BuyCart = () => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
+        'Authorization': localStorage.getItem("token")
       },
     })
       .then((response) => response.json())

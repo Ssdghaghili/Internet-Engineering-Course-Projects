@@ -1,7 +1,6 @@
 import React from "react";
 
 const HistoryItem = ({ Item, Image }) => {
-  // console.log(Item);
   return (
     <>
       <div className="row fw-light font-small pt-2 pb-2 mb-2 border-bottom">

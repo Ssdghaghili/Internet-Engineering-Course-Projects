@@ -51,7 +51,7 @@ const HomePage = () => {
         const res = await fetch(`/api/books/book/top-rated?size=5`, {
           method: "GET",
           headers: {
-          'Authorization': localStorage.getItem("token"),
+            'Authorization': localStorage.getItem("token"),
           },
         });
         if (!res.ok) {
