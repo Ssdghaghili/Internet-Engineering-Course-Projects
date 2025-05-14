@@ -5,10 +5,7 @@ import jakarta.validation.Valid;
 import org.example.dto.DtoMapper;
 import org.example.dto.UserDTO;
 import org.example.exception.*;
-import org.example.model.Address;
-import org.example.model.Admin;
-import org.example.model.Customer;
-import org.example.model.User;
+import org.example.model.*;
 import org.example.request.LoginRequest;
 import org.example.request.SignupRequest;
 import org.example.response.Response;
@@ -24,53 +21,32 @@ public class AuthController {
     private AuthService authService;
 
     @GetMapping("/user")
-    public Response<UserDTO> user() throws UnauthorizedException, ForbiddenException {
-        User user = authService.showUserDetails();
+    public Response<UserDTO> user(@RequestHeader("Authorization") String token) throws UnauthorizedException, ForbiddenException {
+        User user = authService.getLoggedInUser(token);
         return Response.ok("User details retrieved successfully",
                 DtoMapper.userToDTO(user));
     }
 
     @PostMapping("/login")
-    public Response<Object> login(@Valid @RequestBody LoginRequest loginRequest)
-            throws UnauthorizedException, ForbiddenException {
+    public Response<LoginResponse> login(@Valid @RequestBody LoginRequest loginRequest)
+            throws UnauthorizedException {
 
-        authService.login(loginRequest.getUsername(), loginRequest.getPassword());
-        return Response.ok("User logged in successfully", user());
+        LoginResponse loginResponse = authService.login(loginRequest.getUsername(), loginRequest.getPassword());
+        return Response.ok("User logged in successfully", loginResponse);
     }
 
     @PostMapping("/signup")
     public Response<Object> signup(@Valid @RequestBody SignupRequest signupRequest)
             throws InvalidFormatException, DuplicateEntityException {
 
-        Address address = new Address(
-                signupRequest.getAddress().getCountry(),
-                signupRequest.getAddress().getCity()
-        );
-
-        User newUser;
-        if ("admin".equalsIgnoreCase(signupRequest.getRole())) {
-            newUser = new Admin(
-                    signupRequest.getUsername(),
-                    signupRequest.getPassword(),
-                    signupRequest.getEmail(),
-                    address
-            );
-        } else {
-            newUser = new Customer(
-                    signupRequest.getUsername(),
-                    signupRequest.getPassword(),
-                    signupRequest.getEmail(),
-                    address
-            );
-        }
-
-        authService.signup(newUser);
+        authService.signup(signupRequest.getUsername(), signupRequest.getPassword(),  signupRequest.getEmail(),
+                signupRequest.getAddress().getCountry(), signupRequest.getAddress().getCity(), signupRequest.getRole());
         return Response.ok("signup successful", null);
     }
 
     @PostMapping("/logout")
-    public Response<Object> logout() throws UnauthorizedException {
-        authService.logout();
-        return Response.ok("User logged out successfully.");
+    public Response<Object> logout(@RequestHeader("Authorization") String token) throws UnauthorizedException {
+        authService.logout(token);
+        return Response.ok("User logged out successfully");
     }
 }

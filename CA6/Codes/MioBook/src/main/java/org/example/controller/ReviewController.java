@@ -10,10 +10,7 @@ import org.example.response.Response;
 import org.example.service.ReviewService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDateTime;
 
@@ -24,10 +21,12 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @PostMapping("/add")
-    public Response<Object> addReview(@Valid @RequestBody AddReviewRequest addReviewRequest)
+    public Response<Object> addReview(@Valid @RequestBody AddReviewRequest addReviewRequest,
+                                      @RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException, NotFoundException, BadRequestException {
+
         reviewService.addReview(addReviewRequest.getTitle(), addReviewRequest.getRate(),
-                addReviewRequest.getComment(), LocalDateTime.now());
+                addReviewRequest.getComment(), LocalDateTime.now(), token);
         return Response.ok("Review added successfully");
     }
 }

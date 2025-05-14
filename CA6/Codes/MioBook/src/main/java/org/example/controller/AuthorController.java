@@ -27,15 +27,13 @@ public class AuthorController {
     @Autowired
     private AuthorService authorService;
 
-    @Autowired
-    private AuthService authService;
-
     @PostMapping("/add")
-    public Response<Object> addAuthor(@Valid @RequestBody AddAuthorRequest addAuthorRequest)
+    public Response<Object> addAuthor(@Valid @RequestBody AddAuthorRequest addAuthorRequest,
+                                      @RequestHeader("Authorization") String token)
             throws ForbiddenException, UnauthorizedException, DuplicateEntityException {
-        Author newAuthor = new Author(addAuthorRequest.getName(), addAuthorRequest.getPenName(), addAuthorRequest.getNationality()
-                , addAuthorRequest.getBorn(), addAuthorRequest.getDied(), addAuthorRequest.getImageLink());
-        authorService.addAuthor(newAuthor);
+
+        authorService.addAuthor(addAuthorRequest.getName(), addAuthorRequest.getPenName(), addAuthorRequest.getNationality()
+                , addAuthorRequest.getBorn(), addAuthorRequest.getDied(), addAuthorRequest.getImageLink(), token);
         return Response.ok("Author added successfully");
     }
 
@@ -46,9 +44,10 @@ public class AuthorController {
     }
 
     @GetMapping("/all")
-    public Response<List<AuthorDTO>> getAdminAuthors() throws ForbiddenException, UnauthorizedException {
-        Admin admin = authService.validateAndGetAdmin();
-        Set<Author> authors = admin.getAuthors();
+    public Response<List<AuthorDTO>> getAdminAuthors(@RequestHeader("Authorization") String token)
+            throws ForbiddenException, UnauthorizedException {
+
+        Set<Author> authors = authorService.getAuthorsByAdmin(token);
         return Response.ok("Authors retrieved successfully",
                 authors.stream().map(DtoMapper::authorToDTO).collect(Collectors.toList()));
     }

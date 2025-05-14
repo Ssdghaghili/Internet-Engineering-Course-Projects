@@ -24,33 +24,21 @@ public class ReviewService {
 
     @Autowired
     private ReviewRepository reviewRepository;
+
     @Autowired
     private BookService bookService;
+
     @Autowired
-    private UserSession  userSession;
-    @Autowired
-    private BookRepository bookRepository;
-    @Autowired
-    private CustomerRepository customerRepository;
+    private AuthService authService;
+
 
     @Transactional
-    public void addReview(String bookTitle, int rate, String comment, LocalDateTime dateTime)
+    public void addReview(String bookTitle, int rate, String comment, LocalDateTime dateTime, String token)
             throws UnauthorizedException, ForbiddenException, NotFoundException, BadRequestException {
 
-        User userSess = userSession.getCurrentUser();
-        if (userSess == null)
-            throw new UnauthorizedException("User is not logged in");
+        Customer customer = authService.getLoggedInCustomer(token);
 
-        if (!(userSess instanceof Customer))
-            throw new ForbiddenException("Only customers can add reviews");
-
-        Customer customer = customerRepository.findById(userSess.getId())
-                .filter(u -> u instanceof Customer)
-                .map(u -> (Customer) u)
-                .orElseThrow(() -> new UnauthorizedException("Customer not found"));
-
-        Book book = bookRepository.findByTitle(bookTitle)
-                .orElseThrow(() -> new NotFoundException("Book not found"));
+        Book book = bookService.findBookByTitle(bookTitle);
 
         if (book == null)
             throw new NotFoundException("Book not found");

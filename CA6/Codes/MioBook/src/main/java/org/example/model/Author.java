@@ -58,4 +58,8 @@ public class Author {
     public void setDied(LocalDate died) { this.died = died; }
     public void setImageLink(String imageLink) { this.imageLink = imageLink; }
     public void setAdmin(Admin admin) { this.admin = admin; }
+
+    public void addBook(Book book) {
+        books.add(book);
+    }
 }

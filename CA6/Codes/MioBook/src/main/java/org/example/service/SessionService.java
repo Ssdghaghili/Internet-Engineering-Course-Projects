@@ -1,14 +1,33 @@
 package org.example.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.StringRedisTemplate;
+
+import java.time.Duration;
 import java.util.UUID;
 
 public class SessionService {
+    @Autowired
+    private StringRedisTemplate redisTemplate;
 
-    public String createSession(int userId) {
+    private final Duration sessionTTL = Duration.ofMinutes(1);
+
+    public String createSession(Long userId) {
         String token = UUID.randomUUID().toString();
-
-        // Save <Token, userId< in redis
-
+        redisTemplate.opsForValue().set(token, Long.toString(userId), sessionTTL);
         return token;
+    }
+
+    public boolean isValid(String token) {
+        return redisTemplate.hasKey(token);
+    }
+
+    public void deleteSession(String token) {
+        redisTemplate.delete(token);
+    }
+
+    public Long getUserID(String token) {
+        String value = redisTemplate.opsForValue().get(token);
+        return value != null ? Long.parseLong(value) : null;
     }
 }

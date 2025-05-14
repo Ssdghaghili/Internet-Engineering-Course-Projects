@@ -2,43 +2,33 @@ package org.example.service;
 
 import org.example.exception.*;
 
-import org.example.model.Admin;
-import org.example.model.Customer;
-import org.example.model.User;
+import org.example.model.*;
 
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Objects;
 
 @Service
 public class AuthService {
 
     @Autowired
-    private UserSession userSession;
+    private SessionService sessionService;
     @Autowired
     private UserRepository userRepository;
 
-    public User getCurrentUser() throws UnauthorizedException, ForbiddenException {
-        User user = userSession.getCurrentUser();
-        if (user == null)
+    public User getLoggedInUser(String token) throws UnauthorizedException {
+
+        Long userId = sessionService.getUserID(token);
+
+        if (userId == null)
             throw new UnauthorizedException("User is not logged in");
 
-        return userRepository.findById(user.getId())
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
     }
 
-    public User showUserDetails() throws UnauthorizedException, ForbiddenException {
-        User user = getCurrentUser();
-
-        if (user == null)
-            throw new UnauthorizedException("User is not logged in");
-
-        return user;
-    }
-
-    public void login(String username, String password) throws UnauthorizedException {
+    public LoginResponse login(String username, String password) throws UnauthorizedException {
         User user = findUserByUsername(username);
 
         if (user == null)
@@ -47,17 +37,28 @@ public class AuthService {
         if (!user.checkPassword(password))
             throw new UnauthorizedException("Invalid username or password");
 
-        userSession.login(user);
+        String token = sessionService.createSession(user.getId());
+
+        return new LoginResponse(token, user.getRole());
     }
 
-    public void logout() throws UnauthorizedException {
-        if (!userSession.isLoggedIn())
+    public void logout(String token) throws UnauthorizedException {
+        if (!sessionService.isValid(token))
             throw new UnauthorizedException("User is not logged in");
 
-        userSession.logout();
+        sessionService.deleteSession(token);
     }
 
-    public void signup(User newUser) throws InvalidFormatException, DuplicateEntityException {
+    public void signup(String username, String password, String email, String country, String city, String role)
+            throws InvalidFormatException, DuplicateEntityException {
+
+        User newUser;
+        if (role.equalsIgnoreCase("customer")) {
+            newUser = new Customer(username, password, email, new Address(country, city));
+        }
+        else {
+            newUser = new Admin(username, password, email, new Address(country, city));
+        }
 
         if (!ServiceUtils.validateUsername(newUser.getUsername()))
             throw new InvalidFormatException("Username is invalid");
@@ -77,19 +78,22 @@ public class AuthService {
         userRepository.save(newUser);
     }
 
-    public Admin validateAndGetAdmin() throws UnauthorizedException, ForbiddenException {
-        User user = userSession.getCurrentUser();
-
-        if (user == null)
-            throw new UnauthorizedException("User is not logged in");
-
-        user = userRepository.findById(user.getId())
-                .orElseThrow(() -> new UnauthorizedException("User not found"));
+    public Admin validateAndGetAdmin(String token) throws UnauthorizedException, ForbiddenException {
+        User user = getLoggedInUser(token);
 
         if (!(user instanceof Admin))
             throw new ForbiddenException("Only admins can perform this action");
 
         return (Admin) user;
+    }
+
+    public Customer getLoggedInCustomer(String token) throws UnauthorizedException, ForbiddenException {
+        User user = getLoggedInUser(token);
+
+        if (!(user instanceof Customer))
+            throw new ForbiddenException("Only customers can perform this action");
+
+        return (Customer) user;
     }
 
     public User findUserByUsername(String username) {

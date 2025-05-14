@@ -2,19 +2,14 @@ package org.example.service;
 
 //import org.example.database.Database;
 import org.example.exception.*;
-import org.example.model.Author;
-import org.example.model.Book;
-import org.example.model.Review;
-import org.example.model.User;
-import org.example.model.Customer;
+import org.example.model.*;
 
 import org.example.repository.BookRepository;
-import org.example.repository.CustomerRepository;
+import org.example.repository.GenreRepository;
+import org.example.repository.ReviewRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -22,36 +17,53 @@ import java.util.*;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static org.example.service.ServiceUtils.MAX_PAGE_SIZE;
 
 @Service
 public class BookService {
-    @Autowired
-    private CustomerRepository customerRepository;
 
     @Autowired
     private BookRepository bookRepository;
 
     @Autowired
+    private GenreRepository genreRepository;
+
+    @Autowired
+    private ReviewRepository reviewRepository;
+
+    @Autowired
     private AuthorService authorService;
 
     @Autowired
-    private UserSession userSession;
+    private AuthService authService;
 
-    public void addBook(Book book)
-            throws NotFoundException, DuplicateEntityException {
-        Author author = authorService.findAuthorByName(book.getAuthor().getName());
 
+    public void addBook(String title, String publisher, int year, int price, String synopsis, String content,
+                        List<String> genreNames, String imageLink, String authorName, String token)
+            throws NotFoundException, DuplicateEntityException, ForbiddenException, UnauthorizedException {
+
+        Admin admin = authService.validateAndGetAdmin(token);
+
+        if (bookTitleExists(title))
+            throw new DuplicateEntityException("Book already exists");
+
+        Author author = authorService.findAuthorByName(authorName);
         if (author == null)
             throw new NotFoundException("Author not found");
 
-        if (bookTitleExists(book.getTitle()))
-            throw new DuplicateEntityException("Book already exists");
+        Set<Genre> genres = new HashSet<>();
+        for (String name : genreNames) {
+            Genre genre = genreRepository.findByName(name)
+                    .orElseThrow(() -> new NotFoundException("Genre not found: " + name));
+            genres.add(genre);
+        }
 
-        bookRepository.save(book);
+        Book newBook = new Book(admin, author, title, publisher, year, price, synopsis, content, genres, imageLink);
+        author.addBook(newBook);
+        admin.addBook(newBook);
+
+        bookRepository.save(newBook);
     }
 
     public Book showBookDetails(String title) throws NotFoundException {
@@ -63,26 +75,16 @@ public class BookService {
         return book;
     }
 
-    public Map<String, Object> showBookContent(String title)
+    public Map<String, Object> showBookContent(String title, String token)
             throws NotFoundException, UnauthorizedException, ForbiddenException {
 
         Book book = findBookByTitle(title);
-        User userSess = userSession.getCurrentUser();
 
         if (book == null) {
             throw new NotFoundException("Book not found");
         }
 
-        if (userSess == null)
-            throw new UnauthorizedException("User is not logged in");
-
-        if (!(userSess instanceof Customer))
-            throw new ForbiddenException("Only customers can access book content");
-
-        Customer customer = customerRepository.findById(userSess.getId())
-                .filter(u -> true)
-                .map(u -> (Customer) u)
-                .orElseThrow(() -> new UnauthorizedException("Customer not found"));
+        Customer customer = authService.getLoggedInCustomer(token);
 
         if (!customer.isBookPurchased(book))
             throw new ForbiddenException("The book is not in your possession");
@@ -90,7 +92,7 @@ public class BookService {
         Map<String, Object> bookContent = new LinkedHashMap<>();
 
         bookContent.put("title", book.getTitle());
-        bookContent.put("author",book.getAuthor());
+        bookContent.put("author", book.getAuthor());
         bookContent.put("content", book.getContent());
 
         return bookContent;
@@ -107,10 +109,7 @@ public class BookService {
 
         Pageable pageable = PageRequest.of(page - 1, size);
 
-        return book.getReviews().stream()
-                .skip((long) (page-1) * size)
-                .limit(size)
-                .collect(Collectors.toList());
+        return reviewRepository.getBookReviews(title, pageable);
     }
 
     public List<Book> getTopRatedBooks(int size) {
@@ -129,7 +128,6 @@ public class BookService {
             size = MAX_PAGE_SIZE;
 
         Pageable pageable = PageRequest.of(page - 1, size);
-
 
         if (sortBy.equals("rating")) {
             if (order.equals("desc"))
@@ -150,14 +148,9 @@ public class BookService {
         }
     }
 
-    public List<Book> getAllBooks() {
-        return bookRepository.findAll();
-    }
-
-    public double getBookAverageRating(String title) throws NotFoundException {
-        Book book = bookRepository.findByTitle(title)
-                .orElseThrow(() -> new NotFoundException("Book not found"));
-        return book.getAverageRate();
+    public Set<Book> getBooksByAdmin(String token) throws ForbiddenException, UnauthorizedException {
+        Admin admin = authService.validateAndGetAdmin(token);
+        return admin.getBooks();
     }
 
     public Book findBookByTitle(String title) {
