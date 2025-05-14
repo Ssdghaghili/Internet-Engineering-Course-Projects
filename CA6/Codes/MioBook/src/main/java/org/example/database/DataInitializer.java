@@ -153,8 +153,8 @@ public class DataInitializer {
                 for (JsonNode g : genres) {
                     Genre genre = genreRepository.findByName(g.asText()).orElse(null);
                     if (genre == null) {
-                        Genre newGenre = new Genre(g.asText());
-                        genreRepository.save(newGenre);
+                        genre = new Genre(g.asText());
+                        genreRepository.save(genre);
                     }
                     book.addGenre(genre);
                 }

@@ -18,8 +18,8 @@ const AddAuthorModal = ({ ModalID, refreshAuthors }) => {
     setPenName("");
     setNationality("");
     setBorn("");
-    setDied(null);
-    setImageLink(null);
+    setDied("");
+    setImageLink("");
     setSubmitError("");
   }
 
@@ -73,7 +73,7 @@ const AddAuthorModal = ({ ModalID, refreshAuthors }) => {
     };
   };
 
-  const canSubmit = (name !== "") && (penName !== "") && (nationality !== "") && (born !== null);
+  const canSubmit = (name !== "") && (penName !== "") && (nationality !== "") && (born !== "");
   const authorExists = submitError === "Author already exists";
 
   return (
