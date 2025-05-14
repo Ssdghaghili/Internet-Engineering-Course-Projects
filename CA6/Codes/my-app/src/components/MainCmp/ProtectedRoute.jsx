@@ -2,13 +2,13 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 
 function ProtectedRoute({ children, allowedRoles }) {
-  const storedUser = JSON.parse(localStorage.getItem("user") || "{}");
+  const role = localStorage.getItem("role");
 
-  if (!storedUser.username) {
+  if (role == null) {
     return <Navigate to="/signin" />;
   }
 
-  if (allowedRoles && !allowedRoles.includes(storedUser.role)) {
+  if (allowedRoles && !allowedRoles.includes(role)) {
     return <Navigate to="/error" />;
   }
 

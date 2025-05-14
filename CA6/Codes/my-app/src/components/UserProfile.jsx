@@ -30,7 +30,12 @@ const UserProfile = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`/api/user`);
+        const res = await fetch(`/api/user`, {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token")
+          }
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -48,11 +53,14 @@ const UserProfile = () => {
   }, []);
 
   useEffect(() => {
-    const fetchCart = async () => {
+    const fetchBooks = async () => {
       try {
-        const res = await fetch(
-          `/api/user/purchased-books`
-        );
+        const res = await fetch("/api/user/purchased-books", {
+          method: "GET",
+          headers: {
+            'Authorization': localStorage.getItem("token")
+          }
+        });
         if (!res.ok) {
           throw new Error("Network response was not ok");
         }
@@ -65,8 +73,8 @@ const UserProfile = () => {
         setCartLoading(false);
       }
     };
-    fetchCart();
-  }, [user]);
+    fetchBooks();
+  }, []);
 
   if (userLoading || cartLoading) {
     return (
@@ -91,15 +99,17 @@ const UserProfile = () => {
     try {
       const response = await fetch("/api/logout", {
         method: "POST",
+        headers: {
+          Authorization: localStorage.getItem("token"),
+        },
       });
       if (response.ok) {
         ToastNotification({
           type: "success",
           message: "Logout successful!",
         });
-
-        localStorage.removeItem("user");
-        // setUser(null);
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
         navigate("/signin");
       } else {
         console.error("Logout failed");
@@ -115,6 +125,9 @@ const UserProfile = () => {
         `/api/user/addCredit?amount=${amount * 100}`,
         {
           method: "POST",
+          headers: {
+            Authorization: localStorage.getItem("token"),
+          },
         }
       );
 

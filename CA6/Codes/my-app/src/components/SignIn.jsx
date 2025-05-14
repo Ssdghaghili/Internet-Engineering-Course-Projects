@@ -41,7 +41,8 @@ const SignIn = () => {
         return;
       }
 
-      localStorage.setItem("user", JSON.stringify(data.data.data));
+      localStorage.setItem("token", data.data.token);
+      localStorage.setItem("role", data.data.role);
 
       ToastNotification({ type: "success", message: "Welcome back! 🎉" });
 
