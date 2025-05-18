@@ -158,6 +158,6 @@ public class UserService {
     }
 
     public boolean emailExists(String email) {
-        return userRepository.findByEmail(email) != null;
+        return userRepository.findByEmail(email).isPresent();
     }
 }

@@ -3,6 +3,7 @@ package org.example.service;
 import org.example.exception.*;
 
 import org.example.model.*;
+import org.example.repository.CustomerRepository;
 import org.example.security.JwtUtil;
 import org.example.security.UserContextHolder;
 import org.example.security.UserDetailsFromToken;
@@ -12,12 +13,16 @@ import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 
 @Service
 public class AuthService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     public User getLoggedInUser() throws UnauthorizedException {
         UserDetailsFromToken details = UserContextHolder.get();
@@ -96,6 +101,28 @@ public class AuthService {
         return (Customer) user;
     }
 
+    public Customer findOrCreateByGoogleEmail(String email, String name) {
+
+        Optional<User> existing = userRepository.findByEmail(email);
+        if (existing.isPresent()) {
+            User user = existing.get();
+            if (user instanceof Customer) {
+                return (Customer) user;
+            } else {
+                throw new IllegalStateException("User with email " + email + " exists but is not a customer");
+            }
+        }
+
+        String salt = PasswordHasher.generateSalt();
+        String hashedPassword = PasswordHasher.hashPassword("oauth_google_login", salt);
+
+        Customer newUser = new Customer(name, hashedPassword, email, new Address("google_oauth", "google_oauth"));
+        newUser.setSalt(salt);
+
+        customerRepository.save(newUser);
+        return newUser;
+    }
+
     public User findUserByUsername(String username) {
         return userRepository.findByUsername(username).orElse(null);
     }
@@ -105,7 +132,7 @@ public class AuthService {
     }
 
     public boolean emailExists(String email) {
-        return userRepository.findByEmail(email) != null;
+        return userRepository.findByEmail(email).isPresent();
     }
 
 }

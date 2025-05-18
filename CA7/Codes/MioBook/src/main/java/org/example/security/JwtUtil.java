@@ -2,11 +2,15 @@ package org.example.security;
 
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.security.Key;
 import java.util.Date;
 
 public class JwtUtil {
+
+//    @Value("${jwt.secret}")
+//    private String secret;
 
     private static final String SECRET_KEY = "MyVerySecretKey1234567890123456A";
     private static final long EXPIRATION_TIME_MS = 24 * 60 * 60 * 1000; // 1 day

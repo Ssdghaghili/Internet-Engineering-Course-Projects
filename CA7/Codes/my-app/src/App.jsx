@@ -12,6 +12,7 @@ import Error from "./components/Error";
 import ProtectedRoute from "./components/MainCmp/ProtectedRoute";
 import BookContent from "./components/BookContent";
 import AuthorPage from "./components/AuthorPage";
+import GoogleCallback from "./components/GoogleCallback";
 import AdminDashboard from "./components/AdminDashboard"
 import { ToastContainer } from "react-toastify";
 
@@ -25,6 +26,7 @@ function App() {
         {/* Public Routes */}
         <Route path="/signup" element={<SignUp />} />
         <Route path="/signin" element={<SignIn />} />
+        <Route path="/google/callback" element={<GoogleCallback />} />
 
         {/* Protected Routes for Both Admin & Customer */}
         <Route

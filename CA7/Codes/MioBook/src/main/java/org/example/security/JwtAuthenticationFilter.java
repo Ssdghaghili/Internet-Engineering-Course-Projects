@@ -21,7 +21,7 @@ public class JwtAuthenticationFilter implements Filter {
 
         String path = req.getRequestURI();
 
-        if (path.startsWith("/api/login") || path.startsWith("/api/signup")) {
+        if (path.startsWith("/api/login") || path.startsWith("/api/signup") || path.startsWith("/api/google/callback")) {
             chain.doFilter(request, response);
             return;
         }

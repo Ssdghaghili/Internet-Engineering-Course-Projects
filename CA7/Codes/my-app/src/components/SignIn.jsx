@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -14,11 +14,17 @@ const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
 
+
   const togglePasswordVisibility = () => {
     setShowPassword((prevState) => !prevState);
   };
 
   const isFormValid = username.trim() !== "" && password.trim() !== "";
+
+  useEffect(() => {
+    
+
+  }, [navigate]);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -136,6 +142,30 @@ const SignIn = () => {
                   >
                     Sign up
                   </Link>
+                </div>
+
+                <div className="col-10 col-sm-8 align-items-center mb-3 text-center">
+                  <button
+                    className="btn btn-outline-danger w-100"
+                    onClick={() => {
+                      const clientId =
+                        "406519361296-s9jjismdujr679fqoh9sadq9q1i1crd4.apps.googleusercontent.com";
+                      const redirectUri = encodeURIComponent(
+                        "http://localhost:5173/google/callback"
+                      );
+                      const scope = encodeURIComponent("openid email profile");
+                      const authUrl =
+                        `https://accounts.google.com/o/oauth2/v2/auth` +
+                        `?response_type=code` +
+                        `&client_id=${clientId}` +
+                        `&redirect_uri=${redirectUri}` +
+                        `&scope=${scope}` +
+                        `&access_type=offline`;
+                      window.location.href = authUrl;
+                    }}
+                  >
+                    Sign in with Google
+                  </button>
                 </div>
               </div>
             </div>
