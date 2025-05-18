@@ -17,6 +17,8 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String salt;
+
     @NotNull
     @Column(unique = true, nullable = false)
     private String username;
@@ -43,6 +45,7 @@ public class User {
     }
 
     public Long getId() { return id; }
+    public String getSalt() { return salt; }
     public String getRole() { return role; }
     public String getUsername() { return username; }
     public String getPassword() { return password; }
@@ -50,11 +53,15 @@ public class User {
     public Address getAddress() { return address;}
 
     public boolean checkPassword(String password) {
-        String hashedPassword = PasswordHasher.hashPassword(password);
+        String hashedPassword = PasswordHasher.hashPassword(password, this.salt);
         return this.password.equals(hashedPassword);
     }
 
-    public void serPassword(String password) {
+    public void setPassword(String password) {
         this.password = password;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 }

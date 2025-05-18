@@ -54,7 +54,9 @@ public class AuthService {
             throws InvalidFormatException, DuplicateEntityException {
 
         User newUser;
-        String hashedPassword = PasswordHasher.hashPassword(password);
+        String salt = PasswordHasher.generateSalt();
+        String hashedPassword = PasswordHasher.hashPassword(password, salt);
+
 
         if (role.equalsIgnoreCase("customer")) {
             newUser = new Customer(username, hashedPassword, email, new Address(country, city));
@@ -78,6 +80,7 @@ public class AuthService {
         if (emailExists(newUser.getEmail()))
             throw new DuplicateEntityException("Email already exists");
 
+        newUser.setSalt(salt);
         userRepository.save(newUser);
     }
 

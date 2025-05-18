@@ -52,7 +52,7 @@ public class DataInitializer {
     @PostConstruct
     public void initializeData() {
 //        fetchGenres();
-//        fetchUsers();
+        fetchUsers();
 //        fetchAuthors();
 //        fetchBooks();
 //        fetchReviews();
@@ -75,7 +75,8 @@ public class DataInitializer {
 
             for (JsonNode userNode : root) {
                 String rawPassword = userNode.get("password").asText();
-                String hashedPassword = PasswordHasher.hashPassword(rawPassword);
+                String salt = PasswordHasher.generateSalt();
+                String hashedPassword = PasswordHasher.hashPassword(rawPassword, salt);
 
                 String username = userNode.get("username").asText();
                 String email = userNode.get("email").asText();
@@ -86,13 +87,16 @@ public class DataInitializer {
 
                 if (userNode.get("role").asText().equals("customer")) {
                     Customer customer =customerRepository.findByUsername(username);
-                    customer.serPassword(hashedPassword);
+                    customer.setPassword(hashedPassword);
+                    customer.setSalt(salt);
 
                     //Customer newCustomer = new Customer(username, hashedPassword, email, address);
                     customerRepository.save(customer);
                 } else {
                     Admin admin = adminRepository.findByUsername(username);
-                    admin.serPassword(hashedPassword);
+                    admin.setPassword(hashedPassword);
+                    admin.setSalt(salt);
+
                     //Admin newAdmin = new Admin(username, hashedPassword, email, address);
                     adminRepository.save(admin);
                 }
