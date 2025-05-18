@@ -13,6 +13,7 @@ import org.example.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.example.utils.PasswordHasher;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -71,26 +72,29 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Users");
             JsonNode root = objectMapper.readTree(json);
-            List<User> users = new ArrayList<>();
 
             for (JsonNode userNode : root) {
+                String rawPassword = userNode.get("password").asText();
+                String hashedPassword = PasswordHasher.hashPassword(rawPassword);
+
+                String username = userNode.get("username").asText();
+                String email = userNode.get("email").asText();
+                String country = userNode.get("address").get("country").asText();
+                String city = userNode.get("address").get("city").asText();
+
+                Address address = new Address(country, city);
+
                 if (userNode.get("role").asText().equals("customer")) {
-                    Customer newCustomer = new Customer(
-                            userNode.get("username").asText(),
-                            userNode.get("password").asText(),
-                            userNode.get("email").asText(),
-                            new Address(userNode.get("address").get("country").asText(), userNode.get("address").get("city").asText())
-                    );
-                    customerRepository.save(newCustomer);
-                }
-                else {
-                    Admin newAdmin = new Admin(
-                            userNode.get("username").asText(),
-                            userNode.get("password").asText(),
-                            userNode.get("email").asText(),
-                            new Address(userNode.get("address").get("country").asText(), userNode.get("address").get("city").asText())
-                    );
-                    adminRepository.save(newAdmin);
+                    Customer customer =customerRepository.findByUsername(username);
+                    customer.serPassword(hashedPassword);
+
+                    //Customer newCustomer = new Customer(username, hashedPassword, email, address);
+                    customerRepository.save(customer);
+                } else {
+                    Admin admin = adminRepository.findByUsername(username);
+                    admin.serPassword(hashedPassword);
+                    //Admin newAdmin = new Admin(username, hashedPassword, email, address);
+                    adminRepository.save(admin);
                 }
             }
         } catch (Exception e) {

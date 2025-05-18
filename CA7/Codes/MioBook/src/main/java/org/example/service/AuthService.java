@@ -3,6 +3,7 @@ package org.example.service;
 import org.example.exception.*;
 
 import org.example.model.*;
+import org.example.utils.PasswordHasher;
 
 import org.example.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,11 +54,13 @@ public class AuthService {
             throws InvalidFormatException, DuplicateEntityException {
 
         User newUser;
+        String hashedPassword = PasswordHasher.hashPassword(password);
+
         if (role.equalsIgnoreCase("customer")) {
-            newUser = new Customer(username, password, email, new Address(country, city));
+            newUser = new Customer(username, hashedPassword, email, new Address(country, city));
         }
         else {
-            newUser = new Admin(username, password, email, new Address(country, city));
+            newUser = new Admin(username, hashedPassword, email, new Address(country, city));
         }
 
         if (!ServiceUtils.validateUsername(newUser.getUsername()))
@@ -66,7 +69,7 @@ public class AuthService {
         if (!ServiceUtils.validateEmail(newUser.getEmail()))
             throw new InvalidFormatException("Email is invalid");
 
-        if (!ServiceUtils.validatePassword(newUser.getPassword()))
+        if (!ServiceUtils.validatePassword(password))
             throw new InvalidFormatException("Password is invalid");
 
         if (usernameExists(newUser.getUsername()))

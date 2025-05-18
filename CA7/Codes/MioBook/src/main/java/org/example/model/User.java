@@ -1,7 +1,7 @@
 package org.example.model;
 
+import org.example.utils.PasswordHasher;
 import jakarta.validation.constraints.NotNull;
-
 import jakarta.persistence.*;
 import org.hibernate.annotations.Formula;
 
@@ -50,6 +50,11 @@ public class User {
     public Address getAddress() { return address;}
 
     public boolean checkPassword(String password) {
-        return this.password.equals(password);
+        String hashedPassword = PasswordHasher.hashPassword(password);
+        return this.password.equals(hashedPassword);
+    }
+
+    public void serPassword(String password) {
+        this.password = password;
     }
 }
