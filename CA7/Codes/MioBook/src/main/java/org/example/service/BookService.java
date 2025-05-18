@@ -40,10 +40,10 @@ public class BookService {
 
 
     public void addBook(String title, String publisher, int year, int price, String synopsis, String content,
-                        List<String> genreNames, String imageLink, String authorName, String token)
+                        List<String> genreNames, String imageLink, String authorName)
             throws NotFoundException, DuplicateEntityException, ForbiddenException, UnauthorizedException {
 
-        Admin admin = authService.validateAndGetAdmin(token);
+        Admin admin = authService.validateAndGetAdmin();
 
         if (bookTitleExists(title))
             throw new DuplicateEntityException("Book already exists");
@@ -75,7 +75,7 @@ public class BookService {
         return book;
     }
 
-    public Map<String, Object> showBookContent(String title, String token)
+    public Map<String, Object> showBookContent(String title)
             throws NotFoundException, UnauthorizedException, ForbiddenException {
 
         Book book = findBookByTitle(title);
@@ -84,7 +84,7 @@ public class BookService {
             throw new NotFoundException("Book not found");
         }
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         if (!customer.isBookPurchased(book))
             throw new ForbiddenException("The book is not in your possession");
@@ -148,8 +148,8 @@ public class BookService {
         }
     }
 
-    public Set<Book> getBooksByAdmin(String token) throws ForbiddenException, UnauthorizedException {
-        Admin admin = authService.validateAndGetAdmin(token);
+    public Set<Book> getBooksByAdmin() throws ForbiddenException, UnauthorizedException {
+        Admin admin = authService.validateAndGetAdmin();
         return admin.getBooks();
     }
 

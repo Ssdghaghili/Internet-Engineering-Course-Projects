@@ -33,8 +33,8 @@ const UserProfile = () => {
         const res = await fetch(`/api/user`, {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token")
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -58,8 +58,8 @@ const UserProfile = () => {
         const res = await fetch("/api/user/purchased-books", {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token")
-          }
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
         });
         if (!res.ok) {
           throw new Error("Network response was not ok");
@@ -100,7 +100,7 @@ const UserProfile = () => {
       const response = await fetch("/api/logout", {
         method: "POST",
         headers: {
-          Authorization: localStorage.getItem("token"),
+          Authorization: `Bearer ${localStorage.getItem("token")}`,
         },
       });
       if (response.ok) {
@@ -126,7 +126,7 @@ const UserProfile = () => {
         {
           method: "POST",
           headers: {
-            Authorization: localStorage.getItem("token"),
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         }
       );
@@ -226,7 +226,7 @@ const UserProfile = () => {
                 </h3>
               </div>
             </div>
-            {book.length === 0 || !book ? (
+            {!book || book.length === 0 ? (
               <div className="row d-flex justify-content-center">
                 <img
                   src={NoBookImage}

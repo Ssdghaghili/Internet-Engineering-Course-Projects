@@ -20,13 +20,13 @@ public class AuthorService {
     private AuthorRepository authorRepository;
 
     public void addAuthor(String name, String penName, String nationality, LocalDate born, LocalDate died,
-                          String imageLink, String token) throws
+                          String imageLink) throws
             DuplicateEntityException, ForbiddenException, UnauthorizedException {
 
         if (authorNameExists(name))
             throw new DuplicateEntityException("Author already exists");
 
-        Admin admin = authService.validateAndGetAdmin(token);
+        Admin admin = authService.validateAndGetAdmin();
 
         Author newAuthor = new Author(name, penName, nationality, born, died, imageLink);
         admin.addAuthor(newAuthor);
@@ -44,7 +44,7 @@ public class AuthorService {
     }
 
     public Set<Author> getAuthorsByAdmin(String token) throws ForbiddenException, UnauthorizedException {
-        Admin admin = authService.validateAndGetAdmin(token);
+        Admin admin = authService.validateAndGetAdmin();
         return admin.getAuthors();
     }
 

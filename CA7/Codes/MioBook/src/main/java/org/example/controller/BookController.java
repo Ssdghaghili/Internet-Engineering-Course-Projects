@@ -26,13 +26,12 @@ public class BookController {
 
 
     @PostMapping("/add")
-    public Response<Object> addBook(@Valid @RequestBody AddBookRequest addBookRequest,
-                                    @RequestHeader("Authorization") String token)
+    public Response<Object> addBook(@Valid @RequestBody AddBookRequest addBookRequest)
             throws ForbiddenException, UnauthorizedException, NotFoundException, DuplicateEntityException {
 
         bookService.addBook(addBookRequest.getTitle(), addBookRequest.getPublisher(), addBookRequest.getYear(),
                 addBookRequest.getPrice(), addBookRequest.getSynopsis(), addBookRequest.getContent(),
-                addBookRequest.getGenres(), addBookRequest.getImageLink(), addBookRequest.getAuthor(), token);
+                addBookRequest.getGenres(), addBookRequest.getImageLink(), addBookRequest.getAuthor());
         return Response.ok("Book added successfully");
     }
 
@@ -43,11 +42,10 @@ public class BookController {
     }
 
     @GetMapping("/book/{title}/content")
-    public Response<Object> getBookContent(@PathVariable String title,
-                                           @RequestHeader("Authorization") String token)
+    public Response<Object> getBookContent(@PathVariable String title)
             throws NotFoundException, ForbiddenException, UnauthorizedException {
 
-        Map<String, Object> bookContent = bookService.showBookContent(title, token);
+        Map<String, Object> bookContent = bookService.showBookContent(title);
         return Response.ok("Book content retrieved successfully", bookContent);
     }
 
@@ -100,10 +98,10 @@ public class BookController {
     }
 
     @GetMapping("/all")
-    public Response<List<BookDTO>> getAllAdminBooks(@RequestHeader("Authorization") String token)
+    public Response<List<BookDTO>> getAllAdminBooks()
             throws ForbiddenException, UnauthorizedException {
 
-        Set<Book> books = bookService.getBooksByAdmin(token);
+        Set<Book> books = bookService.getBooksByAdmin();
         return Response.ok("Books retrieved successfully",
                 books.stream().map(DtoMapper::bookToDTO).collect(Collectors.toList()));
     }

@@ -19,7 +19,7 @@ const BookContent = () => {
         const res = await fetch(`/api/books/book/${bookSlug}/content`, {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token"),
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
         });
         if (!res.ok) {

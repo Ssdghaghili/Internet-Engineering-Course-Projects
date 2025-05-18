@@ -33,10 +33,10 @@ public class ReviewService {
 
 
     @Transactional
-    public void addReview(String bookTitle, int rate, String comment, LocalDateTime dateTime, String token)
+    public void addReview(String bookTitle, int rate, String comment, LocalDateTime dateTime)
             throws UnauthorizedException, ForbiddenException, NotFoundException, BadRequestException {
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         Book book = bookService.findBookByTitle(bookTitle);
 

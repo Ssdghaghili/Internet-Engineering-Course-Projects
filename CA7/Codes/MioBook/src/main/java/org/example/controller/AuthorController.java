@@ -28,12 +28,11 @@ public class AuthorController {
     private AuthorService authorService;
 
     @PostMapping("/add")
-    public Response<Object> addAuthor(@Valid @RequestBody AddAuthorRequest addAuthorRequest,
-                                      @RequestHeader("Authorization") String token)
+    public Response<Object> addAuthor(@Valid @RequestBody AddAuthorRequest addAuthorRequest)
             throws ForbiddenException, UnauthorizedException, DuplicateEntityException {
 
         authorService.addAuthor(addAuthorRequest.getName(), addAuthorRequest.getPenName(), addAuthorRequest.getNationality()
-                , addAuthorRequest.getBorn(), addAuthorRequest.getDied(), addAuthorRequest.getImageLink(), token);
+                , addAuthorRequest.getBorn(), addAuthorRequest.getDied(), addAuthorRequest.getImageLink());
         return Response.ok("Author added successfully");
     }
 

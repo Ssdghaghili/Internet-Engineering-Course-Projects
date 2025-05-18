@@ -26,7 +26,7 @@ public class UserService {
 
 
     @Transactional
-    public void addCart(String bookTitle, String token)
+    public void addCart(String bookTitle)
             throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
 
         Book book = bookService.findBookByTitle(bookTitle);
@@ -34,7 +34,7 @@ public class UserService {
         if (book == null)
             throw new NotFoundException("Book not found");
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         if (customer.getCart().size() >= 10)
             throw new BadRequestException("Cart cannot have more than 10 items");
@@ -49,7 +49,7 @@ public class UserService {
     }
 
     @Transactional
-    public void removeCart(String bookTitle, String token)
+    public void removeCart(String bookTitle)
             throws NotFoundException, UnauthorizedException, ForbiddenException, BadRequestException {
 
         Book book = bookService.findBookByTitle(bookTitle);
@@ -57,17 +57,17 @@ public class UserService {
         if (book == null)
             throw new NotFoundException("Book not found");
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         if (!customer.removeBookFromCart(book))
             throw new BadRequestException("Book is not in the your cart");
     }
 
     @Transactional
-    public Customer addCredit(int amount, String token)
+    public Customer addCredit(int amount)
             throws UnauthorizedException, ForbiddenException, BadRequestException {
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         if (amount < 100)
             throw new BadRequestException("Minimum deposit amount is 100 cents (1 dollar)");
@@ -78,10 +78,10 @@ public class UserService {
     }
 
     @Transactional
-    public PurchaseReceipt purchaseCart(String token)
+    public PurchaseReceipt purchaseCart()
             throws UnauthorizedException, ForbiddenException, BadRequestException {
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         if (customer.getCart().isEmpty())
             throw new BadRequestException("Cart cannot be empty");
@@ -99,7 +99,7 @@ public class UserService {
     }
 
     @Transactional
-    public void borrowBook(String bookTitle, int days, String token)
+    public void borrowBook(String bookTitle, int days)
             throws UnauthorizedException, NotFoundException, ForbiddenException, BadRequestException {
 
         Book book = bookService.findBookByTitle(bookTitle);
@@ -107,7 +107,7 @@ public class UserService {
         if (book == null)
             throw new NotFoundException("Book not found");
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         if (customer.getCart().size() >= 10)
             throw new BadRequestException("Cart cannot have more than 10 items");
@@ -125,26 +125,26 @@ public class UserService {
     }
 
     @Transactional
-    public Cart showCart(String token)
+    public Cart showCart()
             throws UnauthorizedException, ForbiddenException {
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         return new Cart(customer.calculateCartCost(), customer.getCart());
     }
 
     @Transactional
-    public List<PurchaseRecord> showPurchaseHistory(String token) throws UnauthorizedException, ForbiddenException {
+    public List<PurchaseRecord> showPurchaseHistory() throws UnauthorizedException, ForbiddenException {
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         return customer.getPurchaseHistory();
     }
 
     @Transactional
-    public List<PurchaseItem> showPurchasedBooks(String token) throws UnauthorizedException, ForbiddenException {
+    public List<PurchaseItem> showPurchasedBooks() throws UnauthorizedException, ForbiddenException {
 
-        Customer customer = authService.getLoggedInCustomer(token);
+        Customer customer = authService.getLoggedInCustomer();
 
         return customer.getPurchasedBooks();
     }

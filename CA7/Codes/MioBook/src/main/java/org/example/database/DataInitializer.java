@@ -52,7 +52,7 @@ public class DataInitializer {
     @PostConstruct
     public void initializeData() {
 //        fetchGenres();
-        fetchUsers();
+//        fetchUsers();
 //        fetchAuthors();
 //        fetchBooks();
 //        fetchReviews();

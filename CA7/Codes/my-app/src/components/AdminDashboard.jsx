@@ -38,7 +38,7 @@ const AdminDashboard = () => {
           const res = await fetch(`/api/user`, {
             method: "GET",
             headers: {
-              'Authorization': localStorage.getItem("token"),
+              'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
           });
           if (!res.ok) {
@@ -62,7 +62,7 @@ const AdminDashboard = () => {
       const res = await fetch(`/api/books/all`, {
         method: "GET",
         headers: {
-          'Authorization': localStorage.getItem("token"),
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
         },
       });
       if (!res.ok) {
@@ -86,7 +86,7 @@ const AdminDashboard = () => {
       const res = await fetch("/api/authors/all", {
         method: "GET",
         headers: {
-          'Authorization': localStorage.getItem("token"),
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
         },
       });
       if (!res.ok) {
@@ -110,7 +110,7 @@ const AdminDashboard = () => {
         const response = await fetch("/api/logout", {
           method: "POST",
           headers: {
-            'Authorization': localStorage.getItem("token"),
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
         });
         if (response.ok) {

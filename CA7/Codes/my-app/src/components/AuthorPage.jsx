@@ -24,7 +24,7 @@ const AuthorPage = () => {
         const res = await fetch(`/api/authors/${authorSlug}`, {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token"),
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
         });
         if (!res.ok) {
@@ -49,7 +49,7 @@ const AuthorPage = () => {
         const res = await fetch(`/api/books/search?author=${authorSlug}`, {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token"),
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
         });
         if (!res.ok) {

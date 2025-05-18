@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "bootstrap/dist/css/bootstrap.min.css";
 import ToastNotification from "./ToastNotification";
@@ -31,7 +31,7 @@ const AddReviewModal = ({ Book, Image, onReviewAdded }) => {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        'Authorization': localStorage.getItem("token"),
+        'Authorization': `Bearer ${localStorage.getItem("token")}`
       },
       body: JSON.stringify(reviewData),
     })

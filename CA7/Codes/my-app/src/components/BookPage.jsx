@@ -28,7 +28,7 @@ const BookPage = () => {
       fetch(`/api/books/${bookSlug}`, {
         method: "GET",
         headers: {
-          'Authorization': localStorage.getItem("token"),
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
         },
       })
       .then((res) => {
@@ -63,7 +63,7 @@ const BookPage = () => {
         `/api/books/book/${bookSlug}/reviews?${query}`, {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token"),
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
         });
 
@@ -336,7 +336,7 @@ const BookPage = () => {
           fetch(`/api/books/${bookSlug}`, {
             method: "GET",
             headers: {
-              'Authorization': localStorage.getItem("token"),
+              'Authorization': `Bearer ${localStorage.getItem("token")}`
             },
           })
           .then((res) => res.json())

@@ -29,7 +29,7 @@ export default function SearchResult() {
           const response = await fetch(url, {
             method: "GET",
             headers: {
-              'Authorization': localStorage.getItem("token")
+              'Authorization': `Bearer ${localStorage.getItem("token")}`
             }
           });
 
@@ -57,7 +57,7 @@ export default function SearchResult() {
           const response = await fetch("/api/books/genres", {
             method: "GET",
             headers: {
-              'Authorization': localStorage.getItem("token")
+              'Authorization': `Bearer ${localStorage.getItem("token")}`
             }
           });
 

@@ -3,6 +3,9 @@ package org.example.service;
 import org.example.exception.*;
 
 import org.example.model.*;
+import org.example.security.JwtUtil;
+import org.example.security.UserContextHolder;
+import org.example.security.UserDetailsFromToken;
 import org.example.utils.PasswordHasher;
 
 import org.example.repository.UserRepository;
@@ -14,40 +17,31 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     @Autowired
-    private SessionService sessionService;
-    @Autowired
     private UserRepository userRepository;
 
-    public User getLoggedInUser(String token) throws UnauthorizedException {
+    public User getLoggedInUser() throws UnauthorizedException {
+        UserDetailsFromToken details = UserContextHolder.get();
 
-        Long userId = sessionService.getUserID(token);
+        if (details == null)
+            throw new UnauthorizedException("No authenticated user");
 
-        if (userId == null)
-            throw new UnauthorizedException("User is not logged in");
-
-        return userRepository.findById(userId)
+        return userRepository.findById(details.getUserId())
                 .orElseThrow(() -> new UnauthorizedException("User not found"));
     }
 
     public LoginResponse login(String username, String password) throws UnauthorizedException {
         User user = findUserByUsername(username);
 
-        if (user == null)
+        if (user == null || !user.checkPassword(password))
             throw new UnauthorizedException("Invalid username or password");
 
-        if (!user.checkPassword(password))
-            throw new UnauthorizedException("Invalid username or password");
-
-        String token = sessionService.createSession(user.getId());
+        String token = JwtUtil.generateToken(
+                String.valueOf(user.getId()),
+                user.getUsername(),
+                user.getEmail()
+        );
 
         return new LoginResponse(token, user.getRole());
-    }
-
-    public void logout(String token) throws UnauthorizedException {
-        if (!sessionService.isValid(token))
-            throw new UnauthorizedException("User is not logged in");
-
-        sessionService.deleteSession(token);
     }
 
     public void signup(String username, String password, String email, String country, String city, String role)
@@ -84,8 +78,8 @@ public class AuthService {
         userRepository.save(newUser);
     }
 
-    public Admin validateAndGetAdmin(String token) throws UnauthorizedException, ForbiddenException {
-        User user = getLoggedInUser(token);
+    public Admin validateAndGetAdmin() throws UnauthorizedException, ForbiddenException {
+        User user = getLoggedInUser();
 
         if (!(user instanceof Admin))
             throw new ForbiddenException("Only admins can perform this action");
@@ -93,8 +87,8 @@ public class AuthService {
         return (Admin) user;
     }
 
-    public Customer getLoggedInCustomer(String token) throws UnauthorizedException, ForbiddenException {
-        User user = getLoggedInUser(token);
+    public Customer getLoggedInCustomer() throws UnauthorizedException, ForbiddenException {
+        User user = getLoggedInUser();
 
         if (!(user instanceof Customer))
             throw new ForbiddenException("Only customers can perform this action");

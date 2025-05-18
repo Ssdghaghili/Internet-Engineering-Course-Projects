@@ -21,8 +21,8 @@ public class AuthController {
     private AuthService authService;
 
     @GetMapping("/user")
-    public Response<UserDTO> user(@RequestHeader("Authorization") String token) throws UnauthorizedException, ForbiddenException {
-        User user = authService.getLoggedInUser(token);
+    public Response<UserDTO> user() throws UnauthorizedException, ForbiddenException {
+        User user = authService.getLoggedInUser();
         return Response.ok("User details retrieved successfully",
                 DtoMapper.userToDTO(user));
     }
@@ -46,7 +46,6 @@ public class AuthController {
 
     @PostMapping("/logout")
     public Response<Object> logout(@RequestHeader("Authorization") String token) throws UnauthorizedException {
-        authService.logout(token);
         return Response.ok("User logged out successfully");
     }
 }

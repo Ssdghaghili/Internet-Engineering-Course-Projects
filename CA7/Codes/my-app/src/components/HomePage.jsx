@@ -25,7 +25,7 @@ const HomePage = () => {
         const res = await fetch(`/api/books/book/new-releases?size=5`, {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token"),
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
         });
         if (!res.ok) {
@@ -51,7 +51,7 @@ const HomePage = () => {
         const res = await fetch(`/api/books/book/top-rated?size=5`, {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token"),
+            'Authorization':`Bearer ${localStorage.getItem("token")}`
           },
         });
         if (!res.ok) {

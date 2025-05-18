@@ -34,7 +34,7 @@ const AddToCartModal = ({
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          'Authorization': localStorage.getItem("token"),
+          'Authorization': `Bearer ${localStorage.getItem("token")}`
         },
       })
         .then((response) => response.json())
@@ -78,7 +78,7 @@ const AddToCartModal = ({
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            'Authorization': localStorage.getItem("token")
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           },
         }
       )

@@ -21,12 +21,11 @@ public class ReviewController {
     private ReviewService reviewService;
 
     @PostMapping("/add")
-    public Response<Object> addReview(@Valid @RequestBody AddReviewRequest addReviewRequest,
-                                      @RequestHeader("Authorization") String token)
+    public Response<Object> addReview(@Valid @RequestBody AddReviewRequest addReviewRequest)
             throws ForbiddenException, UnauthorizedException, NotFoundException, BadRequestException {
 
         reviewService.addReview(addReviewRequest.getTitle(), addReviewRequest.getRate(),
-                addReviewRequest.getComment(), LocalDateTime.now(), token);
+                addReviewRequest.getComment(), LocalDateTime.now());
         return Response.ok("Review added successfully");
     }
 }

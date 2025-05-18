@@ -20,7 +20,7 @@ const PurchaseHistory = () => {
         const res = await fetch("/api/user/purchase-history", {
           method: "GET",
           headers: {
-            'Authorization': localStorage.getItem("token")
+            'Authorization': `Bearer ${localStorage.getItem("token")}`
           }
         });
         if (!res.ok) {
@@ -38,7 +38,7 @@ const PurchaseHistory = () => {
     fetchHistory();
 
     const handlePurchaseSuccess = () => {
-      fetchHistory(); // وقتی event اومد دوباره fetch کن
+      fetchHistory();
     };
   
     window.addEventListener("purchaseSuccess", handlePurchaseSuccess);
