@@ -62,4 +62,9 @@ public class ControllerExceptionHandler {
                 errors.put(error.getPropertyPath().toString(), error.getMessage()));
         return Response.failure(HttpStatus.BAD_REQUEST, "Validation failed", errors);
     }
+
+    @ExceptionHandler(GoogleAuthException.class)
+    private Response<Object> handleGoogleAuthException(GoogleAuthException ex) {
+        return Response.failure(HttpStatus.UNAUTHORIZED, ex.getMessage(), null);
+    }
 }
