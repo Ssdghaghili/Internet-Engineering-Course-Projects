@@ -39,7 +39,6 @@ public class GoogleAuthController {
     public ResponseEntity<Response<LoginResponse>> googleCallback(@RequestBody GoogleAuthRequest request) {
         String code = request.getCode();
 
-        // 1. گرفتن access token
         MultiValueMap<String, String> body = new LinkedMultiValueMap<>();
         body.add("code", code);
         body.add("client_id", clientId);
@@ -72,7 +71,6 @@ public class GoogleAuthController {
 
         String accessToken = (String) tokenResponse.getBody().get("access_token");
 
-        // 2. گرفتن اطلاعات کاربر
         HttpHeaders userInfoHeaders = new HttpHeaders();
         userInfoHeaders.setBearerAuth(accessToken);
         HttpEntity<Void> userInfoRequest = new HttpEntity<>(userInfoHeaders);
@@ -101,19 +99,16 @@ public class GoogleAuthController {
         String email = (String) userInfo.get("email");
         String name = (String) userInfo.get("name");
 
-        System.out.println("Google login - Email: " + email + ", Name: " + name);
 
-        // 3. ثبت یا ورود کاربر
         Customer customer = authService.findOrCreateByGoogleEmail(email, name);
-
-        // 4. ساخت JWT
+        
         String token = JwtUtil.generateToken(
                 String.valueOf(customer.getId()),
                 customer.getUsername(),
                 customer.getEmail()
         );
 
-        LoginResponse loginResponse = new LoginResponse(token, customer.getRole());
+        LoginResponse loginResponse = new LoginResponse(token, "customer");
 
         return ResponseEntity.ok(Response.ok("User logged in successfully", loginResponse));
     }

@@ -52,6 +52,8 @@ public class User {
     public String getEmail() { return email; }
     public Address getAddress() { return address;}
 
+    public void setRole(String role) { this.role = role; }
+
     public boolean checkPassword(String password) {
         String hashedPassword = PasswordHasher.hashPassword(password, this.salt);
         return this.password.equals(hashedPassword);

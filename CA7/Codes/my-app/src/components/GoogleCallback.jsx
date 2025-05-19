@@ -29,6 +29,13 @@ const GoogleCallback = () => {
           body: JSON.stringify({ code }),
         });
 
+        if (!response.ok) {
+          const errorData = await response.json();
+          ToastNotification({ type: "error", message: errorData.message });
+          navigate("/signin");
+          return;
+        }
+
         const data = await response.json();
 
         if (!data.success) {
@@ -41,7 +48,7 @@ const GoogleCallback = () => {
         localStorage.setItem("role", data.data.role);
 
         ToastNotification({ type: "success", message: "Welcome back! 🎉" });
-        navigate("/");
+        setTimeout(() => navigate("/"), 100);
       } catch (error) {
         console.error("Error during Google OAuth callback:", error);
         ToastNotification({ type: "error", message: "Something went wrong!" });

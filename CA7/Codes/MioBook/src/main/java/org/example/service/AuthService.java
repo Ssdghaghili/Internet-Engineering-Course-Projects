@@ -104,7 +104,20 @@ public class AuthService {
     public Customer findOrCreateByGoogleEmail(String email, String name) {
 
         Optional<User> existing = userRepository.findByEmail(email);
-        if (existing.isPresent()) {
+
+        if (existing.isEmpty()){
+            String salt = PasswordHasher.generateSalt();
+            String hashedPassword = PasswordHasher.hashPassword("oauth_google_login", salt);
+
+            Customer newCustomer = new Customer(name, hashedPassword, email, new Address("google_oauth", "google_oauth"));
+            newCustomer.setRole("customer");
+            newCustomer.setSalt(salt);
+
+            customerRepository.save(newCustomer);
+            return newCustomer;
+        }
+
+        else {
             User user = existing.get();
             if (user instanceof Customer) {
                 return (Customer) user;
@@ -112,15 +125,6 @@ public class AuthService {
                 throw new IllegalStateException("User with email " + email + " exists but is not a customer");
             }
         }
-
-        String salt = PasswordHasher.generateSalt();
-        String hashedPassword = PasswordHasher.hashPassword("oauth_google_login", salt);
-
-        Customer newUser = new Customer(name, hashedPassword, email, new Address("google_oauth", "google_oauth"));
-        newUser.setSalt(salt);
-
-        customerRepository.save(newUser);
-        return newUser;
     }
 
     public User findUserByUsername(String username) {
