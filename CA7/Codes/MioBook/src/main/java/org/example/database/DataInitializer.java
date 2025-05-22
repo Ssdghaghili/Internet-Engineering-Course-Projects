@@ -51,11 +51,11 @@ public class DataInitializer {
 
     @PostConstruct
     public void initializeData() {
-//        fetchGenres();
-//        fetchUsers();
-//        fetchAuthors();
-//        fetchBooks();
-//        fetchReviews();
+        fetchGenres();
+        fetchUsers();
+        fetchAuthors();
+        fetchBooks();
+        fetchReviews();
     }
 
     private void fetchGenres() {
@@ -72,6 +72,7 @@ public class DataInitializer {
         try {
             String json = getJsonFromApi("Users");
             JsonNode root = objectMapper.readTree(json);
+            List<User> users = new ArrayList<>();
 
             for (JsonNode userNode : root) {
                 String rawPassword = userNode.get("password").asText();
@@ -86,21 +87,19 @@ public class DataInitializer {
                 Address address = new Address(country, city);
 
                 if (userNode.get("role").asText().equals("customer")) {
-                    Customer customer =customerRepository.findByUsername(username);
-                    customer.setPassword(hashedPassword);
+                    Customer customer = new Customer(username, hashedPassword, email, address);
                     customer.setSalt(salt);
 
-                    //Customer newCustomer = new Customer(username, hashedPassword, email, address);
-                    customerRepository.save(customer);
+                    users.add(customer);
                 } else {
-                    Admin admin = adminRepository.findByUsername(username);
-                    admin.setPassword(hashedPassword);
-                    admin.setSalt(salt);
+                    Admin newAdmin = new Admin(username, hashedPassword, email, address);
+                    newAdmin.setSalt(salt);
 
-                    //Admin newAdmin = new Admin(username, hashedPassword, email, address);
-                    adminRepository.save(admin);
+                    users.add(newAdmin);
                 }
             }
+            userRepository.saveAll(users);
+
         } catch (Exception e) {
             System.out.println("Failed to fetch users: " + e.getMessage());
         }
@@ -205,9 +204,13 @@ public class DataInitializer {
                     User user = optionalUser.get();
                     Book book = optionalBook.get();
 
-                    Review newReview = new Review((Customer) user, book, rate, comment, dateTime);
+                    if (!(user instanceof Customer customer)) {
+                        System.out.println("Admins can not add reviews");
+                        continue;
+                    }
 
-                    if (!reviewRepository.existsByBookAndCustomer(book, (Customer) user)) {
+                    if (!reviewRepository.existsByBookAndCustomer(book, customer)) {
+                        Review newReview = new Review(customer, book, rate, comment, dateTime);
                         reviewRepository.save(newReview);
                     }
 
