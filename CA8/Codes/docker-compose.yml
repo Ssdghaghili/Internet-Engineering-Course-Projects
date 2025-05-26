@@ -1,0 +1,67 @@
+services:
+  db:
+    image: mysql:8.0
+    ports:
+      - "3306:3306"
+    restart: always
+    environment:
+      - MYSQL_DATABASE=miobookdb
+      - MYSQL_USER=miobookAdmin
+      - MYSQL_PASSWORD_FILE=/run/secrets/db_password
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/db_password
+    secrets:
+      - db_password
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - miobook-net
+
+  backend:
+    image: sdghaghili/miobook-backend:v1.0.1
+    build:
+      context: ./MioBook-Back
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://db:3306/miobookdb?allowPublicKeyRetrieval=true&useSSL=false
+      - SPRING_DATASOURCE_USERNAME=miobookAdmin
+      - SPRING_DATASOURCE_PASSWORD_FILE=/run/secrets/db_password
+      - JWT_SECRET=${JWT_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GOOGLE_REDIRECT_URI=${GOOGLE_REDIRECT_URI}
+    depends_on:
+      db:
+        condition: service_healthy
+    secrets:
+      - db_password
+    networks:
+      - miobook-net
+
+  frontend:
+    image: sdghaghili/miobook-frontend:v1.0.1
+    build:
+      context: ./MioBook-Front
+    ports:
+      - "3000:80"
+    environment:
+      - BACKEND_HOST=http://backend:8080
+    depends_on:
+      - backend
+    networks:
+      - miobook-net
+
+secrets:
+  db_password:
+    file: ./secrets/db_password.txt
+
+volumes:
+  mysql-data:
+
+networks:
+  miobook-net:

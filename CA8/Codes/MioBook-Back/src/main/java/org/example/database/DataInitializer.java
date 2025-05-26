@@ -51,11 +51,11 @@ public class DataInitializer {
 
     @PostConstruct
     public void initializeData() {
-//        fetchGenres();
-//        fetchUsers();
-//        fetchAuthors();
-//        fetchBooks();
-//        fetchReviews();
+        fetchGenres();
+        fetchUsers();
+        fetchAuthors();
+        fetchBooks();
+        fetchReviews();
     }
 
     private void fetchGenres() {
